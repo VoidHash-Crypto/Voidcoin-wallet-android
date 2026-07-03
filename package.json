@@ -63,7 +63,7 @@
     "android:clean": "cd android;  ./gradlew clean ; cd .. ; npm run android",
     "android:restart": "adb shell am force-stop org.void.wallet; adb shell monkey -p org.void.wallet -c android.intent.category.LAUNCHER 1",
     "ios": "react-native run-ios",
-    "postinstall": "npm run releasenotes2json; npm run branch2json; npm run patches",
+    "postinstall": "npm run releasenotes2json; npm run branch2json; npm run patches && bash scripts/patch-rn-qr-generator.sh",
     "patches": "",
     "test": "npm run lint && npm run unit && npm run integration",
     "integration": "jest tests/integration/*",
