@@ -1,4 +1,4 @@
-# BlueWallet VOID Edition
+# VoidCoin VOID Edition
 
 A mobile wallet for **VoidCoin (VOID)** with support for both BC2 and VOID chains.
 
@@ -56,7 +56,7 @@ npx react-native build-ios --mode Release
 ## Download
 
 Pre-built APKs are available at:
-- [GitHub Releases](https://github.com/BitcoincashII/bluewallet-void/releases)
+- [GitHub Releases](https://github.com/BitcoincashII/voidcoin-void/releases)
 - [void.org/wallet](https://void.org/wallet)
 
 ## Technical Details
@@ -74,9 +74,9 @@ Pre-built APKs are available at:
 
 ## License
 
-MIT License - Based on [BlueWallet](https://github.com/BlueWallet/BlueWallet)
+MIT License - Based on [VoidCoin](https://github.com/VoidCoin/VoidCoin)
 
 ## Support
 
 - Discord: https://discord.gg/void
-- GitHub Issues: https://github.com/BitcoincashII/bluewallet-void/issues
+- GitHub Issues: https://github.com/BitcoincashII/voidcoin-void/issues

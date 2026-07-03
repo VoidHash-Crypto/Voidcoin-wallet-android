@@ -9,13 +9,13 @@
   "apps": {
     "ios.debug": {
       "type": "ios.app",
-      "binaryPath": "ios/build/Build/Products/Debug-iphonesimulator/BlueWallet.app",
-      "build": "xcodebuild -workspace ios/BlueWallet.xcworkspace -scheme BlueWallet -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build"
+      "binaryPath": "ios/build/Build/Products/Debug-iphonesimulator/VoidCoin.app",
+      "build": "xcodebuild -workspace ios/VoidCoin.xcworkspace -scheme VoidCoin -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build"
     },
     "ios.release": {
       "type": "ios.app",
-      "binaryPath": "ios/build/Build/Products/Release-iphonesimulator/BlueWallet.app",
-      "build": "npx react-native codegen && xcodebuild -workspace ios/BlueWallet.xcworkspace -scheme BlueWallet -configuration Release -sdk iphonesimulator -derivedDataPath ios/build"
+      "binaryPath": "ios/build/Build/Products/Release-iphonesimulator/VoidCoin.app",
+      "build": "npx react-native codegen && xcodebuild -workspace ios/VoidCoin.xcworkspace -scheme VoidCoin -configuration Release -sdk iphonesimulator -derivedDataPath ios/build"
     },
     "android.debug": {
       "type": "android.apk",

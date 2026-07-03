@@ -66,7 +66,7 @@ APK output: `android/app/build/outputs/apk/release/app-release-unsigned.apk`
 
 ## Credits
 
-This wallet is a fork of [BlueWallet](https://github.com/BlueWallet/BlueWallet), adapted for VoidCoin.
+This wallet is a fork of [VoidCoin](https://github.com/VoidCoin/VoidCoin), adapted for VoidCoin.
 
 ## License
 

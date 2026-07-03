@@ -1456,7 +1456,7 @@ describe('multisig-wallet (native segwit)', () => {
     assert.ok(psbt);
     // we are using .cosignPsbt for now, because .createTransaction throws
     // Need one bip32Derivation masterFingerprint to match the HDSigner fingerprint
-    // https://github.com/BlueWallet/BlueWallet/pull/2466
+    // https://github.com/VoidCoin/VoidCoin/pull/2466
     const { tx } = w.cosignPsbt(psbt);
     assert.ok(tx);
   });
@@ -1794,7 +1794,7 @@ describe('multisig-wallet (native segwit)', () => {
   it('can sign valid tx if we have more keys than quorum ("Too many signatures" error)', async () => {
     const w = new MultisigHDWallet();
     w.setSecret(
-      '# BlueWallet Multisig setup file\n' +
+      '# VoidCoin Multisig setup file\n' +
         '# this file may contain private information\n' +
         '#\n' +
         'Name: Multisig Vault\n' +
@@ -1852,7 +1852,7 @@ describe('multisig-wallet (native segwit)', () => {
   it('can sign multiple inputs', async () => {
     const w = new MultisigHDWallet();
     w.setSecret(
-      '# BlueWallet Multisig setup file\n' +
+      '# VoidCoin Multisig setup file\n' +
         '# this file may contain private information\n' +
         '#\n' +
         'Name: Multisig Vault\n' +
@@ -1910,7 +1910,7 @@ describe('multisig-wallet (native segwit)', () => {
   });
 
   it('can generate proper addresses for wallets with passphrases. Export and import such wallet', () => {
-    // test case from https://github.com/BlueWallet/BlueWallet/issues/3665#issuecomment-907377442
+    // test case from https://github.com/VoidCoin/VoidCoin/issues/3665#issuecomment-907377442
     const path = "m/48'/0'/0'/2'";
     const w = new MultisigHDWallet();
     w.addCosigner(
@@ -1946,7 +1946,7 @@ describe('multisig-wallet (native segwit)', () => {
   });
 
   it('can work with passphrases when seeds are the same but passwords differ', () => {
-    // test case from https://github.com/BlueWallet/BlueWallet/issues/3665#issuecomment-907377442
+    // test case from https://github.com/VoidCoin/VoidCoin/issues/3665#issuecomment-907377442
     const path = "m/48'/0'/0'/2'";
     const w = new MultisigHDWallet();
     w.addCosigner(

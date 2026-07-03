@@ -24,7 +24,7 @@ import {
   WatchOnlyWallet,
 } from '.';
 import bip39WalletFormatsElectrum from './bip39_wallet_formats.json'; // https://github.com/spesmilo/electrum/blob/master/electrum/bip39_wallet_formats.json
-import bip39WalletFormatsBlueWallet from './bip39_wallet_formats_bluewallet.json';
+import bip39WalletFormatsVoidCoin from './bip39_wallet_formats_voidcoin.json';
 import type { TWallet } from './wallets/types';
 
 // https://github.com/bitcoinjs/bip32/blob/master/ts-src/bip32.ts#L43
@@ -238,7 +238,7 @@ const startImport = (
     if (hd2.validateMnemonic()) {
       let walletFound = false;
       // by default we don't try all the paths and options
-      const searchPaths = searchAccounts ? bip39WalletFormatsElectrum : bip39WalletFormatsBlueWallet;
+      const searchPaths = searchAccounts ? bip39WalletFormatsElectrum : bip39WalletFormatsVoidCoin;
       for (const i of searchPaths) {
         // we need to skip m/0' p2pkh from default scan list. It could be a BRD wallet and will be handled later
         if (i.derivation_path === "m/0'" && i.script_type === 'p2pkh') continue;

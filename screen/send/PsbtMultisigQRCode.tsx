@@ -130,7 +130,7 @@ const PsbtMultisigQRCode: React.FC = () => {
         number="1"
         title={loc.multisig.provide_signature}
         description={loc.multisig.provide_signature_details}
-        additionalDescription={`${loc.multisig.provide_signature_details_bluewallet} ${loc.multisig.co_sign_transaction}`}
+        additionalDescription={`${loc.multisig.provide_signature_details_voidcoin} ${loc.multisig.co_sign_transaction}`}
       />
       <DynamicQRCode value={psbt.toHex()} ref={dynamicQRCode} walletID={walletID} />
       {!isLoading && (

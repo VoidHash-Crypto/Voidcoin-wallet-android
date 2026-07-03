@@ -372,7 +372,7 @@
     "header": "යවන්න",
     "view": "දැක්ම",
     "manage_keys": "යතුරු කළමනාකරණය කරන්න",
-    "how_many_signatures_can_bluewallet_make": "බ්ලූවොලට්ට කොපමණ අත්සන් කළ හැකිද?",
+    "how_many_signatures_can_voidcoin_make": "බ්ලූවොලට්ට කොපමණ අත්සන් කළ හැකිද?",
     "signatures_required_to_spend": "අත්සන් අවශ්‍යයි {number}",
     "signatures_we_can_make": "{number} සෑදිය හැක",
     "scan_or_import_file": "ගොනුව පරිලෝකනය කරන්න හෝ ආයාත කරන්න",

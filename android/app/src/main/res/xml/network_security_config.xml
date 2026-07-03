@@ -7,11 +7,11 @@
         </trust-anchors>
     </base-config>
 
-    <!-- BCH2 Electrum servers: system CAs only (no user-installed certs) -->
+    <!-- VOID Electrum servers: system CAs only (no user-installed certs) -->
     <!-- Raw TCP (port 50001) uses java.net.Socket — not subject to this config -->
     <domain-config cleartextTrafficPermitted="false">
-        <domain>electrum.bch2.org</domain>
-        <domain>electrum2.bch2.org</domain>
+        <domain>electrum.void.org</domain>
+        <domain>electrum2.void.org</domain>
         <trust-anchors>
             <certificates src="system" />
         </trust-anchors>

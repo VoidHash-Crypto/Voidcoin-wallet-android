@@ -20,4 +20,4 @@ LogBox.ignoreLogs([
   'Non-serializable values were found in the navigation state',
 ]);
 
-AppRegistry.registerComponent('BlueWallet', () => VoidApp);
+AppRegistry.registerComponent('VoidCoin', () => VoidApp);

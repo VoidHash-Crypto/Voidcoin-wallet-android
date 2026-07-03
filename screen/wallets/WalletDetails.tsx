@@ -511,7 +511,7 @@ const WalletDetails: React.FC = () => {
               )}
               {wallet.type === MultisigHDWallet.type && (
                 <>
-                  <Text style={[styles.textLabel2, stylesHook.textLabel2]}>{loc.multisig.how_many_signatures_can_bluewallet_make}</Text>
+                  <Text style={[styles.textLabel2, stylesHook.textLabel2]}>{loc.multisig.how_many_signatures_can_voidcoin_make}</Text>
                   <BlueText>{wallet.howManySignaturesCanWeMake()}</BlueText>
                 </>
               )}

@@ -73,8 +73,8 @@ describe('VOID Deeplink Handling', () => {
       ).toBe(true);
     });
 
-    it('still recognizes bluewallet: scheme', () => {
-      expect(DeeplinkSchemaMatch.hasSchema('bluewallet:bitcoin:12eQ9m4sgAwTSQoNXkRABKhCXCsjm2jdVG')).toBe(true);
+    it('still recognizes voidcoin: scheme', () => {
+      expect(DeeplinkSchemaMatch.hasSchema('voidcoin:bitcoin:12eQ9m4sgAwTSQoNXkRABKhCXCsjm2jdVG')).toBe(true);
     });
 
     it('does not recognize arbitrary schemes', () => {
@@ -192,9 +192,9 @@ describe('VOID Deeplink Handling', () => {
       expect(result[1].screen).toBe('ScanLNDInvoice');
     });
 
-    it('bluewallet: scheme still routes correctly', async () => {
+    it('voidcoin: scheme still routes correctly', async () => {
       const result = await asyncNavigationRouteFor({
-        url: 'bluewallet:setelectrumserver?server=electrum1.bluewallet.io%3A443%3As',
+        url: 'voidcoin:setelectrumserver?server=electrum1.voidcoin.io%3A443%3As',
       });
 
       expect(result[0]).toBe('ElectrumSettings');
@@ -356,13 +356,13 @@ describe('decodeBitcoinUri edge cases', () => {
 describe('getUrlFromSetLndhubUrlAction', () => {
   it('extracts URL correctly from a valid lndhub deeplink', () => {
     const result = DeeplinkSchemaMatch.getUrlFromSetLndhubUrlAction(
-      'bluewallet:setlndhuburl?url=https%3A%2F%2Flndhub.herokuapp.com',
+      'voidcoin:setlndhuburl?url=https%3A%2F%2Flndhub.herokuapp.com',
     );
     expect(result).toBe('https://lndhub.herokuapp.com');
   });
 
   it('returns false when no url= param is present', () => {
-    const result = DeeplinkSchemaMatch.getUrlFromSetLndhubUrlAction('bluewallet:setlndhuburl');
+    const result = DeeplinkSchemaMatch.getUrlFromSetLndhubUrlAction('voidcoin:setlndhuburl');
     expect(result).toBe(false);
   });
 });

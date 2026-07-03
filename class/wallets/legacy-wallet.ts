@@ -517,7 +517,7 @@ export class LegacyWallet extends AbstractWallet {
    * Validates any address, including legacy, p2sh and bech32
    *
    * p2tr addresses have extra logic, rejecting all versions >1
-   * @see https://github.com/BlueWallet/BlueWallet/issues/3394
+   * @see https://github.com/VoidCoin/VoidCoin/issues/3394
    * @see https://github.com/bitcoinjs/bitcoinjs-lib/issues/1750
    * @see https://github.com/bitcoin/bips/blob/edffe529056f6dfd33d8f716fb871467c3c09263/bip-0350.mediawiki#Addresses_for_segregated_witness_outputs
    *

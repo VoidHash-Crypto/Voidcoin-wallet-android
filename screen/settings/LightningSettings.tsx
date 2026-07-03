@@ -100,7 +100,7 @@ const LightningSettings: React.FC = () => {
   }, [params?.onBarScanned, setParams]);
 
   const handleOpenGithub = () => {
-    Linking.openURL('https://github.com/BlueWallet/LndHub');
+    Linking.openURL('https://github.com/VoidCoin/LndHub');
   };
 
   return (
@@ -114,7 +114,7 @@ const LightningSettings: React.FC = () => {
       <View style={[styles.rowPadding, styles.githubContainer]}>
         <SettingsListItem
           title={loc.settings.lndhub_github}
-          subtitle="github.com/BlueWallet/LndHub"
+          subtitle="github.com/VoidCoin/LndHub"
           onPress={handleOpenGithub}
           iconName="github"
           position="single"

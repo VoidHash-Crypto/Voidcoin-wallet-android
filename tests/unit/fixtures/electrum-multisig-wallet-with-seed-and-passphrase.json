@@ -84,7 +84,7 @@
     "wallet_type": "2of2",
     "x1/": {
         "derivation": "m/1'",
-        "passphrase": "BlueWallet",
+        "passphrase": "VoidCoin",
         "pw_hash_version": 1,
         "root_fingerprint": "8de7b2c3",
         "seed": "diagram grape account sustain bright member ethics strategy burger senior capital enforce",

@@ -95,9 +95,9 @@ android {
         }
     }
 
-    namespace "org.bch2.wallet"
+    namespace "org.void.wallet"
     defaultConfig {
-        applicationId "org.bch2.wallet"
+        applicationId "org.void.wallet"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 6

@@ -103,7 +103,7 @@ async function _doConnectMain(): Promise<void> {
         };
 
         await Promise.race([
-          mainClient.initElectrum({ client: 'bluewallet-void', version: '1.4' }),
+          mainClient.initElectrum({ client: 'voidcoin-void', version: '1.4' }),
           new Promise((_, reject) => setTimeout(() => reject(new Error('Connection timeout')), 10000)),
         ]);
         mainConnected = true;
@@ -546,7 +546,7 @@ async function _doConnectVOID(): Promise<void> {
         };
 
         await Promise.race([
-          voidClient.initElectrum({ client: 'bluewallet-void', version: '1.4' }),
+          voidClient.initElectrum({ client: 'voidcoin-void', version: '1.4' }),
           new Promise((_, reject) => setTimeout(() => reject(new Error('VOID connection timeout')), 10000)),
         ]);
         voidConnected = true;
