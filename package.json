@@ -1,11 +1,11 @@
 {
-  "name": "bch2-wallet",
-  "version": "1.2.1",
-  "description": "Bitcoin Cash II (BCH2) Wallet - Fork of BlueWallet with BC2 and BCH2 support",
+  "name": "voidcoin-wallet",
+  "version": "1.0.0",
+  "description": "VoidCoin (VOID) Wallet - Mobile wallet for the VoidCoin quantum-resistant blockchain",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/BitcoincashII/bluewallet-bch2.git"
+    "url": "https://github.com/BitcoincashII/bluewallet-void.git"
   },
   "devDependencies": {
     "@babel/core": "^7.26.0",
@@ -58,10 +58,10 @@
     "branch2json": "./scripts/current-branch.sh > current-branch.json",
     "start": "react-native start",
     "android": "react-native run-android",
-    "android:relaunch": "adb shell am force-stop org.bch2.wallet; adb shell monkey -p org.bch2.wallet -c android.intent.category.LAUNCHER 1",
+    "android:relaunch": "adb shell am force-stop org.void.wallet; adb shell monkey -p org.void.wallet -c android.intent.category.LAUNCHER 1",
     "adb": "adb reverse tcp:8081 tcp:8081",
     "android:clean": "cd android;  ./gradlew clean ; cd .. ; npm run android",
-    "android:restart": "adb shell am force-stop org.bch2.wallet; adb shell monkey -p org.bch2.wallet -c android.intent.category.LAUNCHER 1",
+    "android:restart": "adb shell am force-stop org.void.wallet; adb shell monkey -p org.void.wallet -c android.intent.category.LAUNCHER 1",
     "ios": "react-native run-ios",
     "postinstall": "npm run releasenotes2json; npm run branch2json; npm run patches",
     "patches": "",

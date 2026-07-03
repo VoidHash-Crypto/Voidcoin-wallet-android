@@ -1,7 +1,7 @@
 /**
- * Tests for BCH2-specific deeplink handling in DeeplinkSchemaMatch.
- * Covers: BCH2 URI recognition, amount parsing, P2SH handling,
- * non-BCH2 scheme coexistence, and malformed URI handling.
+ * Tests for VOID-specific deeplink handling in DeeplinkSchemaMatch.
+ * Covers: VOID URI recognition, amount parsing, P2SH handling,
+ * non-VOID scheme coexistence, and malformed URI handling.
  */
 
 import DeeplinkSchemaMatch from '../../class/deeplink-schema-match';
@@ -27,7 +27,7 @@ const asyncNavigationRouteFor = async (event: { url: string }): Promise<any> => 
   });
 };
 
-describe('BCH2 Deeplink Handling', () => {
+describe('VOID Deeplink Handling', () => {
   // ===== hasSchema recognition =====
   describe('hasSchema', () => {
     it('recognizes bitcoincashii: scheme', () => {
@@ -60,7 +60,7 @@ describe('BCH2 Deeplink Handling', () => {
       expect(DeeplinkSchemaMatch.hasSchema('  bitcoincashii:qr95sy3j9xwd2ap32xkykttr4cvcu7as5yc93ky292  ')).toBe(true);
     });
 
-    // Non-BCH2 schemes should still be recognized
+    // Non-VOID schemes should still be recognized
     it('still recognizes bitcoin: scheme', () => {
       expect(DeeplinkSchemaMatch.hasSchema('bitcoin:12eQ9m4sgAwTSQoNXkRABKhCXCsjm2jdVG')).toBe(true);
     });
@@ -84,17 +84,17 @@ describe('BCH2 Deeplink Handling', () => {
     });
   });
 
-  // ===== BCH2 navigation routing =====
-  describe('navigationRouteFor with BCH2 URIs', () => {
-    it('routes bitcoincashii:qaddr to BCH2SendRoot', async () => {
+  // ===== VOID navigation routing =====
+  describe('navigationRouteFor with VOID URIs', () => {
+    it('routes bitcoincashii:qaddr to VoidSendRoot', async () => {
       const result = await asyncNavigationRouteFor({
         url: 'bitcoincashii:qr95sy3j9xwd2ap32xkykttr4cvcu7as5yc93ky292',
       });
 
       expect(result).toEqual([
-        'BCH2SendRoot',
+        'VoidSendRoot',
         {
-          screen: 'BCH2Send',
+          screen: 'VoidSend',
           params: {
             uri: 'bitcoincashii:qr95sy3j9xwd2ap32xkykttr4cvcu7as5yc93ky292',
           },
@@ -108,9 +108,9 @@ describe('BCH2 Deeplink Handling', () => {
       });
 
       expect(result).toEqual([
-        'BCH2SendRoot',
+        'VoidSendRoot',
         {
-          screen: 'BCH2Send',
+          screen: 'VoidSend',
           params: {
             uri: 'bitcoincashii:qr95sy3j9xwd2ap32xkykttr4cvcu7as5yc93ky292?amount=1.5',
           },
@@ -118,15 +118,15 @@ describe('BCH2 Deeplink Handling', () => {
       ]);
     });
 
-    it('routes bitcoincashii:paddr (P2SH) to BCH2SendRoot', async () => {
+    it('routes bitcoincashii:paddr (P2SH) to VoidSendRoot', async () => {
       const result = await asyncNavigationRouteFor({
         url: 'bitcoincashii:pqq3728yw0y47sqn6l2na30mcw6zm78dzq5ucqzc37',
       });
 
       expect(result).toEqual([
-        'BCH2SendRoot',
+        'VoidSendRoot',
         {
-          screen: 'BCH2Send',
+          screen: 'VoidSend',
           params: {
             uri: 'bitcoincashii:pqq3728yw0y47sqn6l2na30mcw6zm78dzq5ucqzc37',
           },
@@ -139,15 +139,15 @@ describe('BCH2 Deeplink Handling', () => {
       const result = await asyncNavigationRouteFor({ url: uri });
 
       expect(result).toEqual([
-        'BCH2SendRoot',
+        'VoidSendRoot',
         {
-          screen: 'BCH2Send',
+          screen: 'VoidSend',
           params: { uri },
         },
       ]);
     });
 
-    it('passes the full URI including query params to BCH2Send', async () => {
+    it('passes the full URI including query params to VoidSend', async () => {
       const uri = 'bitcoincashii:qr95sy3j9xwd2ap32xkykttr4cvcu7as5yc93ky292?amount=2.0&message=hello';
       const result = await asyncNavigationRouteFor({ url: uri });
 
@@ -159,21 +159,21 @@ describe('BCH2 Deeplink Handling', () => {
         url: 'BITCOINCASHII:qr95sy3j9xwd2ap32xkykttr4cvcu7as5yc93ky292',
       });
 
-      expect(result[0]).toBe('BCH2SendRoot');
-      expect(result[1].screen).toBe('BCH2Send');
+      expect(result[0]).toBe('VoidSendRoot');
+      expect(result[1].screen).toBe('VoidSend');
     });
 
-    it('handles mixed case BitcoinCashII: scheme', async () => {
+    it('handles mixed case VoidCoin: scheme', async () => {
       const result = await asyncNavigationRouteFor({
-        url: 'BitcoinCashII:qr95sy3j9xwd2ap32xkykttr4cvcu7as5yc93ky292',
+        url: 'VoidCoin:qr95sy3j9xwd2ap32xkykttr4cvcu7as5yc93ky292',
       });
 
-      expect(result[0]).toBe('BCH2SendRoot');
+      expect(result[0]).toBe('VoidSendRoot');
     });
   });
 
-  // ===== Non-BCH2 schemes still handled correctly =====
-  describe('Non-BCH2 schemes still work', () => {
+  // ===== Non-VOID schemes still handled correctly =====
+  describe('Non-VOID schemes still work', () => {
     it('bitcoin: scheme still routes to SendDetailsRoot', async () => {
       const result = await asyncNavigationRouteFor({
         url: 'bitcoin:12eQ9m4sgAwTSQoNXkRABKhCXCsjm2jdVG',
@@ -201,8 +201,8 @@ describe('BCH2 Deeplink Handling', () => {
     });
   });
 
-  // ===== Invalid/malformed BCH2 URIs =====
-  describe('Invalid/malformed BCH2 URIs', () => {
+  // ===== Invalid/malformed VOID URIs =====
+  describe('Invalid/malformed VOID URIs', () => {
     it('null URL does not crash', () => {
       // navigationRouteFor should handle null gracefully (returns undefined)
       const handler = jest.fn();
@@ -228,11 +228,11 @@ describe('BCH2 Deeplink Handling', () => {
       // The scheme is recognized but the URI has no address
       const handler = jest.fn();
       DeeplinkSchemaMatch.navigationRouteFor({ url: 'bitcoincashii:' }, handler);
-      // Should still route to BCH2Send (the BCH2Send screen handles validation)
+      // Should still route to VoidSend (the VoidSend screen handles validation)
       expect(handler).toHaveBeenCalledWith([
-        'BCH2SendRoot',
+        'VoidSendRoot',
         {
-          screen: 'BCH2Send',
+          screen: 'VoidSend',
           params: {
             uri: 'bitcoincashii:',
           },
@@ -241,34 +241,34 @@ describe('BCH2 Deeplink Handling', () => {
     });
   });
 
-  // ===== BCH2 does not conflict with BIP21 bitcoin/lightning combo =====
-  describe('BCH2 does not conflict with bitcoin+lightning combo URIs', () => {
-    it('isBothBitcoinAndLightning does not match BCH2 URIs', () => {
+  // ===== VOID does not conflict with BIP21 bitcoin/lightning combo =====
+  describe('VOID does not conflict with bitcoin+lightning combo URIs', () => {
+    it('isBothBitcoinAndLightning does not match VOID URIs', () => {
       const result = DeeplinkSchemaMatch.isBothBitcoinAndLightning(
         'bitcoincashii:qr95sy3j9xwd2ap32xkykttr4cvcu7as5yc93ky292?amount=1.5',
       );
-      // BCH2 URIs should NOT be matched as "both bitcoin and lightning"
+      // VOID URIs should NOT be matched as "both bitcoin and lightning"
       expect(result).toBeUndefined();
     });
   });
 
   // ===== Utility methods =====
   describe('Utility methods', () => {
-    it('isBitcoinAddress does not match BCH2 CashAddr', () => {
-      // BCH2 CashAddr is NOT a Bitcoin address (different chain)
+    it('isBitcoinAddress does not match VOID CashAddr', () => {
+      // VOID CashAddr is NOT a Bitcoin address (different chain)
       const result = DeeplinkSchemaMatch.isBitcoinAddress('bitcoincashii:qr95sy3j9xwd2ap32xkykttr4cvcu7as5yc93ky292');
       expect(result).toBe(false);
     });
 
-    it('isLightningInvoice does not match BCH2 URI', () => {
+    it('isLightningInvoice does not match VOID URI', () => {
       expect(DeeplinkSchemaMatch.isLightningInvoice('bitcoincashii:qr95sy3j9xwd2ap32xkykttr4cvcu7as5yc93ky292')).toBe(false);
     });
 
-    it('isPossiblyPSBTFile does not match BCH2 URI', () => {
+    it('isPossiblyPSBTFile does not match VOID URI', () => {
       expect(DeeplinkSchemaMatch.isPossiblyPSBTFile('bitcoincashii:qr95sy3j9xwd2ap32xkykttr4cvcu7as5yc93ky292')).toBe(false);
     });
 
-    it('isTXNFile does not match BCH2 URI', () => {
+    it('isTXNFile does not match VOID URI', () => {
       expect(DeeplinkSchemaMatch.isTXNFile('bitcoincashii:qr95sy3j9xwd2ap32xkykttr4cvcu7as5yc93ky292')).toBe(false);
     });
 

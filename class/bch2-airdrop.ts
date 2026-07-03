@@ -1,21 +1,21 @@
 /**
- * BCH2 Airdrop Claim
+ * VOID Airdrop Claim
  *
- * Since BCH2 forks from BC2 at block 53,200, any BC2 wallet with balance
- * at that block automatically has the same balance on BCH2.
+ * Since VOID forks from VOID at block 53,200, any VOID wallet with balance
+ * at that block automatically has the same balance on VOID.
  *
  * This module handles:
- * 1. Importing BC2 private keys/seeds
- * 2. Deriving BCH2 addresses from the same keys (including SegWit bc1 addresses)
- * 3. Checking and displaying BCH2 balances
+ * 1. Importing VOID private keys/seeds
+ * 2. Deriving VOID addresses from the same keys (including SegWit bc1 addresses)
+ * 3. Checking and displaying VOID balances
  */
 
 import { ECPairAPI, ECPairFactory } from 'ecpair';
 import * as bip39 from 'bip39';
 import BIP32Factory, { BIP32Interface } from 'bip32';
 import ecc from '../blue_modules/noble_ecc';
-import * as BCH2Electrum from '../blue_modules/BCH2Electrum';
-import { BCH2Wallet } from './wallets/bch2-wallet';
+import * as VoidElectrum from '../blue_modules/VoidElectrum';
+import { VoidWallet } from './wallets/void-wallet';
 
 const ECPair: ECPairAPI = ECPairFactory(ecc);
 const bip32 = BIP32Factory(ecc);
@@ -43,17 +43,17 @@ export interface AirdropClaimResult {
   success: boolean;
   address: string;
   addressType?: 'legacy' | 'bc1' | 'p2sh-segwit' | 'p2tr' | 'p2pk';
-  bch2Address: string;
+  voidAddress: string;
   balance: number;
-  bc2Balance?: number; // Current BC2 balance (for anti-gaming comparison)
+  voidBalance?: number; // Current VOID balance (for anti-gaming comparison)
   derivationPath?: string;
   error?: string;
 }
 
 export interface AirdropScanResult {
   totalBalance: number;
-  airdropBalance: number;    // Balance that likely existed at fork (min of BCH2, BC2 per address)
-  postForkBalance: number;   // Excess BCH2 over BC2 (received after fork)
+  airdropBalance: number;    // Balance that likely existed at fork (min of VOID, VOID per address)
+  postForkBalance: number;   // Excess VOID over VOID (received after fork)
   claims: AirdropClaimResult[];
 }
 
@@ -64,19 +64,19 @@ export interface AntiGamingResult {
 
 /**
  * Get anti-gaming status. Warns but never blocks — users who moved
- * their BC2 after the fork still have legitimate BCH2 to claim.
+ * their VOID after the fork still have legitimate VOID to claim.
  */
 export function getAntiGamingStatus(result: AirdropScanResult): AntiGamingResult {
   if (result.postForkBalance > 0 && result.airdropBalance === 0) {
     return {
-      warning: 'No matching BC2 balance found at this address. If you moved your BC2 after the fork, your BCH2 is still claimable.',
+      warning: 'No matching VOID balance found at this address. If you moved your VOID after the fork, your VOID is still claimable.',
       blocked: false,
     };
   }
   if (result.postForkBalance > 0) {
     const excess = (result.postForkBalance / 100000000).toFixed(8);
     return {
-      warning: `Note: ${excess} BCH2 exceeds the current BC2 balance and may have been received after the fork.`,
+      warning: `Note: ${excess} VOID exceeds the current VOID balance and may have been received after the fork.`,
       blocked: false,
     };
   }
@@ -84,9 +84,9 @@ export function getAntiGamingStatus(result: AirdropScanResult): AntiGamingResult
 }
 
 export interface WalletImportResult {
-  wallet: BCH2Wallet;
-  bc2Address: string;
-  bch2Address: string;
+  wallet: VoidWallet;
+  voidAddress: string;
+  voidAddress: string;
   balance: {
     confirmed: number;
     unconfirmed: number;
@@ -94,7 +94,7 @@ export interface WalletImportResult {
 }
 
 /**
- * Claim BCH2 airdrop from BC2 WIF private key
+ * Claim VOID airdrop from VOID WIF private key
  * Checks both legacy (P2PKH) and SegWit (P2WPKH) addresses
  */
 export async function claimFromWIF(wif: string): Promise<AirdropClaimResult> {
@@ -103,11 +103,11 @@ export async function claimFromWIF(wif: string): Promise<AirdropClaimResult> {
     keyPair = ECPair.fromWIF(wif);
     const pubkeyHash = hash160(Buffer.from(keyPair.publicKey));
 
-    // Get BC2 legacy address (for display)
-    const bc2Address = getLegacyAddress(pubkeyHash);
+    // Get VOID legacy address (for display)
+    const voidAddress = getLegacyAddress(pubkeyHash);
 
-    // Get BCH2 CashAddr
-    const bch2Address = encodeCashAddr('bitcoincashii', 0, pubkeyHash);
+    // Get VOID CashAddr
+    const voidAddress = encodeCashAddr('bitcoincashii', 0, pubkeyHash);
 
     // Scan all address types (legacy, P2PK, bc1, P2SH-SegWit, P2TR)
     const claims: AirdropClaimResult[] = [];
@@ -134,20 +134,20 @@ export async function claimFromWIF(wif: string): Promise<AirdropClaimResult> {
         return true;
       });
       if (dedupedClaims.length === 0) {
-        return { success: false, address: bc2Address, addressType: 'legacy', bch2Address: '', balance: 0 };
+        return { success: false, address: voidAddress, addressType: 'legacy', voidAddress: '', balance: 0 };
       }
       const best = dedupedClaims[0];
       return {
         success: true,
         address: best.address,
         addressType: best.addressType,
-        bch2Address: best.bch2Address,
+        voidAddress: best.voidAddress,
         balance: dedupedClaims.reduce((sum, c) => {
           const newSum = sum + c.balance;
           return newSum > Number.MAX_SAFE_INTEGER ? sum : newSum;
         }, 0),
-        bc2Balance: dedupedClaims.reduce((sum, c) => {
-          const newSum = sum + (c.bc2Balance ?? 0);
+        voidBalance: dedupedClaims.reduce((sum, c) => {
+          const newSum = sum + (c.voidBalance ?? 0);
           return newSum > Number.MAX_SAFE_INTEGER ? sum : newSum;
         }, 0),
       };
@@ -155,19 +155,19 @@ export async function claimFromWIF(wif: string): Promise<AirdropClaimResult> {
 
     return {
       success: false,
-      address: bc2Address,
+      address: voidAddress,
       addressType: 'legacy',
-      bch2Address: bch2Address,
+      voidAddress: voidAddress,
       balance: 0,
       error: hadNetworkError
         ? 'Network error — could not reach Electrum server. Please check your connection and try again.'
-        : 'No BCH2 balance found for this key',
+        : 'No VOID balance found for this key',
     };
   } catch (err: any) {
     return {
       success: false,
       address: '',
-      bch2Address: '',
+      voidAddress: '',
       balance: 0,
       error: err.message || 'Invalid private key',
     };
@@ -181,7 +181,7 @@ export async function claimFromWIF(wif: string): Promise<AirdropClaimResult> {
 }
 
 /**
- * Claim BCH2 airdrop from BIP39 mnemonic seed phrase
+ * Claim VOID airdrop from BIP39 mnemonic seed phrase
  * Derives addresses using gap-limit scanning across:
  * - BIP44 path: m/44'/145'/0'/0/x (BCH) and m/44'/0'/0'/0/x (BTC legacy)
  * - BIP49 path: m/49'/0'/0'/0/x (Wrapped SegWit P2SH-P2WPKH)
@@ -199,7 +199,7 @@ export async function claimFromMnemonic(mnemonic: string, passphrase: string = '
       return [{
         success: false,
         address: '',
-        bch2Address: '',
+        voidAddress: '',
         balance: 0,
         error: `Invalid mnemonic: expected 12, 15, 18, 21, or 24 words, got ${wordCount}`,
       }];
@@ -208,7 +208,7 @@ export async function claimFromMnemonic(mnemonic: string, passphrase: string = '
       return [{
         success: false,
         address: '',
-        bch2Address: '',
+        voidAddress: '',
         balance: 0,
         error: 'Invalid mnemonic phrase',
       }];
@@ -361,15 +361,15 @@ export async function claimFromMnemonic(mnemonic: string, passphrase: string = '
     }
 
     // Clean up: disconnect Electrum clients after scan
-    try { BCH2Electrum.disconnectAll(); } catch {}
+    try { VoidElectrum.disconnectAll(); } catch {}
 
     if (results.length === 0) {
       return [{
         success: false,
         address: '',
-        bch2Address: '',
+        voidAddress: '',
         balance: 0,
-        error: 'No BCH2 balance found for this seed',
+        error: 'No VOID balance found for this seed',
       }];
     }
 
@@ -378,7 +378,7 @@ export async function claimFromMnemonic(mnemonic: string, passphrase: string = '
     return [{
       success: false,
       address: '',
-      bch2Address: '',
+      voidAddress: '',
       balance: 0,
       error: err.message || 'Failed to process mnemonic',
     }];
@@ -392,27 +392,27 @@ export async function claimFromMnemonic(mnemonic: string, passphrase: string = '
 }
 
 /**
- * Import BC2 wallet and create BCH2 wallet with same keys
+ * Import VOID wallet and create VOID wallet with same keys
  */
-export async function importBC2Wallet(wif: string): Promise<WalletImportResult> {
-  const wallet = new BCH2Wallet();
+export async function importVOIDWallet(wif: string): Promise<WalletImportResult> {
+  const wallet = new VoidWallet();
   wallet.setSecret(wif);
 
   const keyPair = ECPair.fromWIF(wif);
   try {
     const pubkeyHash = hash160(Buffer.from(keyPair.publicKey));
 
-    const bc2Address = getLegacyAddress(pubkeyHash);
-    const bch2Address = wallet.getAddress();
-    if (!bch2Address) throw new Error('Failed to derive BCH2 address from WIF');
+    const voidAddress = getLegacyAddress(pubkeyHash);
+    const voidAddress = wallet.getAddress();
+    if (!voidAddress) throw new Error('Failed to derive VOID address from WIF');
 
     await wallet.fetchBalance();
     wallet.prepareForSerialization();
 
     return {
       wallet,
-      bc2Address,
-      bch2Address,
+      voidAddress,
+      voidAddress,
       balance: {
         confirmed: wallet.balance,
         unconfirmed: wallet.unconfirmed_balance,
@@ -428,16 +428,16 @@ export async function importBC2Wallet(wif: string): Promise<WalletImportResult> 
 }
 
 /**
- * Get total claimable BCH2 from multiple BC2 addresses
+ * Get total claimable VOID from multiple VOID addresses
  */
 export async function getTotalClaimable(addresses: string[]): Promise<number> {
   let total = 0;
 
   for (const address of addresses) {
     try {
-      // Convert BC2 address to BCH2 CashAddr format
-      const bch2Address = convertToCashAddr(address);
-      const balance = await BCH2Electrum.getBalanceByAddress(bch2Address);
+      // Convert VOID address to VOID CashAddr format
+      const voidAddress = convertToCashAddr(address);
+      const balance = await VoidElectrum.getBalanceByAddress(voidAddress);
       if (!Number.isSafeInteger(balance.confirmed) || !Number.isSafeInteger(balance.unconfirmed)) continue;
       total += balance.confirmed + balance.unconfirmed;
       if (total > Number.MAX_SAFE_INTEGER) break;
@@ -966,7 +966,7 @@ function computeTweakedXonly(pubkey: Buffer): Buffer | null {
   // xOnlyPointAddTweak already returns the x-only coordinate (which is
   // parity-agnostic), and result.parity indicates if Y is odd. The x-only
   // pubkey is the same regardless of parity, so no negation needed here —
-  // the parity only matters when signing (handled in bch2-transaction.ts).
+  // the parity only matters when signing (handled in void-transaction.ts).
   return Buffer.from(result.xOnlyPubkey);
 }
 
@@ -1183,7 +1183,7 @@ const DESCRIPTOR_MAX_INDEX = 200;
 const DESCRIPTOR_BATCH_SIZE = 5;
 
 /**
- * Scan descriptor/xprv input for all claimable BCH2 balances.
+ * Scan descriptor/xprv input for all claimable VOID balances.
  * Uses gap-limit scanning and cross-type checking.
  */
 export async function scanDescriptorForAirdrop(input: string): Promise<AirdropScanResult> {
@@ -1303,16 +1303,16 @@ export async function scanDescriptorForAirdrop(input: string): Promise<AirdropSc
   }
 
   // Clean up: disconnect Electrum clients after scan
-  try { BCH2Electrum.disconnectAll(); } catch {}
+  try { VoidElectrum.disconnectAll(); } catch {}
 
   const totalBalance = claims.reduce((sum, c) => {
     if (!Number.isSafeInteger(c.balance)) return sum;
     return sum + c.balance;
   }, 0);
   const airdropBalance = claims.reduce((sum, c) => {
-    const bc2 = c.bc2Balance ?? 0;
-    if (!Number.isSafeInteger(c.balance) || !Number.isSafeInteger(bc2)) return sum;
-    return sum + Math.min(c.balance, bc2);
+    const void = c.voidBalance ?? 0;
+    if (!Number.isSafeInteger(c.balance) || !Number.isSafeInteger(void)) return sum;
+    return sum + Math.min(c.balance, void);
   }, 0);
 
   return {
@@ -1324,7 +1324,7 @@ export async function scanDescriptorForAirdrop(input: string): Promise<AirdropSc
 }
 
 /**
- * Scan a single address for BCH2 balance.
+ * Scan a single address for VOID balance.
  * Handles different address types (legacy, bc1, p2sh-segwit, p2tr).
  * Returns null for confirmed-zero balance.
  * Throws ElectrumNetworkError for network failures (callers should not
@@ -1337,10 +1337,10 @@ async function scanSingleAddress(
   derivationPath?: string,
 ): Promise<AirdropClaimResult | null> {
   let address: string;
-  let bch2Address: string;
+  let voidAddress: string;
   let scripthash: string;
 
-  bch2Address = encodeCashAddr('bitcoincashii', 0, pubkeyHash);
+  voidAddress = encodeCashAddr('bitcoincashii', 0, pubkeyHash);
 
   switch (addressType) {
     case 'legacy':
@@ -1369,16 +1369,16 @@ async function scanSingleAddress(
     }
   }
 
-  // Query BCH2 balance — throw ElectrumNetworkError on failure so callers
+  // Query VOID balance — throw ElectrumNetworkError on failure so callers
   // can distinguish "confirmed zero" from "network error" for gap-limit logic
   let total: number;
   try {
     if (addressType === 'legacy') {
-      const balance = await BCH2Electrum.getBalanceByAddress(bch2Address);
+      const balance = await VoidElectrum.getBalanceByAddress(voidAddress);
       if (!Number.isSafeInteger(balance.confirmed) || !Number.isSafeInteger(balance.unconfirmed)) throw new ElectrumNetworkError('Invalid balance response');
       total = balance.confirmed + balance.unconfirmed;
     } else {
-      const balance = await BCH2Electrum.getBalanceByScripthash(scripthash);
+      const balance = await VoidElectrum.getBalanceByScripthash(scripthash);
       if (!Number.isSafeInteger(balance.confirmed) || !Number.isSafeInteger(balance.unconfirmed)) throw new ElectrumNetworkError('Invalid balance response');
       total = balance.confirmed + balance.unconfirmed;
     }
@@ -1388,26 +1388,26 @@ async function scanSingleAddress(
 
   if (total <= 0) return null; // Confirmed zero balance
 
-  let bc2Total = 0;
+  let voidTotal = 0;
   try {
     if (addressType === 'legacy') {
-      const bc2Result = await BCH2Electrum.getBC2Balance(address);
-      bc2Total = bc2Result.confirmed + bc2Result.unconfirmed;
+      const voidResult = await VoidElectrum.getVoidBalance(address);
+      voidTotal = voidResult.confirmed + voidResult.unconfirmed;
     } else {
-      const bc2Result = await BCH2Electrum.getBC2BalanceByScripthash(scripthash);
-      bc2Total = bc2Result.confirmed + bc2Result.unconfirmed;
+      const voidResult = await VoidElectrum.getVoidBalanceByScripthash(scripthash);
+      voidTotal = voidResult.confirmed + voidResult.unconfirmed;
     }
   } catch {
-    // BC2 check failed — non-critical, continue with bc2Total=0
+    // VOID check failed — non-critical, continue with voidTotal=0
   }
 
   return {
     success: true,
     address,
     addressType,
-    bch2Address,
+    voidAddress,
     balance: total,
-    bc2Balance: bc2Total,
+    voidBalance: voidTotal,
     derivationPath,
   };
 }
@@ -1423,9 +1423,9 @@ export function buildScanResult(results: AirdropClaimResult[]): AirdropScanResul
     return sum + c.balance;
   }, 0);
   const airdropBalance = claims.reduce((sum, c) => {
-    const bc2 = c.bc2Balance ?? 0;
-    if (!Number.isSafeInteger(c.balance) || !Number.isSafeInteger(bc2)) return sum;
-    return sum + Math.min(c.balance, bc2);
+    const void = c.voidBalance ?? 0;
+    if (!Number.isSafeInteger(c.balance) || !Number.isSafeInteger(void)) return sum;
+    return sum + Math.min(c.balance, void);
   }, 0);
 
   return {
@@ -1439,7 +1439,7 @@ export function buildScanResult(results: AirdropClaimResult[]): AirdropScanResul
 export default {
   claimFromWIF,
   claimFromMnemonic,
-  importBC2Wallet,
+  importVOIDWallet,
   getTotalClaimable,
   bc1AddressToScripthash,
   scanDescriptorForAirdrop,

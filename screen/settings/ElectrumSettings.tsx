@@ -6,7 +6,7 @@ import DefaultPreference from 'react-native-default-preference';
 
 import * as BlueElectrum from '../../blue_modules/BlueElectrum';
 import { hardcodedPeers, presentResetToDefaultsAlert, suggestedServers } from '../../blue_modules/BlueElectrum';
-import { GROUP_IO_BCH2 } from '../../blue_modules/currency';
+import { GROUP_IO_VOID } from '../../blue_modules/currency';
 import triggerHapticFeedback, { HapticFeedbackTypes, triggerSelectionHapticFeedback } from '../../blue_modules/hapticFeedback';
 import { BlueCard, BlueText } from '../../BlueComponents';
 import DeeplinkSchemaMatch from '../../class/deeplink-schema-match';
@@ -198,7 +198,7 @@ const ElectrumSettings: React.FC = () => {
               message: serverHost.endsWith('.onion') ? loc.settings.electrum_error_connect_tor : loc.settings.electrum_error_connect,
             });
           }
-          await DefaultPreference.setName(GROUP_IO_BCH2);
+          await DefaultPreference.setName(GROUP_IO_VOID);
 
           await DefaultPreference.clear(BlueElectrum.ELECTRUM_HOST);
           await DefaultPreference.clear(BlueElectrum.ELECTRUM_TCP_PORT);

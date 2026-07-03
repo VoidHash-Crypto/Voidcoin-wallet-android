@@ -1,6 +1,6 @@
 /**
- * BCH2 Send Screen
- * Send BCH2 or BC2 to another address
+ * VOID Send Screen
+ * Send VOID or VOID to another address
  */
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
@@ -15,22 +15,22 @@ import {
   Alert,
   Keyboard,
 } from 'react-native';
-import { BCH2Colors, BCH2Spacing, BCH2Typography, BCH2Shadows, BCH2BorderRadius } from '../../components/BCH2Theme';
-import { decodeCashAddr } from '../../class/bch2-transaction';
+import { VoidColors, VOIDSpacing, VOIDTypography, VOIDShadows, VOIDBorderRadius } from '../../components/VoidTheme';
+import { decodeCashAddr } from '../../class/void-transaction';
 const bs58check = require('bs58check');
 
-interface BCH2SendProps {
+interface VoidSendProps {
   walletBalance: number;
   walletAddress: string;
-  isBC2?: boolean;
+  isVOID?: boolean;
   onSend?: (toAddress: string, amount: number, fee: number) => Promise<{ txid: string }>;
   navigation?: any;
 }
 
-export const BCH2SendScreen: React.FC<BCH2SendProps> = ({
+export const VoidSendScreen: React.FC<VoidSendProps> = ({
   walletBalance,
   walletAddress,
-  isBC2 = false,
+  isVOID = false,
   onSend,
   navigation,
 }) => {
@@ -42,9 +42,9 @@ export const BCH2SendScreen: React.FC<BCH2SendProps> = ({
   const [txid, setTxid] = useState('');
   const sendingRef = useRef(false);
 
-  const primaryColor = isBC2 ? BCH2Colors.bc2Primary : BCH2Colors.primary;
-  const coinSymbol = isBC2 ? 'BC2' : 'BCH2';
-  const addressPrefix = isBC2 ? '' : 'bitcoincashii:';
+  const primaryColor = isVOID ? VoidColors.voidPrimary : VoidColors.primary;
+  const coinSymbol = isVOID ? 'VOID' : 'VOID';
+  const addressPrefix = isVOID ? '' : 'bitcoincashii:';
 
   const formatBalance = (sats: number): string => {
     return (sats / 100000000).toFixed(8);
@@ -72,7 +72,7 @@ export const BCH2SendScreen: React.FC<BCH2SendProps> = ({
 
   const validateAddress = (addr: string): boolean => {
     if (!addr) return false;
-    if (isBC2) {
+    if (isVOID) {
       // Validate with full Base58Check checksum verification
       try {
         const decoded = bs58check.decode(addr);
@@ -83,13 +83,13 @@ export const BCH2SendScreen: React.FC<BCH2SendProps> = ({
         return false;
       }
     } else {
-      // BCH2 CashAddr format with full polymod checksum verification
+      // VOID CashAddr format with full polymod checksum verification
       const normalizedAddr = addr.toLowerCase();
       // Reject BCH addresses (wrong chain)
       if (normalizedAddr.startsWith('bitcoincash:') || normalizedAddr.startsWith('bchtest:')) {
         return false;
       }
-      // Require bitcoincashii: prefix for BCH2 addresses
+      // Require bitcoincashii: prefix for VOID addresses
       if (!normalizedAddr.startsWith('bitcoincashii:')) {
         return false;
       }
@@ -198,7 +198,7 @@ export const BCH2SendScreen: React.FC<BCH2SendProps> = ({
             value={toAddress}
             onChangeText={setToAddress}
             placeholder={`${addressPrefix}q...`}
-            placeholderTextColor={BCH2Colors.textMuted}
+            placeholderTextColor={VoidColors.textMuted}
             autoCapitalize="none"
             autoCorrect={false}
             maxLength={120}
@@ -219,7 +219,7 @@ export const BCH2SendScreen: React.FC<BCH2SendProps> = ({
             value={amount}
             onChangeText={setAmount}
             placeholder="0.00000000"
-            placeholderTextColor={BCH2Colors.textMuted}
+            placeholderTextColor={VoidColors.textMuted}
             keyboardType="decimal-pad"
             maxLength={18}
             accessibilityLabel={`Amount in ${coinSymbol}`}
@@ -337,7 +337,7 @@ export const BCH2SendScreen: React.FC<BCH2SendProps> = ({
               accessibilityRole="button"
             >
               {loading ? (
-                <ActivityIndicator color={BCH2Colors.textPrimary} />
+                <ActivityIndicator color={VoidColors.textPrimary} />
               ) : (
                 <Text style={styles.confirmButtonText}>Send {coinSymbol}</Text>
               )}
@@ -384,224 +384,224 @@ export const BCH2SendScreen: React.FC<BCH2SendProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: BCH2Colors.background,
+    backgroundColor: VoidColors.background,
   },
   content: {
-    padding: BCH2Spacing.lg,
+    padding: VOIDSpacing.lg,
   },
   header: {
-    marginBottom: BCH2Spacing.xl,
+    marginBottom: VOIDSpacing.xl,
   },
   title: {
-    fontSize: BCH2Typography.fontSize.xxl,
-    fontWeight: BCH2Typography.fontWeight.bold,
-    color: BCH2Colors.textPrimary,
-    marginBottom: BCH2Spacing.sm,
+    fontSize: VOIDTypography.fontSize.xxl,
+    fontWeight: VOIDTypography.fontWeight.bold,
+    color: VoidColors.textPrimary,
+    marginBottom: VOIDSpacing.sm,
   },
   balanceRow: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   balanceLabel: {
-    fontSize: BCH2Typography.fontSize.base,
-    color: BCH2Colors.textSecondary,
-    marginRight: BCH2Spacing.sm,
+    fontSize: VOIDTypography.fontSize.base,
+    color: VoidColors.textSecondary,
+    marginRight: VOIDSpacing.sm,
   },
   balanceValue: {
-    fontSize: BCH2Typography.fontSize.base,
-    fontWeight: BCH2Typography.fontWeight.semibold,
+    fontSize: VOIDTypography.fontSize.base,
+    fontWeight: VOIDTypography.fontWeight.semibold,
     fontFamily: 'monospace',
   },
   inputGroup: {
-    marginBottom: BCH2Spacing.lg,
+    marginBottom: VOIDSpacing.lg,
   },
   inputLabelRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: BCH2Spacing.sm,
+    marginBottom: VOIDSpacing.sm,
   },
   inputLabel: {
-    fontSize: BCH2Typography.fontSize.sm,
-    color: BCH2Colors.textSecondary,
-    marginBottom: BCH2Spacing.sm,
+    fontSize: VOIDTypography.fontSize.sm,
+    color: VoidColors.textSecondary,
+    marginBottom: VOIDSpacing.sm,
   },
   maxButton: {
-    fontSize: BCH2Typography.fontSize.sm,
-    fontWeight: BCH2Typography.fontWeight.bold,
+    fontSize: VOIDTypography.fontSize.sm,
+    fontWeight: VOIDTypography.fontWeight.bold,
   },
   input: {
-    backgroundColor: BCH2Colors.backgroundCard,
-    borderRadius: BCH2BorderRadius.md,
+    backgroundColor: VoidColors.backgroundCard,
+    borderRadius: VOIDBorderRadius.md,
     borderWidth: 1,
-    borderColor: BCH2Colors.border,
-    padding: BCH2Spacing.md,
-    color: BCH2Colors.textPrimary,
-    fontSize: BCH2Typography.fontSize.base,
+    borderColor: VoidColors.border,
+    padding: VOIDSpacing.md,
+    color: VoidColors.textPrimary,
+    fontSize: VOIDTypography.fontSize.base,
     fontFamily: 'monospace',
   },
   feeSelector: {
     flexDirection: 'row',
-    gap: BCH2Spacing.sm,
-    marginBottom: BCH2Spacing.sm,
+    gap: VOIDSpacing.sm,
+    marginBottom: VOIDSpacing.sm,
   },
   feeButton: {
     flex: 1,
-    paddingVertical: BCH2Spacing.sm,
+    paddingVertical: VOIDSpacing.sm,
     alignItems: 'center',
-    borderRadius: BCH2BorderRadius.md,
+    borderRadius: VOIDBorderRadius.md,
     borderWidth: 1,
-    borderColor: BCH2Colors.border,
-    backgroundColor: BCH2Colors.backgroundCard,
+    borderColor: VoidColors.border,
+    backgroundColor: VoidColors.backgroundCard,
   },
   feeButtonText: {
-    fontSize: BCH2Typography.fontSize.base,
-    color: BCH2Colors.textSecondary,
-    fontWeight: BCH2Typography.fontWeight.medium,
+    fontSize: VOIDTypography.fontSize.base,
+    color: VoidColors.textSecondary,
+    fontWeight: VOIDTypography.fontWeight.medium,
   },
   feeButtonTextActive: {
-    color: BCH2Colors.textPrimary,
+    color: VoidColors.textPrimary,
   },
   feeEstimate: {
-    fontSize: BCH2Typography.fontSize.xs,
-    color: BCH2Colors.textMuted,
+    fontSize: VOIDTypography.fontSize.xs,
+    color: VoidColors.textMuted,
   },
   summaryCard: {
-    backgroundColor: BCH2Colors.backgroundCard,
-    borderRadius: BCH2BorderRadius.md,
-    padding: BCH2Spacing.md,
-    marginBottom: BCH2Spacing.xl,
+    backgroundColor: VoidColors.backgroundCard,
+    borderRadius: VOIDBorderRadius.md,
+    padding: VOIDSpacing.md,
+    marginBottom: VOIDSpacing.xl,
   },
   summaryRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingVertical: BCH2Spacing.xs,
+    paddingVertical: VOIDSpacing.xs,
   },
   summaryLabel: {
-    fontSize: BCH2Typography.fontSize.sm,
-    color: BCH2Colors.textMuted,
+    fontSize: VOIDTypography.fontSize.sm,
+    color: VoidColors.textMuted,
   },
   summaryValue: {
-    fontSize: BCH2Typography.fontSize.sm,
-    color: BCH2Colors.textSecondary,
+    fontSize: VOIDTypography.fontSize.sm,
+    color: VoidColors.textSecondary,
     fontFamily: 'monospace',
   },
   summaryTotal: {
     borderTopWidth: 1,
-    borderTopColor: BCH2Colors.border,
-    marginTop: BCH2Spacing.sm,
-    paddingTop: BCH2Spacing.sm,
+    borderTopColor: VoidColors.border,
+    marginTop: VOIDSpacing.sm,
+    paddingTop: VOIDSpacing.sm,
   },
   summaryTotalLabel: {
-    fontSize: BCH2Typography.fontSize.base,
-    fontWeight: BCH2Typography.fontWeight.semibold,
-    color: BCH2Colors.textPrimary,
+    fontSize: VOIDTypography.fontSize.base,
+    fontWeight: VOIDTypography.fontWeight.semibold,
+    color: VoidColors.textPrimary,
   },
   summaryTotalValue: {
-    fontSize: BCH2Typography.fontSize.base,
-    fontWeight: BCH2Typography.fontWeight.bold,
+    fontSize: VOIDTypography.fontSize.base,
+    fontWeight: VOIDTypography.fontWeight.bold,
     fontFamily: 'monospace',
   },
   sendButton: {
-    borderRadius: BCH2BorderRadius.md,
-    paddingVertical: BCH2Spacing.md,
+    borderRadius: VOIDBorderRadius.md,
+    paddingVertical: VOIDSpacing.md,
     alignItems: 'center',
-    ...BCH2Shadows.glow,
+    ...VOIDShadows.glow,
   },
   sendButtonText: {
-    color: BCH2Colors.textPrimary,
-    fontSize: BCH2Typography.fontSize.lg,
-    fontWeight: BCH2Typography.fontWeight.bold,
+    color: VoidColors.textPrimary,
+    fontSize: VOIDTypography.fontSize.lg,
+    fontWeight: VOIDTypography.fontWeight.bold,
   },
   // Confirm styles
   confirmContent: {
     flex: 1,
-    padding: BCH2Spacing.lg,
+    padding: VOIDSpacing.lg,
     justifyContent: 'center',
   },
   confirmTitle: {
-    fontSize: BCH2Typography.fontSize.xl,
-    fontWeight: BCH2Typography.fontWeight.bold,
-    color: BCH2Colors.textPrimary,
+    fontSize: VOIDTypography.fontSize.xl,
+    fontWeight: VOIDTypography.fontWeight.bold,
+    color: VoidColors.textPrimary,
     textAlign: 'center',
-    marginBottom: BCH2Spacing.xl,
+    marginBottom: VOIDSpacing.xl,
   },
   confirmCard: {
-    backgroundColor: BCH2Colors.backgroundCard,
-    borderRadius: BCH2BorderRadius.lg,
-    padding: BCH2Spacing.lg,
-    marginBottom: BCH2Spacing.xl,
+    backgroundColor: VoidColors.backgroundCard,
+    borderRadius: VOIDBorderRadius.lg,
+    padding: VOIDSpacing.lg,
+    marginBottom: VOIDSpacing.xl,
   },
   confirmRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: BCH2Spacing.sm,
+    paddingVertical: VOIDSpacing.sm,
   },
   confirmLabel: {
-    fontSize: BCH2Typography.fontSize.base,
-    color: BCH2Colors.textMuted,
+    fontSize: VOIDTypography.fontSize.base,
+    color: VoidColors.textMuted,
   },
   confirmValue: {
-    fontSize: BCH2Typography.fontSize.base,
-    color: BCH2Colors.textSecondary,
+    fontSize: VOIDTypography.fontSize.base,
+    color: VoidColors.textSecondary,
     fontFamily: 'monospace',
   },
   confirmValueLarge: {
-    fontSize: BCH2Typography.fontSize.lg,
-    fontWeight: BCH2Typography.fontWeight.bold,
+    fontSize: VOIDTypography.fontSize.lg,
+    fontWeight: VOIDTypography.fontWeight.bold,
     fontFamily: 'monospace',
   },
   confirmTotal: {
     borderTopWidth: 1,
-    borderTopColor: BCH2Colors.border,
-    marginTop: BCH2Spacing.sm,
-    paddingTop: BCH2Spacing.md,
+    borderTopColor: VoidColors.border,
+    marginTop: VOIDSpacing.sm,
+    paddingTop: VOIDSpacing.md,
   },
   confirmTotalLabel: {
-    fontSize: BCH2Typography.fontSize.lg,
-    fontWeight: BCH2Typography.fontWeight.bold,
-    color: BCH2Colors.textPrimary,
+    fontSize: VOIDTypography.fontSize.lg,
+    fontWeight: VOIDTypography.fontWeight.bold,
+    color: VoidColors.textPrimary,
   },
   confirmTotalValue: {
-    fontSize: BCH2Typography.fontSize.lg,
-    fontWeight: BCH2Typography.fontWeight.bold,
-    color: BCH2Colors.textPrimary,
+    fontSize: VOIDTypography.fontSize.lg,
+    fontWeight: VOIDTypography.fontWeight.bold,
+    color: VoidColors.textPrimary,
     fontFamily: 'monospace',
   },
   confirmActions: {
     flexDirection: 'row',
-    gap: BCH2Spacing.md,
+    gap: VOIDSpacing.md,
   },
   cancelButton: {
     flex: 1,
-    paddingVertical: BCH2Spacing.md,
+    paddingVertical: VOIDSpacing.md,
     alignItems: 'center',
-    borderRadius: BCH2BorderRadius.md,
+    borderRadius: VOIDBorderRadius.md,
     borderWidth: 1,
-    borderColor: BCH2Colors.border,
+    borderColor: VoidColors.border,
   },
   cancelButtonText: {
-    color: BCH2Colors.textSecondary,
-    fontSize: BCH2Typography.fontSize.lg,
-    fontWeight: BCH2Typography.fontWeight.semibold,
+    color: VoidColors.textSecondary,
+    fontSize: VOIDTypography.fontSize.lg,
+    fontWeight: VOIDTypography.fontWeight.semibold,
   },
   confirmButton: {
     flex: 2,
-    paddingVertical: BCH2Spacing.md,
+    paddingVertical: VOIDSpacing.md,
     alignItems: 'center',
-    borderRadius: BCH2BorderRadius.md,
-    ...BCH2Shadows.glow,
+    borderRadius: VOIDBorderRadius.md,
+    ...VOIDShadows.glow,
   },
   confirmButtonText: {
-    color: BCH2Colors.textPrimary,
-    fontSize: BCH2Typography.fontSize.lg,
-    fontWeight: BCH2Typography.fontWeight.bold,
+    color: VoidColors.textPrimary,
+    fontSize: VOIDTypography.fontSize.lg,
+    fontWeight: VOIDTypography.fontWeight.bold,
   },
   // Success styles
   successContent: {
     flex: 1,
-    padding: BCH2Spacing.lg,
+    padding: VOIDSpacing.lg,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -612,53 +612,53 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: BCH2Spacing.xl,
+    marginBottom: VOIDSpacing.xl,
   },
   successIconText: {
     fontSize: 40,
-    color: BCH2Colors.success,
+    color: VoidColors.success,
   },
   successTitle: {
-    fontSize: BCH2Typography.fontSize.xl,
-    fontWeight: BCH2Typography.fontWeight.bold,
-    color: BCH2Colors.textPrimary,
-    marginBottom: BCH2Spacing.sm,
+    fontSize: VOIDTypography.fontSize.xl,
+    fontWeight: VOIDTypography.fontWeight.bold,
+    color: VoidColors.textPrimary,
+    marginBottom: VOIDSpacing.sm,
   },
   successAmount: {
-    fontSize: BCH2Typography.fontSize.xxl,
-    fontWeight: BCH2Typography.fontWeight.bold,
-    color: BCH2Colors.success,
+    fontSize: VOIDTypography.fontSize.xxl,
+    fontWeight: VOIDTypography.fontWeight.bold,
+    color: VoidColors.success,
     fontFamily: 'monospace',
-    marginBottom: BCH2Spacing.xl,
+    marginBottom: VOIDSpacing.xl,
   },
   txidCard: {
-    backgroundColor: BCH2Colors.backgroundCard,
-    borderRadius: BCH2BorderRadius.md,
-    padding: BCH2Spacing.md,
+    backgroundColor: VoidColors.backgroundCard,
+    borderRadius: VOIDBorderRadius.md,
+    padding: VOIDSpacing.md,
     width: '100%',
-    marginBottom: BCH2Spacing.xl,
+    marginBottom: VOIDSpacing.xl,
   },
   txidLabel: {
-    fontSize: BCH2Typography.fontSize.sm,
-    color: BCH2Colors.textMuted,
-    marginBottom: BCH2Spacing.xs,
+    fontSize: VOIDTypography.fontSize.sm,
+    color: VoidColors.textMuted,
+    marginBottom: VOIDSpacing.xs,
   },
   txidValue: {
-    fontSize: BCH2Typography.fontSize.xs,
-    color: BCH2Colors.textSecondary,
+    fontSize: VOIDTypography.fontSize.xs,
+    color: VoidColors.textSecondary,
     fontFamily: 'monospace',
   },
   doneButton: {
-    paddingVertical: BCH2Spacing.md,
-    paddingHorizontal: BCH2Spacing.xxl,
-    borderRadius: BCH2BorderRadius.md,
-    ...BCH2Shadows.glow,
+    paddingVertical: VOIDSpacing.md,
+    paddingHorizontal: VOIDSpacing.xxl,
+    borderRadius: VOIDBorderRadius.md,
+    ...VOIDShadows.glow,
   },
   doneButtonText: {
-    color: BCH2Colors.textPrimary,
-    fontSize: BCH2Typography.fontSize.lg,
-    fontWeight: BCH2Typography.fontWeight.bold,
+    color: VoidColors.textPrimary,
+    fontSize: VOIDTypography.fontSize.lg,
+    fontWeight: VOIDTypography.fontWeight.bold,
   },
 });
 
-export default BCH2SendScreen;
+export default VoidSendScreen;

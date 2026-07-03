@@ -1,6 +1,6 @@
 /**
  * Add Wallet Screen
- * Create new or import existing BCH2 or BC2 wallet
+ * Create new or import existing VOID or VOID wallet
  */
 
 import React, { useState, useEffect } from 'react';
@@ -15,21 +15,21 @@ import {
   ScrollView,
   Image,
 } from 'react-native';
-import { BCH2Colors, BCH2Spacing, BCH2Typography, BCH2BorderRadius, BCH2Shadows } from '../../components/BCH2Theme';
+import { VoidColors, VOIDSpacing, VOIDTypography, VOIDBorderRadius, VOIDShadows } from '../../components/VoidTheme';
 import * as bip39 from 'bip39';
-import { saveWallet } from '../../class/bch2-wallet-storage';
+import { saveWallet } from '../../class/void-wallet-storage';
 import { useScreenProtect } from '../../hooks/useScreenProtect';
 
 // Coin logos
-const BCH2_LOGO = require('../../img/bch2-logo-small.png');
-const BC2_LOGO = require('../../img/bc2-logo-small.png');
+const VOID_LOGO = require('../../img/void-logo-small.png');
+const VOID_LOGO = require('../../img/void-logo-small.png');
 
 interface AddWalletProps {
   navigation: any;
 }
 
-type WalletType = 'bch2' | 'bc2' | 'bc1';
-type Mode = 'select' | 'create-bch2' | 'create-bc2' | 'import-bch2' | 'import-bc2';
+type WalletType = 'void' | 'void' | 'bc1';
+type Mode = 'select' | 'create-void' | 'create-void' | 'import-void' | 'import-void';
 
 export const AddWalletScreen: React.FC<AddWalletProps> = ({ navigation }) => {
   const [mode, setMode] = useState<Mode>('select');
@@ -41,8 +41,8 @@ export const AddWalletScreen: React.FC<AddWalletProps> = ({ navigation }) => {
 
   // Enable screenshot protection when mnemonic is displayed or being imported
   useEffect(() => {
-    const showsMnemonic = mnemonic && (mode === 'create-bch2' || mode === 'create-bc2');
-    const importingMnemonic = importMnemonic && (mode === 'import-bch2' || mode === 'import-bc2');
+    const showsMnemonic = mnemonic && (mode === 'create-void' || mode === 'create-void');
+    const importingMnemonic = importMnemonic && (mode === 'import-void' || mode === 'import-void');
     if (showsMnemonic || importingMnemonic) {
       enableScreenProtect();
     } else {
@@ -60,8 +60,8 @@ export const AddWalletScreen: React.FC<AddWalletProps> = ({ navigation }) => {
   }, []);
 
   const getCurrentWalletType = (): WalletType => {
-    if (mode === 'create-bc2' || mode === 'import-bc2') return 'bc2';
-    return 'bch2';
+    if (mode === 'create-void' || mode === 'import-void') return 'void';
+    return 'void';
   };
 
   const generateNewWallet = async (walletType: WalletType) => {
@@ -71,7 +71,7 @@ export const AddWalletScreen: React.FC<AddWalletProps> = ({ navigation }) => {
       const newMnemonic = bip39.generateMnemonic(128);
       setMnemonic(newMnemonic);
       setWalletLabel('');
-      setMode(walletType === 'bc2' ? 'create-bc2' : 'create-bch2');
+      setMode(walletType === 'void' ? 'create-void' : 'create-void');
     } catch (error: any) {
       Alert.alert('Error', 'Failed to generate wallet');
     } finally {
@@ -86,7 +86,7 @@ export const AddWalletScreen: React.FC<AddWalletProps> = ({ navigation }) => {
     }
 
     const walletType = getCurrentWalletType();
-    const coinName = walletType === 'bc2' ? 'BC2' : 'BCH2';
+    const coinName = walletType === 'void' ? 'VOID' : 'VOID';
 
     setLoading(true);
     try {
@@ -128,7 +128,7 @@ export const AddWalletScreen: React.FC<AddWalletProps> = ({ navigation }) => {
     }
 
     const walletType = getCurrentWalletType();
-    const coinName = walletType === 'bc2' ? 'BC2' : 'BCH2';
+    const coinName = walletType === 'void' ? 'VOID' : 'VOID';
 
     setLoading(true);
     try {
@@ -150,7 +150,7 @@ export const AddWalletScreen: React.FC<AddWalletProps> = ({ navigation }) => {
   const goToImport = (walletType: WalletType) => {
     setImportMnemonic('');
     setWalletLabel('');
-    setMode(walletType === 'bc2' ? 'import-bc2' : 'import-bch2');
+    setMode(walletType === 'void' ? 'import-void' : 'import-void');
   };
 
   // Main selection screen
@@ -160,80 +160,80 @@ export const AddWalletScreen: React.FC<AddWalletProps> = ({ navigation }) => {
         <Text style={styles.title}>Add Wallet</Text>
         <Text style={styles.subtitle}>Choose which wallet to create or import</Text>
 
-        {/* BCH2 Section */}
+        {/* VOID Section */}
         <View style={styles.sectionHeader}>
-          <Image source={BCH2_LOGO} style={styles.sectionLogo} resizeMode="contain" />
-          <Text style={[styles.sectionTitle, { color: BCH2Colors.primary }]}>Bitcoin Cash II (BCH2)</Text>
+          <Image source={VOID_LOGO} style={styles.sectionLogo} resizeMode="contain" />
+          <Text style={[styles.sectionTitle, { color: VoidColors.primary }]}>VoidCoin (VOID)</Text>
         </View>
 
         <TouchableOpacity
-          style={[styles.optionCard, { borderColor: BCH2Colors.primary }]}
-          onPress={() => generateNewWallet('bch2')}
+          style={[styles.optionCard, { borderColor: VoidColors.primary }]}
+          onPress={() => generateNewWallet('void')}
           disabled={loading}
-          accessibilityLabel="Create a new BCH2 wallet with recovery phrase"
+          accessibilityLabel="Create a new VOID wallet with recovery phrase"
           accessibilityRole="button"
         >
           {loading ? (
-            <ActivityIndicator color={BCH2Colors.primary} />
+            <ActivityIndicator color={VoidColors.primary} />
           ) : (
             <>
               <Text style={styles.optionIcon}>✨</Text>
               <View style={styles.optionText}>
-                <Text style={styles.optionTitle}>Create BCH2 Wallet</Text>
-                <Text style={styles.optionDesc}>Generate a new BCH2 wallet with recovery phrase</Text>
+                <Text style={styles.optionTitle}>Create VOID Wallet</Text>
+                <Text style={styles.optionDesc}>Generate a new VOID wallet with recovery phrase</Text>
               </View>
             </>
           )}
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.optionCard, { borderColor: BCH2Colors.primary }]}
-          onPress={() => goToImport('bch2')}
-          accessibilityLabel="Import a BCH2 wallet using recovery phrase"
+          style={[styles.optionCard, { borderColor: VoidColors.primary }]}
+          onPress={() => goToImport('void')}
+          accessibilityLabel="Import a VOID wallet using recovery phrase"
           accessibilityRole="button"
         >
           <Text style={styles.optionIcon}>📥</Text>
           <View style={styles.optionText}>
-            <Text style={styles.optionTitle}>Import BCH2 Wallet</Text>
+            <Text style={styles.optionTitle}>Import VOID Wallet</Text>
             <Text style={styles.optionDesc}>Restore using your 12 or 24 word recovery phrase</Text>
           </View>
         </TouchableOpacity>
 
-        {/* BC2 Section */}
-        <View style={[styles.sectionHeader, { marginTop: BCH2Spacing.xl }]}>
-          <Image source={BC2_LOGO} style={styles.sectionLogo} resizeMode="contain" />
-          <Text style={[styles.sectionTitle, { color: BCH2Colors.bc2Primary }]}>BitcoinII (BC2)</Text>
+        {/* VOID Section */}
+        <View style={[styles.sectionHeader, { marginTop: VOIDSpacing.xl }]}>
+          <Image source={VOID_LOGO} style={styles.sectionLogo} resizeMode="contain" />
+          <Text style={[styles.sectionTitle, { color: VoidColors.voidPrimary }]}>BitcoinII (VOID)</Text>
         </View>
 
         <TouchableOpacity
-          style={[styles.optionCard, { borderColor: BCH2Colors.bc2Primary }]}
-          onPress={() => generateNewWallet('bc2')}
+          style={[styles.optionCard, { borderColor: VoidColors.voidPrimary }]}
+          onPress={() => generateNewWallet('void')}
           disabled={loading}
-          accessibilityLabel="Create a new BC2 wallet with recovery phrase"
+          accessibilityLabel="Create a new VOID wallet with recovery phrase"
           accessibilityRole="button"
         >
           {loading ? (
-            <ActivityIndicator color={BCH2Colors.bc2Primary} />
+            <ActivityIndicator color={VoidColors.voidPrimary} />
           ) : (
             <>
               <Text style={styles.optionIcon}>✨</Text>
               <View style={styles.optionText}>
-                <Text style={styles.optionTitle}>Create BC2 Wallet</Text>
-                <Text style={styles.optionDesc}>Generate a new BC2 wallet with recovery phrase</Text>
+                <Text style={styles.optionTitle}>Create VOID Wallet</Text>
+                <Text style={styles.optionDesc}>Generate a new VOID wallet with recovery phrase</Text>
               </View>
             </>
           )}
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.optionCard, { borderColor: BCH2Colors.bc2Primary }]}
-          onPress={() => goToImport('bc2')}
-          accessibilityLabel="Import a BC2 wallet using recovery phrase"
+          style={[styles.optionCard, { borderColor: VoidColors.voidPrimary }]}
+          onPress={() => goToImport('void')}
+          accessibilityLabel="Import a VOID wallet using recovery phrase"
           accessibilityRole="button"
         >
           <Text style={styles.optionIcon}>📥</Text>
           <View style={styles.optionText}>
-            <Text style={styles.optionTitle}>Import BC2 Wallet</Text>
+            <Text style={styles.optionTitle}>Import VOID Wallet</Text>
             <Text style={styles.optionDesc}>Restore using your 12 or 24 word recovery phrase</Text>
           </View>
         </TouchableOpacity>
@@ -241,12 +241,12 @@ export const AddWalletScreen: React.FC<AddWalletProps> = ({ navigation }) => {
     );
   }
 
-  // Create wallet screen (BCH2 or BC2)
-  if (mode === 'create-bch2' || mode === 'create-bc2') {
+  // Create wallet screen (VOID or VOID)
+  if (mode === 'create-void' || mode === 'create-void') {
     const walletType = getCurrentWalletType();
-    const coinName = walletType === 'bc2' ? 'BC2' : 'BCH2';
-    const primaryColor = walletType === 'bc2' ? BCH2Colors.bc2Primary : BCH2Colors.primary;
-    const logo = walletType === 'bc2' ? BC2_LOGO : BCH2_LOGO;
+    const coinName = walletType === 'void' ? 'VOID' : 'VOID';
+    const primaryColor = walletType === 'void' ? VoidColors.voidPrimary : VoidColors.primary;
+    const logo = walletType === 'void' ? VOID_LOGO : VOID_LOGO;
 
     return (
       <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
@@ -272,7 +272,7 @@ export const AddWalletScreen: React.FC<AddWalletProps> = ({ navigation }) => {
             value={walletLabel}
             onChangeText={setWalletLabel}
             placeholder={`My ${coinName} Wallet`}
-            placeholderTextColor={BCH2Colors.textMuted}
+            placeholderTextColor={VoidColors.textMuted}
             maxLength={50}
           />
         </View>
@@ -283,7 +283,7 @@ export const AddWalletScreen: React.FC<AddWalletProps> = ({ navigation }) => {
           disabled={loading}
         >
           {loading ? (
-            <ActivityIndicator color={BCH2Colors.textPrimary} />
+            <ActivityIndicator color={VoidColors.textPrimary} />
           ) : (
             <Text style={styles.primaryButtonText}>I've Saved My Phrase</Text>
           )}
@@ -296,11 +296,11 @@ export const AddWalletScreen: React.FC<AddWalletProps> = ({ navigation }) => {
     );
   }
 
-  // Import wallet screen (BCH2 or BC2)
+  // Import wallet screen (VOID or VOID)
   const walletType = getCurrentWalletType();
-  const coinName = walletType === 'bc2' ? 'BC2' : 'BCH2';
-  const primaryColor = walletType === 'bc2' ? BCH2Colors.bc2Primary : BCH2Colors.primary;
-  const logo = walletType === 'bc2' ? BC2_LOGO : BCH2_LOGO;
+  const coinName = walletType === 'void' ? 'VOID' : 'VOID';
+  const primaryColor = walletType === 'void' ? VoidColors.voidPrimary : VoidColors.primary;
+  const logo = walletType === 'void' ? VOID_LOGO : VOID_LOGO;
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
@@ -317,7 +317,7 @@ export const AddWalletScreen: React.FC<AddWalletProps> = ({ navigation }) => {
           value={importMnemonic}
           onChangeText={setImportMnemonic}
           placeholder="Enter your recovery phrase..."
-          placeholderTextColor={BCH2Colors.textMuted}
+          placeholderTextColor={VoidColors.textMuted}
           multiline
           numberOfLines={4}
           autoCapitalize="none"
@@ -337,7 +337,7 @@ export const AddWalletScreen: React.FC<AddWalletProps> = ({ navigation }) => {
           value={walletLabel}
           onChangeText={setWalletLabel}
           placeholder={`My ${coinName} Wallet`}
-          placeholderTextColor={BCH2Colors.textMuted}
+          placeholderTextColor={VoidColors.textMuted}
           maxLength={50}
         />
       </View>
@@ -348,7 +348,7 @@ export const AddWalletScreen: React.FC<AddWalletProps> = ({ navigation }) => {
         disabled={loading}
       >
         {loading ? (
-          <ActivityIndicator color={BCH2Colors.textPrimary} />
+          <ActivityIndicator color={VoidColors.textPrimary} />
         ) : (
           <Text style={styles.primaryButtonText}>Import Wallet</Text>
         )}
@@ -364,149 +364,149 @@ export const AddWalletScreen: React.FC<AddWalletProps> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: BCH2Colors.background,
+    backgroundColor: VoidColors.background,
   },
   scrollContent: {
-    padding: BCH2Spacing.lg,
-    paddingBottom: BCH2Spacing.xxl,
+    padding: VOIDSpacing.lg,
+    paddingBottom: VOIDSpacing.xxl,
   },
   title: {
-    fontSize: BCH2Typography.fontSize.xxl,
-    fontWeight: BCH2Typography.fontWeight.bold,
-    color: BCH2Colors.textPrimary,
+    fontSize: VOIDTypography.fontSize.xxl,
+    fontWeight: VOIDTypography.fontWeight.bold,
+    color: VoidColors.textPrimary,
     textAlign: 'center',
-    marginBottom: BCH2Spacing.sm,
+    marginBottom: VOIDSpacing.sm,
   },
   subtitle: {
-    fontSize: BCH2Typography.fontSize.base,
-    color: BCH2Colors.textSecondary,
+    fontSize: VOIDTypography.fontSize.base,
+    color: VoidColors.textSecondary,
     textAlign: 'center',
-    marginBottom: BCH2Spacing.xl,
+    marginBottom: VOIDSpacing.xl,
   },
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: BCH2Spacing.md,
-    marginTop: BCH2Spacing.md,
+    marginBottom: VOIDSpacing.md,
+    marginTop: VOIDSpacing.md,
   },
   sectionLogo: {
     width: 32,
     height: 32,
-    marginRight: BCH2Spacing.sm,
+    marginRight: VOIDSpacing.sm,
   },
   sectionTitle: {
-    fontSize: BCH2Typography.fontSize.lg,
-    fontWeight: BCH2Typography.fontWeight.bold,
+    fontSize: VOIDTypography.fontSize.lg,
+    fontWeight: VOIDTypography.fontWeight.bold,
   },
   optionCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: BCH2Colors.backgroundCard,
-    borderRadius: BCH2BorderRadius.lg,
-    padding: BCH2Spacing.lg,
-    marginBottom: BCH2Spacing.md,
+    backgroundColor: VoidColors.backgroundCard,
+    borderRadius: VOIDBorderRadius.lg,
+    padding: VOIDSpacing.lg,
+    marginBottom: VOIDSpacing.md,
     borderWidth: 1,
   },
   optionIcon: {
     fontSize: 32,
-    marginRight: BCH2Spacing.md,
+    marginRight: VOIDSpacing.md,
   },
   optionText: {
     flex: 1,
   },
   optionTitle: {
-    fontSize: BCH2Typography.fontSize.lg,
-    fontWeight: BCH2Typography.fontWeight.semibold,
-    color: BCH2Colors.textPrimary,
-    marginBottom: BCH2Spacing.xs,
+    fontSize: VOIDTypography.fontSize.lg,
+    fontWeight: VOIDTypography.fontWeight.semibold,
+    color: VoidColors.textPrimary,
+    marginBottom: VOIDSpacing.xs,
   },
   optionDesc: {
-    fontSize: BCH2Typography.fontSize.sm,
-    color: BCH2Colors.textSecondary,
+    fontSize: VOIDTypography.fontSize.sm,
+    color: VoidColors.textSecondary,
   },
   createHeader: {
     alignItems: 'center',
-    marginBottom: BCH2Spacing.md,
+    marginBottom: VOIDSpacing.md,
   },
   createLogo: {
     width: 64,
     height: 64,
-    marginBottom: BCH2Spacing.sm,
+    marginBottom: VOIDSpacing.sm,
   },
   mnemonicBox: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    backgroundColor: BCH2Colors.backgroundCard,
-    borderRadius: BCH2BorderRadius.lg,
-    padding: BCH2Spacing.md,
-    marginBottom: BCH2Spacing.xl,
+    backgroundColor: VoidColors.backgroundCard,
+    borderRadius: VOIDBorderRadius.lg,
+    padding: VOIDSpacing.md,
+    marginBottom: VOIDSpacing.xl,
     borderWidth: 1,
   },
   wordChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: BCH2Colors.backgroundElevated,
-    borderRadius: BCH2BorderRadius.sm,
-    paddingVertical: BCH2Spacing.sm,
-    paddingHorizontal: BCH2Spacing.md,
-    margin: BCH2Spacing.xs,
+    backgroundColor: VoidColors.backgroundElevated,
+    borderRadius: VOIDBorderRadius.sm,
+    paddingVertical: VOIDSpacing.sm,
+    paddingHorizontal: VOIDSpacing.md,
+    margin: VOIDSpacing.xs,
   },
   wordNumber: {
-    fontSize: BCH2Typography.fontSize.xs,
-    color: BCH2Colors.textMuted,
-    marginRight: BCH2Spacing.xs,
+    fontSize: VOIDTypography.fontSize.xs,
+    color: VoidColors.textMuted,
+    marginRight: VOIDSpacing.xs,
   },
   wordText: {
-    fontSize: BCH2Typography.fontSize.base,
-    color: BCH2Colors.textPrimary,
+    fontSize: VOIDTypography.fontSize.base,
+    color: VoidColors.textPrimary,
     fontFamily: 'monospace',
   },
   inputGroup: {
-    marginBottom: BCH2Spacing.lg,
+    marginBottom: VOIDSpacing.lg,
   },
   inputLabel: {
-    fontSize: BCH2Typography.fontSize.sm,
-    color: BCH2Colors.textSecondary,
-    marginBottom: BCH2Spacing.sm,
+    fontSize: VOIDTypography.fontSize.sm,
+    color: VoidColors.textSecondary,
+    marginBottom: VOIDSpacing.sm,
   },
   input: {
-    backgroundColor: BCH2Colors.backgroundCard,
-    borderRadius: BCH2BorderRadius.md,
+    backgroundColor: VoidColors.backgroundCard,
+    borderRadius: VOIDBorderRadius.md,
     borderWidth: 1,
-    borderColor: BCH2Colors.border,
-    padding: BCH2Spacing.md,
-    color: BCH2Colors.textPrimary,
-    fontSize: BCH2Typography.fontSize.base,
+    borderColor: VoidColors.border,
+    padding: VOIDSpacing.md,
+    color: VoidColors.textPrimary,
+    fontSize: VOIDTypography.fontSize.base,
   },
   mnemonicInput: {
     height: 100,
     textAlignVertical: 'top',
   },
   primaryButton: {
-    borderRadius: BCH2BorderRadius.md,
-    paddingVertical: BCH2Spacing.md,
+    borderRadius: VOIDBorderRadius.md,
+    paddingVertical: VOIDSpacing.md,
     alignItems: 'center',
-    marginBottom: BCH2Spacing.md,
-    ...BCH2Shadows.glow,
+    marginBottom: VOIDSpacing.md,
+    ...VOIDShadows.glow,
   },
   primaryButtonText: {
-    color: BCH2Colors.textPrimary,
-    fontSize: BCH2Typography.fontSize.lg,
-    fontWeight: BCH2Typography.fontWeight.bold,
+    color: VoidColors.textPrimary,
+    fontSize: VOIDTypography.fontSize.lg,
+    fontWeight: VOIDTypography.fontWeight.bold,
   },
   secondaryButton: {
-    paddingVertical: BCH2Spacing.md,
+    paddingVertical: VOIDSpacing.md,
     alignItems: 'center',
   },
   secondaryButtonText: {
-    color: BCH2Colors.textSecondary,
-    fontSize: BCH2Typography.fontSize.base,
+    color: VoidColors.textSecondary,
+    fontSize: VOIDTypography.fontSize.base,
   },
   errorText: {
-    color: BCH2Colors.error,
-    fontSize: BCH2Typography.fontSize.sm,
+    color: VoidColors.error,
+    fontSize: VOIDTypography.fontSize.sm,
     textAlign: 'center',
-    marginBottom: BCH2Spacing.md,
+    marginBottom: VOIDSpacing.md,
   },
 });
 

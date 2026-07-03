@@ -1,5 +1,5 @@
 /**
- * BCH2 Android Wallet E2E Test Suite
+ * VOID Android Wallet E2E Test Suite
  * Comprehensive testing of wallet, airdrop, and transaction functions
  * Self-contained - uses npm packages directly
  */
@@ -26,7 +26,7 @@ function test(name, fn) {
 
 async function runTests() {
   console.log('\n' + '='.repeat(70));
-  console.log('BCH2 Android Wallet E2E Test Suite');
+  console.log('VOID Android Wallet E2E Test Suite');
   console.log('='.repeat(70) + '\n');
 
   for (const { name, fn } of tests) {
@@ -369,15 +369,15 @@ test('BIP49 derivation path m/49\'/0\'/0\'/0/0', async () => {
   console.log(`      Wrapped SegWit address: ${p2shAddr}`);
 });
 
-// Test 7: BCH2 CashAddr derivation
-test('BCH2 CashAddr derivation m/44\'/145\'/0\'/0/0', async () => {
+// Test 7: VOID CashAddr derivation
+test('VOID CashAddr derivation m/44\'/145\'/0\'/0/0', async () => {
   const testMnemonic = 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about';
   const seed = await bip39.mnemonicToSeed(testMnemonic);
   const root = bip32.fromSeed(seed);
   const child = root.derivePath("m/44'/145'/0'/0/0");
   const addr = pubkeyToCashAddr(child.publicKey);
-  assert(addr.startsWith('bitcoincashii:q'), 'BCH2 address should start with bitcoincashii:q');
-  console.log(`      BCH2 CashAddr: ${addr}`);
+  assert(addr.startsWith('bitcoincashii:q'), 'VOID address should start with bitcoincashii:q');
+  console.log(`      VOID CashAddr: ${addr}`);
 });
 
 // Test 8: Bech32 encoding/decoding
@@ -457,7 +457,7 @@ test('Electrum proxy connectivity', async () => {
 
     ws.on('open', () => {
       // First send connect handshake
-      ws.send(JSON.stringify({ type: 'connect', network: 'bch2' }));
+      ws.send(JSON.stringify({ type: 'connect', network: 'void' }));
     });
 
     ws.on('message', (data) => {
@@ -470,7 +470,7 @@ test('Electrum proxy connectivity', async () => {
           jsonrpc: '2.0',
           id: 1,
           method: 'server.version',
-          params: ['bch2-test', '1.4']
+          params: ['void-test', '1.4']
         }));
         return;
       }
@@ -509,7 +509,7 @@ test('Electrum scripthash balance query', async () => {
 
     ws.on('open', () => {
       // First send connect handshake
-      ws.send(JSON.stringify({ type: 'connect', network: 'bch2' }));
+      ws.send(JSON.stringify({ type: 'connect', network: 'void' }));
     });
 
     ws.on('message', (data) => {
@@ -546,28 +546,28 @@ test('Electrum scripthash balance query', async () => {
 });
 
 // Test 17: Anti-gaming detection logic
-test('Anti-gaming detection - higher BC2 balance indicates post-fork deposit', () => {
-  const bc2Balance = 1000000; // 0.01 BC2
-  const bch2Balance = 500000; // 0.005 BCH2
+test('Anti-gaming detection - higher VOID balance indicates post-fork deposit', () => {
+  const voidBalance = 1000000; // 0.01 VOID
+  const voidBalance = 500000; // 0.005 VOID
 
-  // If BC2 balance > BCH2 balance, funds were deposited after fork
-  const isFromAirdrop = bch2Balance >= bc2Balance;
-  assertEquals(isFromAirdrop, false, 'Higher BC2 balance should indicate post-fork deposit');
+  // If VOID balance > VOID balance, funds were deposited after fork
+  const isFromAirdrop = voidBalance >= voidBalance;
+  assertEquals(isFromAirdrop, false, 'Higher VOID balance should indicate post-fork deposit');
 });
 
 // Test 18: Anti-gaming detection - equal balances
 test('Anti-gaming detection - equal balances indicates pre-fork holding', () => {
-  const bc2Balance = 1000000;
-  const bch2Balance = 1000000;
+  const voidBalance = 1000000;
+  const voidBalance = 1000000;
 
-  const isFromAirdrop = bch2Balance >= bc2Balance;
+  const isFromAirdrop = voidBalance >= voidBalance;
   assertEquals(isFromAirdrop, true, 'Equal balances should indicate pre-fork holding');
 });
 
-// Test 19: BIP44 coin type for BCH2
-test('BCH2 uses coin type 145 (BCH compatible)', () => {
-  const bch2Path = "m/44'/145'/0'/0/0";
-  assert(bch2Path.includes("145'"), 'BCH2 should use coin type 145');
+// Test 19: BIP44 coin type for VOID
+test('VOID uses coin type 145 (BCH compatible)', () => {
+  const voidPath = "m/44'/145'/0'/0/0";
+  assert(voidPath.includes("145'"), 'VOID should use coin type 145');
 });
 
 // Test 20: Private key is 32 bytes
@@ -590,7 +590,7 @@ test('Public key is compressed (33 bytes, starts with 02 or 03)', async () => {
 });
 
 // Test 22: Transaction sighash flag
-test('BCH2 uses SIGHASH_ALL | SIGHASH_FORKID (0x41)', () => {
+test('VOID uses SIGHASH_ALL | SIGHASH_FORKID (0x41)', () => {
   const SIGHASH_ALL = 0x01;
   const SIGHASH_FORKID = 0x40;
   const combined = SIGHASH_ALL | SIGHASH_FORKID;

@@ -1,6 +1,6 @@
 /**
- * BCH2 Settings Screen
- * Configure Electrum servers for BCH2 and BC2
+ * VOID Settings Screen
+ * Configure Electrum servers for VOID and VOID
  */
 
 import React, { useState, useCallback, useEffect } from 'react';
@@ -17,7 +17,7 @@ import {
   Image,
   Linking,
 } from 'react-native';
-import { BCH2Colors, BCH2Spacing, BCH2Typography, BCH2Shadows, BCH2BorderRadius } from '../../components/BCH2Theme';
+import { VoidColors, VOIDSpacing, VOIDTypography, VOIDShadows, VOIDBorderRadius } from '../../components/VoidTheme';
 import {
   isBiometricAvailable,
   isBiometricEnabled,
@@ -25,11 +25,11 @@ import {
   authenticateWithBiometric,
   getAutoLockTimeout,
   setAutoLockTimeout,
-} from './BCH2AppPassword';
+} from './VoidAppPassword';
 
 // Coin logos
-const BCH2_LOGO = require('../../img/bch2-logo-small.png');
-const BC2_LOGO = require('../../img/bc2-logo-small.png');
+const VOID_LOGO = require('../../img/void-logo-small.png');
+const VOID_LOGO = require('../../img/void-logo-small.png');
 
 interface ElectrumServer {
   host: string;
@@ -37,38 +37,38 @@ interface ElectrumServer {
   ssl: boolean;
 }
 
-interface BCH2SettingsProps {
+interface VoidSettingsProps {
   navigation?: any;
 }
 
-// BCH2 Electrum Servers
-const BCH2_SERVERS: ElectrumServer[] = [
-  { host: 'electrum.bch2.org', port: 50001, ssl: false },
-  { host: 'electrum.bch2.org', port: 50002, ssl: true },
+// VOID Electrum Servers
+const VOID_SERVERS: ElectrumServer[] = [
+  { host: 'electrum.void.org', port: 50001, ssl: false },
+  { host: 'electrum.void.org', port: 50002, ssl: true },
 ];
 
-// BC2 Electrum Servers — Dallas server
-const BC2_SERVERS: ElectrumServer[] = [
-  { host: 'bc2electrum.bch2.org', port: 50010, ssl: false },
-  { host: 'bc2electrum.bch2.org', port: 50011, ssl: true },
+// VOID Electrum Servers — Dallas server
+const VOID_SERVERS: ElectrumServer[] = [
+  { host: 'voidelectrum.void.org', port: 50010, ssl: false },
+  { host: 'voidelectrum.void.org', port: 50011, ssl: true },
 ];
 
-export const BCH2SettingsScreen: React.FC<BCH2SettingsProps> = ({ navigation }) => {
-  // BCH2 Server State
-  const [bch2SelectedServer, setBch2SelectedServer] = useState(0);
-  const [bch2CustomHost, setBch2CustomHost] = useState('');
-  const [bch2CustomPort, setBch2CustomPort] = useState('50001');
-  const [bch2UseSSL, setBch2UseSSL] = useState(false);
-  const [bch2Testing, setBch2Testing] = useState(false);
-  const [bch2Status, setBch2Status] = useState<'unknown' | 'connected' | 'failed'>('unknown');
+export const VoidSettingsScreen: React.FC<VoidSettingsProps> = ({ navigation }) => {
+  // VOID Server State
+  const [voidSelectedServer, setBch2SelectedServer] = useState(0);
+  const [voidCustomHost, setBch2CustomHost] = useState('');
+  const [voidCustomPort, setBch2CustomPort] = useState('50001');
+  const [voidUseSSL, setBch2UseSSL] = useState(false);
+  const [voidTesting, setBch2Testing] = useState(false);
+  const [voidStatus, setBch2Status] = useState<'unknown' | 'connected' | 'failed'>('unknown');
 
-  // BC2 Server State
-  const [bc2SelectedServer, setBc2SelectedServer] = useState(0);
-  const [bc2CustomHost, setBc2CustomHost] = useState('');
-  const [bc2CustomPort, setBc2CustomPort] = useState('50010');
-  const [bc2UseSSL, setBc2UseSSL] = useState(false);
-  const [bc2Testing, setBc2Testing] = useState(false);
-  const [bc2Status, setBc2Status] = useState<'unknown' | 'connected' | 'failed'>('unknown');
+  // VOID Server State
+  const [voidSelectedServer, setBc2SelectedServer] = useState(0);
+  const [voidCustomHost, setBc2CustomHost] = useState('');
+  const [voidCustomPort, setBc2CustomPort] = useState('50010');
+  const [voidUseSSL, setBc2UseSSL] = useState(false);
+  const [voidTesting, setBc2Testing] = useState(false);
+  const [voidStatus, setBc2Status] = useState<'unknown' | 'connected' | 'failed'>('unknown');
 
   // Biometric State
   const [biometricAvailable, setBiometricAvailable] = useState(false);
@@ -143,23 +143,23 @@ export const BCH2SettingsScreen: React.FC<BCH2SettingsProps> = ({ navigation }) 
     (async () => {
       try {
         const DefaultPreference = require('react-native-default-preference').default;
-        const bch2Host = await DefaultPreference.get('bch2_electrum_host');
-        if (bch2Host) {
-          setBch2CustomHost(bch2Host);
+        const voidHost = await DefaultPreference.get('void_electrum_host');
+        if (voidHost) {
+          setBch2CustomHost(voidHost);
           setBch2SelectedServer(-1);
-          const bch2Port = await DefaultPreference.get('bch2_electrum_port');
-          if (bch2Port) setBch2CustomPort(bch2Port);
-          const bch2Ssl = await DefaultPreference.get('bch2_electrum_ssl');
-          if (bch2Ssl !== null) setBch2UseSSL(bch2Ssl === '1');
+          const voidPort = await DefaultPreference.get('void_electrum_port');
+          if (voidPort) setBch2CustomPort(voidPort);
+          const voidSsl = await DefaultPreference.get('void_electrum_ssl');
+          if (voidSsl !== null) setBch2UseSSL(voidSsl === '1');
         }
-        const bc2Host = await DefaultPreference.get('bc2_electrum_host');
-        if (bc2Host) {
-          setBc2CustomHost(bc2Host);
+        const voidHost = await DefaultPreference.get('void_electrum_host');
+        if (voidHost) {
+          setBc2CustomHost(voidHost);
           setBc2SelectedServer(-1);
-          const bc2Port = await DefaultPreference.get('bc2_electrum_port');
-          if (bc2Port) setBc2CustomPort(bc2Port);
-          const bc2Ssl = await DefaultPreference.get('bc2_electrum_ssl');
-          if (bc2Ssl !== null) setBc2UseSSL(bc2Ssl === '1');
+          const voidPort = await DefaultPreference.get('void_electrum_port');
+          if (voidPort) setBc2CustomPort(voidPort);
+          const voidSsl = await DefaultPreference.get('void_electrum_ssl');
+          if (voidSsl !== null) setBc2UseSSL(voidSsl === '1');
         }
       } catch {
         // Silently ignore load failures — defaults are already set
@@ -194,7 +194,7 @@ export const BCH2SettingsScreen: React.FC<BCH2SettingsProps> = ({ navigation }) 
 
       // Connect with 10s timeout — initElectrum calls server.version internally
       const versionResult = await Promise.race([
-        client.initElectrum({ client: 'bch2-wallet-test', version: '1.4' }, { maxRetry: 0, callback: null }),
+        client.initElectrum({ client: 'void-wallet-test', version: '1.4' }, { maxRetry: 0, callback: null }),
         new Promise((_, reject) => setTimeout(() => reject(new Error('Connection timeout (10s)')), 10000)),
       ]);
 
@@ -236,75 +236,75 @@ export const BCH2SettingsScreen: React.FC<BCH2SettingsProps> = ({ navigation }) 
     return !isNaN(port) && port >= 1 && port <= 65535;
   };
 
-  const handleTestBCH2 = useCallback(() => {
-    if (bch2SelectedServer === -1) {
-      const host = bch2CustomHost.trim();
+  const handleTestVOID = useCallback(() => {
+    if (voidSelectedServer === -1) {
+      const host = voidCustomHost.trim();
       if (!host) { Alert.alert('Error', 'Please enter a server hostname'); return; }
       if (!validateHostname(host)) { Alert.alert('Error', 'Invalid hostname format'); return; }
-      if (!validatePort(bch2CustomPort)) { Alert.alert('Error', 'Port must be between 1 and 65535'); return; }
+      if (!validatePort(voidCustomPort)) { Alert.alert('Error', 'Port must be between 1 and 65535'); return; }
     }
-    const server = bch2SelectedServer === -1
-      ? { host: bch2CustomHost.trim(), port: parseInt(bch2CustomPort) || 50001, ssl: bch2UseSSL }
-      : BCH2_SERVERS[bch2SelectedServer];
-    testConnection(server, setBch2Testing, setBch2Status, 'BCH2');
-  }, [bch2SelectedServer, bch2CustomHost, bch2CustomPort, bch2UseSSL, testConnection]);
+    const server = voidSelectedServer === -1
+      ? { host: voidCustomHost.trim(), port: parseInt(voidCustomPort) || 50001, ssl: voidUseSSL }
+      : VOID_SERVERS[voidSelectedServer];
+    testConnection(server, setBch2Testing, setBch2Status, 'VOID');
+  }, [voidSelectedServer, voidCustomHost, voidCustomPort, voidUseSSL, testConnection]);
 
-  const handleTestBC2 = useCallback(() => {
-    if (bc2SelectedServer === -1) {
-      const host = bc2CustomHost.trim();
+  const handleTestVOID = useCallback(() => {
+    if (voidSelectedServer === -1) {
+      const host = voidCustomHost.trim();
       if (!host) { Alert.alert('Error', 'Please enter a server hostname'); return; }
       if (!validateHostname(host)) { Alert.alert('Error', 'Invalid hostname format'); return; }
-      if (!validatePort(bc2CustomPort)) { Alert.alert('Error', 'Port must be between 1 and 65535'); return; }
+      if (!validatePort(voidCustomPort)) { Alert.alert('Error', 'Port must be between 1 and 65535'); return; }
     }
-    const server = bc2SelectedServer === -1
-      ? { host: bc2CustomHost.trim(), port: parseInt(bc2CustomPort) || 50010, ssl: bc2UseSSL }
-      : BC2_SERVERS[bc2SelectedServer];
-    testConnection(server, setBc2Testing, setBc2Status, 'BC2');
-  }, [bc2SelectedServer, bc2CustomHost, bc2CustomPort, bc2UseSSL, testConnection]);
+    const server = voidSelectedServer === -1
+      ? { host: voidCustomHost.trim(), port: parseInt(voidCustomPort) || 50010, ssl: voidUseSSL }
+      : VOID_SERVERS[voidSelectedServer];
+    testConnection(server, setBc2Testing, setBc2Status, 'VOID');
+  }, [voidSelectedServer, voidCustomHost, voidCustomPort, voidUseSSL, testConnection]);
 
   const handleSaveSettings = useCallback(async () => {
     try {
       // Validate custom hostnames before saving
-      if (bch2SelectedServer === -1 && bch2CustomHost.trim() && !validateHostname(bch2CustomHost.trim())) {
-        Alert.alert('Error', 'Invalid BCH2 server hostname'); return;
+      if (voidSelectedServer === -1 && voidCustomHost.trim() && !validateHostname(voidCustomHost.trim())) {
+        Alert.alert('Error', 'Invalid VOID server hostname'); return;
       }
-      if (bc2SelectedServer === -1 && bc2CustomHost.trim() && !validateHostname(bc2CustomHost.trim())) {
-        Alert.alert('Error', 'Invalid BC2 server hostname'); return;
+      if (voidSelectedServer === -1 && voidCustomHost.trim() && !validateHostname(voidCustomHost.trim())) {
+        Alert.alert('Error', 'Invalid VOID server hostname'); return;
       }
       // Validate custom ports before saving
-      if (bch2SelectedServer === -1 && bch2CustomPort && !validatePort(bch2CustomPort)) {
-        Alert.alert('Error', 'BCH2 port must be between 1 and 65535'); return;
+      if (voidSelectedServer === -1 && voidCustomPort && !validatePort(voidCustomPort)) {
+        Alert.alert('Error', 'VOID port must be between 1 and 65535'); return;
       }
-      if (bc2SelectedServer === -1 && bc2CustomPort && !validatePort(bc2CustomPort)) {
-        Alert.alert('Error', 'BC2 port must be between 1 and 65535'); return;
+      if (voidSelectedServer === -1 && voidCustomPort && !validatePort(voidCustomPort)) {
+        Alert.alert('Error', 'VOID port must be between 1 and 65535'); return;
       }
       const DefaultPreference = require('react-native-default-preference').default;
-      // Save BCH2 server settings
-      if (bch2SelectedServer === -1 && bch2CustomHost.trim()) {
-        await DefaultPreference.set('bch2_electrum_host', bch2CustomHost.trim());
-        await DefaultPreference.set('bch2_electrum_port', bch2CustomPort);
-        await DefaultPreference.set('bch2_electrum_ssl', bch2UseSSL ? '1' : '0');
+      // Save VOID server settings
+      if (voidSelectedServer === -1 && voidCustomHost.trim()) {
+        await DefaultPreference.set('void_electrum_host', voidCustomHost.trim());
+        await DefaultPreference.set('void_electrum_port', voidCustomPort);
+        await DefaultPreference.set('void_electrum_ssl', voidUseSSL ? '1' : '0');
       } else {
         // Clear stale custom server entries when switching to built-in server
-        await DefaultPreference.clear('bch2_electrum_host');
-        await DefaultPreference.clear('bch2_electrum_port');
-        await DefaultPreference.clear('bch2_electrum_ssl');
+        await DefaultPreference.clear('void_electrum_host');
+        await DefaultPreference.clear('void_electrum_port');
+        await DefaultPreference.clear('void_electrum_ssl');
       }
-      // Save BC2 server settings
-      if (bc2SelectedServer === -1 && bc2CustomHost.trim()) {
-        await DefaultPreference.set('bc2_electrum_host', bc2CustomHost.trim());
-        await DefaultPreference.set('bc2_electrum_port', bc2CustomPort);
-        await DefaultPreference.set('bc2_electrum_ssl', bc2UseSSL ? '1' : '0');
+      // Save VOID server settings
+      if (voidSelectedServer === -1 && voidCustomHost.trim()) {
+        await DefaultPreference.set('void_electrum_host', voidCustomHost.trim());
+        await DefaultPreference.set('void_electrum_port', voidCustomPort);
+        await DefaultPreference.set('void_electrum_ssl', voidUseSSL ? '1' : '0');
       } else {
-        await DefaultPreference.clear('bc2_electrum_host');
-        await DefaultPreference.clear('bc2_electrum_port');
-        await DefaultPreference.clear('bc2_electrum_ssl');
+        await DefaultPreference.clear('void_electrum_host');
+        await DefaultPreference.clear('void_electrum_port');
+        await DefaultPreference.clear('void_electrum_ssl');
       }
       Alert.alert('Settings Saved', 'Your Electrum server settings have been saved. Restart the app for changes to take effect.');
     } catch (error: any) {
       Alert.alert('Error', 'Failed to save settings. Please try again.');
     }
-  }, [bch2SelectedServer, bch2CustomHost, bch2CustomPort, bch2UseSSL, bc2SelectedServer, bc2CustomHost, bc2CustomPort, bc2UseSSL]);
+  }, [voidSelectedServer, voidCustomHost, voidCustomPort, voidUseSSL, voidSelectedServer, voidCustomHost, voidCustomPort, voidUseSSL]);
 
   const renderServerSection = (
     title: string,
@@ -346,7 +346,7 @@ export const BCH2SettingsScreen: React.FC<BCH2SettingsProps> = ({ navigation }) 
           accessibilityRole="radio"
           accessibilityState={{ selected: selectedServer === index }}
           >
-            <View style={[styles.serverRadio, { borderColor: selectedServer === index ? primaryColor : BCH2Colors.textMuted }]}>
+            <View style={[styles.serverRadio, { borderColor: selectedServer === index ? primaryColor : VoidColors.textMuted }]}>
               {selectedServer === index && <View style={[styles.serverRadioInner, { backgroundColor: primaryColor }]} />}
             </View>
             <View style={styles.serverInfo}>
@@ -369,7 +369,7 @@ export const BCH2SettingsScreen: React.FC<BCH2SettingsProps> = ({ navigation }) 
           accessibilityRole="radio"
           accessibilityState={{ selected: selectedServer === -1 }}
         >
-          <View style={[styles.serverRadio, { borderColor: selectedServer === -1 ? primaryColor : BCH2Colors.textMuted }]}>
+          <View style={[styles.serverRadio, { borderColor: selectedServer === -1 ? primaryColor : VoidColors.textMuted }]}>
             {selectedServer === -1 && <View style={[styles.serverRadioInner, { backgroundColor: primaryColor }]} />}
           </View>
           <Text style={styles.serverHost}>Custom Server</Text>
@@ -386,7 +386,7 @@ export const BCH2SettingsScreen: React.FC<BCH2SettingsProps> = ({ navigation }) 
               value={customHost}
               onChangeText={setCustomHost}
               placeholder="electrum.example.com"
-              placeholderTextColor={BCH2Colors.textMuted}
+              placeholderTextColor={VoidColors.textMuted}
               autoCapitalize="none"
               autoCorrect={false}
               maxLength={253}
@@ -401,20 +401,20 @@ export const BCH2SettingsScreen: React.FC<BCH2SettingsProps> = ({ navigation }) 
                 value={customPort}
                 onChangeText={setCustomPort}
                 placeholder="50002"
-                placeholderTextColor={BCH2Colors.textMuted}
+                placeholderTextColor={VoidColors.textMuted}
                 keyboardType="number-pad"
                 maxLength={5}
               />
             </View>
 
-            <View style={[styles.inputGroup, { flex: 1, marginLeft: BCH2Spacing.md }]}>
+            <View style={[styles.inputGroup, { flex: 1, marginLeft: VOIDSpacing.md }]}>
               <Text style={styles.inputLabel}>Use SSL</Text>
               <View style={styles.switchContainer}>
                 <Switch
                   value={useSSL}
                   onValueChange={setUseSSL}
-                  trackColor={{ false: BCH2Colors.border, true: primaryColor + '40' }}
-                  thumbColor={useSSL ? primaryColor : BCH2Colors.textMuted}
+                  trackColor={{ false: VoidColors.border, true: primaryColor + '40' }}
+                  thumbColor={useSSL ? primaryColor : VoidColors.textMuted}
                   accessibilityLabel={`Use SSL encryption, currently ${useSSL ? 'enabled' : 'disabled'}`}
                 />
                 <Text style={styles.switchLabel}>{useSSL ? 'Yes' : 'No'}</Text>
@@ -462,72 +462,72 @@ export const BCH2SettingsScreen: React.FC<BCH2SettingsProps> = ({ navigation }) 
         <Text style={styles.subtitle}>Configure your wallet connections</Text>
       </View>
 
-      {/* BCH2 Electrum Server Section */}
+      {/* VOID Electrum Server Section */}
       {renderServerSection(
-        'BCH2',
-        BCH2_LOGO,
-        BCH2Colors.primary,
-        BCH2_SERVERS,
-        bch2SelectedServer,
+        'VOID',
+        VOID_LOGO,
+        VoidColors.primary,
+        VOID_SERVERS,
+        voidSelectedServer,
         setBch2SelectedServer,
-        bch2CustomHost,
+        voidCustomHost,
         setBch2CustomHost,
-        bch2CustomPort,
+        voidCustomPort,
         setBch2CustomPort,
-        bch2UseSSL,
+        voidUseSSL,
         setBch2UseSSL,
-        bch2Testing,
-        bch2Status,
-        handleTestBCH2
+        voidTesting,
+        voidStatus,
+        handleTestVOID
       )}
 
-      {/* BC2 Electrum Server Section */}
+      {/* VOID Electrum Server Section */}
       {renderServerSection(
-        'BC2',
-        BC2_LOGO,
-        BCH2Colors.bc2Primary,
-        BC2_SERVERS,
-        bc2SelectedServer,
+        'VOID',
+        VOID_LOGO,
+        VoidColors.voidPrimary,
+        VOID_SERVERS,
+        voidSelectedServer,
         setBc2SelectedServer,
-        bc2CustomHost,
+        voidCustomHost,
         setBc2CustomHost,
-        bc2CustomPort,
+        voidCustomPort,
         setBc2CustomPort,
-        bc2UseSSL,
+        voidUseSSL,
         setBc2UseSSL,
-        bc2Testing,
-        bc2Status,
-        handleTestBC2
+        voidTesting,
+        voidStatus,
+        handleTestVOID
       )}
 
       {/* Block Explorers Section */}
       <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: BCH2Colors.textPrimary }]}>Block Explorers</Text>
+        <Text style={[styles.sectionTitle, { color: VoidColors.textPrimary }]}>Block Explorers</Text>
 
         <View style={styles.explorerCard}>
           <TouchableOpacity
             style={styles.explorerRow}
-            onPress={() => Linking.openURL('https://explorer.bch2.org').catch(() => {})}
-            accessibilityLabel="Open BCH2 block explorer"
+            onPress={() => Linking.openURL('https://explorer.void.org').catch(() => {})}
+            accessibilityLabel="Open VOID block explorer"
             accessibilityRole="link"
           >
-            <Image source={BCH2_LOGO} style={styles.explorerLogo} resizeMode="contain" />
+            <Image source={VOID_LOGO} style={styles.explorerLogo} resizeMode="contain" />
             <View style={styles.explorerInfo}>
-              <Text style={styles.explorerLabel}>BCH2 Explorer</Text>
-              <Text style={[styles.explorerUrl, { color: BCH2Colors.primary }]}>explorer.bch2.org</Text>
+              <Text style={styles.explorerLabel}>VOID Explorer</Text>
+              <Text style={[styles.explorerUrl, { color: VoidColors.primary }]}>explorer.void.org</Text>
             </View>
             <Text style={styles.explorerArrow}>→</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.explorerRow}
             onPress={() => Linking.openURL('https://explorer.bitcoin-ii.org').catch(() => {})}
-            accessibilityLabel="Open BC2 block explorer"
+            accessibilityLabel="Open VOID block explorer"
             accessibilityRole="link"
           >
-            <Image source={BC2_LOGO} style={styles.explorerLogo} resizeMode="contain" />
+            <Image source={VOID_LOGO} style={styles.explorerLogo} resizeMode="contain" />
             <View style={styles.explorerInfo}>
-              <Text style={styles.explorerLabel}>BC2 Explorer</Text>
-              <Text style={[styles.explorerUrl, { color: BCH2Colors.bc2Primary }]}>explorer.bitcoin-ii.org</Text>
+              <Text style={styles.explorerLabel}>VOID Explorer</Text>
+              <Text style={[styles.explorerUrl, { color: VoidColors.voidPrimary }]}>explorer.bitcoin-ii.org</Text>
             </View>
             <Text style={styles.explorerArrow}>→</Text>
           </TouchableOpacity>
@@ -536,18 +536,18 @@ export const BCH2SettingsScreen: React.FC<BCH2SettingsProps> = ({ navigation }) 
 
       {/* Security Section */}
       <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: BCH2Colors.textPrimary }]}>Security</Text>
+        <Text style={[styles.sectionTitle, { color: VoidColors.textPrimary }]}>Security</Text>
 
         <View style={styles.explorerCard}>
           <TouchableOpacity
-            onPress={() => navigation?.navigate('BCH2AppPassword')}
+            onPress={() => navigation?.navigate('VoidAppPassword')}
             accessibilityLabel="Set up app password"
             accessibilityRole="button"
           >
             <View style={[styles.explorerRow, { paddingVertical: 16 }]}>
               <View style={styles.explorerInfo}>
                 <Text style={styles.explorerLabel}>App Password</Text>
-                <Text style={[styles.explorerUrl, { color: BCH2Colors.textSecondary }]}>
+                <Text style={[styles.explorerUrl, { color: VoidColors.textSecondary }]}>
                   Lock the app with a password on open
                 </Text>
               </View>
@@ -559,15 +559,15 @@ export const BCH2SettingsScreen: React.FC<BCH2SettingsProps> = ({ navigation }) 
             <View style={[styles.explorerRow, { paddingVertical: 16 }]}>
               <View style={styles.explorerInfo}>
                 <Text style={styles.explorerLabel}>{biometricTypeName}</Text>
-                <Text style={[styles.explorerUrl, { color: BCH2Colors.textSecondary }]}>
+                <Text style={[styles.explorerUrl, { color: VoidColors.textSecondary }]}>
                   Unlock with {biometricTypeName.toLowerCase()} instead of password
                 </Text>
               </View>
               <Switch
                 value={biometricOn}
                 onValueChange={handleBiometricToggle}
-                trackColor={{ false: BCH2Colors.border, true: BCH2Colors.primary + '40' }}
-                thumbColor={biometricOn ? BCH2Colors.primary : BCH2Colors.textMuted}
+                trackColor={{ false: VoidColors.border, true: VoidColors.primary + '40' }}
+                thumbColor={biometricOn ? VoidColors.primary : VoidColors.textMuted}
                 accessibilityLabel={`${biometricTypeName} unlock, currently ${biometricOn ? 'enabled' : 'disabled'}`}
               />
             </View>
@@ -581,11 +581,11 @@ export const BCH2SettingsScreen: React.FC<BCH2SettingsProps> = ({ navigation }) 
             <View style={[styles.explorerRow, { paddingVertical: 16, borderBottomWidth: 0 }]}>
               <View style={styles.explorerInfo}>
                 <Text style={styles.explorerLabel}>Auto-Lock</Text>
-                <Text style={[styles.explorerUrl, { color: BCH2Colors.textSecondary }]}>
+                <Text style={[styles.explorerUrl, { color: VoidColors.textSecondary }]}>
                   Re-lock after going to background
                 </Text>
               </View>
-              <Text style={[styles.explorerUrl, { color: BCH2Colors.primary }]}>{autoLockLabel}</Text>
+              <Text style={[styles.explorerUrl, { color: VoidColors.primary }]}>{autoLockLabel}</Text>
             </View>
           </TouchableOpacity>
         </View>
@@ -593,20 +593,20 @@ export const BCH2SettingsScreen: React.FC<BCH2SettingsProps> = ({ navigation }) 
 
       {/* Network Info Section */}
       <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: BCH2Colors.textPrimary }]}>Network Information</Text>
+        <Text style={[styles.sectionTitle, { color: VoidColors.textPrimary }]}>Network Information</Text>
 
         <View style={styles.infoCard}>
           <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>BCH2 Fork Height</Text>
+            <Text style={styles.infoLabel}>VOID Fork Height</Text>
             <Text style={styles.infoValue}>Block 53,200</Text>
           </View>
           <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>BCH2 Address Format</Text>
-            <Text style={[styles.infoValue, { color: BCH2Colors.primary }]}>bitcoincashii:</Text>
+            <Text style={styles.infoLabel}>VOID Address Format</Text>
+            <Text style={[styles.infoValue, { color: VoidColors.primary }]}>bitcoincashii:</Text>
           </View>
           <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>BC2 Address Format</Text>
-            <Text style={[styles.infoValue, { color: BCH2Colors.bc2Primary }]}>Legacy (1...)</Text>
+            <Text style={styles.infoLabel}>VOID Address Format</Text>
+            <Text style={[styles.infoValue, { color: VoidColors.voidPrimary }]}>Legacy (1...)</Text>
           </View>
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>Derivation Path</Text>
@@ -617,12 +617,12 @@ export const BCH2SettingsScreen: React.FC<BCH2SettingsProps> = ({ navigation }) 
 
       {/* Support Section */}
       <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: BCH2Colors.textPrimary }]}>Support</Text>
+        <Text style={[styles.sectionTitle, { color: VoidColors.textPrimary }]}>Support</Text>
 
         <TouchableOpacity
           style={styles.supportButton}
           onPress={() => {
-            const subject = encodeURIComponent('Bitcoin Cash II Android Wallet - Bug Report');
+            const subject = encodeURIComponent('VoidCoin Android Wallet - Bug Report');
             const body = encodeURIComponent(
               `\n\n` +
               `-------------------\n` +
@@ -646,7 +646,7 @@ export const BCH2SettingsScreen: React.FC<BCH2SettingsProps> = ({ navigation }) 
         <TouchableOpacity
           style={styles.supportButton}
           onPress={() => {
-            const subject = encodeURIComponent('Bitcoin Cash II Android Wallet - Feature Request');
+            const subject = encodeURIComponent('VoidCoin Android Wallet - Feature Request');
             const body = encodeURIComponent(
               `\n\n` +
               `-------------------\n` +
@@ -668,27 +668,27 @@ export const BCH2SettingsScreen: React.FC<BCH2SettingsProps> = ({ navigation }) 
 
       {/* About Section */}
       <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: BCH2Colors.textPrimary }]}>About</Text>
+        <Text style={[styles.sectionTitle, { color: VoidColors.textPrimary }]}>About</Text>
 
         <View style={styles.aboutCard}>
-          <Text style={styles.aboutTitle}>Bitcoin Cash II Wallet</Text>
+          <Text style={styles.aboutTitle}>VoidCoin Wallet</Text>
           <Text style={styles.aboutVersion}>Version 1.3.0</Text>
           <Text style={styles.aboutDescription}>
-            A mobile wallet for Bitcoin Cash II (BCH2) and BitcoinII (BC2) with full support for both chains.
+            A mobile wallet for VoidCoin (VOID) and BitcoinII (VOID) with full support for both chains.
           </Text>
 
           <View style={styles.aboutLinks}>
             <TouchableOpacity
               style={styles.aboutLink}
-              onPress={() => Linking.openURL('https://bch2.org').catch(() => {})}
+              onPress={() => Linking.openURL('https://void.org').catch(() => {})}
             >
-              <Text style={styles.aboutLinkText}>bch2.org</Text>
+              <Text style={styles.aboutLinkText}>void.org</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.aboutLink}
               onPress={() => Linking.openURL('https://bitcoin-ii.org').catch(() => {})}
             >
-              <Text style={[styles.aboutLinkText, { color: BCH2Colors.bc2Primary }]}>bitcoin-ii.org</Text>
+              <Text style={[styles.aboutLinkText, { color: VoidColors.voidPrimary }]}>bitcoin-ii.org</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -705,70 +705,70 @@ export const BCH2SettingsScreen: React.FC<BCH2SettingsProps> = ({ navigation }) 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: BCH2Colors.background,
+    backgroundColor: VoidColors.background,
   },
   content: {
-    padding: BCH2Spacing.lg,
-    paddingBottom: BCH2Spacing.xxl,
+    padding: VOIDSpacing.lg,
+    paddingBottom: VOIDSpacing.xxl,
   },
   header: {
-    marginBottom: BCH2Spacing.xl,
+    marginBottom: VOIDSpacing.xl,
   },
   title: {
-    fontSize: BCH2Typography.fontSize.xxl,
-    fontWeight: BCH2Typography.fontWeight.bold,
-    color: BCH2Colors.textPrimary,
-    marginBottom: BCH2Spacing.xs,
+    fontSize: VOIDTypography.fontSize.xxl,
+    fontWeight: VOIDTypography.fontWeight.bold,
+    color: VoidColors.textPrimary,
+    marginBottom: VOIDSpacing.xs,
   },
   subtitle: {
-    fontSize: BCH2Typography.fontSize.base,
-    color: BCH2Colors.textSecondary,
+    fontSize: VOIDTypography.fontSize.base,
+    color: VoidColors.textSecondary,
   },
   section: {
-    marginBottom: BCH2Spacing.xl,
+    marginBottom: VOIDSpacing.xl,
   },
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: BCH2Spacing.xs,
+    marginBottom: VOIDSpacing.xs,
   },
   sectionLogo: {
     width: 28,
     height: 28,
-    marginRight: BCH2Spacing.sm,
+    marginRight: VOIDSpacing.sm,
   },
   sectionTitle: {
-    fontSize: BCH2Typography.fontSize.lg,
-    fontWeight: BCH2Typography.fontWeight.semibold,
+    fontSize: VOIDTypography.fontSize.lg,
+    fontWeight: VOIDTypography.fontWeight.semibold,
   },
   sectionDescription: {
-    fontSize: BCH2Typography.fontSize.sm,
-    color: BCH2Colors.textSecondary,
-    marginBottom: BCH2Spacing.lg,
+    fontSize: VOIDTypography.fontSize.sm,
+    color: VoidColors.textSecondary,
+    marginBottom: VOIDSpacing.lg,
     lineHeight: 20,
   },
   serverList: {
-    marginBottom: BCH2Spacing.lg,
+    marginBottom: VOIDSpacing.lg,
   },
   serverOption: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: BCH2Colors.backgroundCard,
-    borderRadius: BCH2BorderRadius.md,
-    padding: BCH2Spacing.md,
-    marginBottom: BCH2Spacing.sm,
+    backgroundColor: VoidColors.backgroundCard,
+    borderRadius: VOIDBorderRadius.md,
+    padding: VOIDSpacing.md,
+    marginBottom: VOIDSpacing.sm,
     borderWidth: 1,
-    borderColor: BCH2Colors.border,
+    borderColor: VoidColors.border,
   },
   serverOptionSelected: {
-    backgroundColor: BCH2Colors.primaryGlow,
+    backgroundColor: VoidColors.primaryGlow,
   },
   serverRadio: {
     width: 20,
     height: 20,
     borderRadius: 10,
     borderWidth: 2,
-    marginRight: BCH2Spacing.md,
+    marginRight: VOIDSpacing.md,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -781,75 +781,75 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   serverHost: {
-    fontSize: BCH2Typography.fontSize.base,
-    color: BCH2Colors.textPrimary,
+    fontSize: VOIDTypography.fontSize.base,
+    color: VoidColors.textPrimary,
     fontFamily: 'monospace',
   },
   serverPort: {
-    fontSize: BCH2Typography.fontSize.sm,
-    color: BCH2Colors.textMuted,
+    fontSize: VOIDTypography.fontSize.sm,
+    color: VoidColors.textMuted,
     marginTop: 2,
   },
   customServerForm: {
-    backgroundColor: BCH2Colors.backgroundCard,
-    borderRadius: BCH2BorderRadius.md,
-    padding: BCH2Spacing.md,
-    marginBottom: BCH2Spacing.lg,
+    backgroundColor: VoidColors.backgroundCard,
+    borderRadius: VOIDBorderRadius.md,
+    padding: VOIDSpacing.md,
+    marginBottom: VOIDSpacing.lg,
   },
   inputGroup: {
-    marginBottom: BCH2Spacing.md,
+    marginBottom: VOIDSpacing.md,
   },
   inputRow: {
     flexDirection: 'row',
   },
   inputLabel: {
-    fontSize: BCH2Typography.fontSize.sm,
-    color: BCH2Colors.textSecondary,
-    marginBottom: BCH2Spacing.xs,
+    fontSize: VOIDTypography.fontSize.sm,
+    color: VoidColors.textSecondary,
+    marginBottom: VOIDSpacing.xs,
   },
   input: {
-    backgroundColor: BCH2Colors.backgroundElevated,
-    borderRadius: BCH2BorderRadius.md,
+    backgroundColor: VoidColors.backgroundElevated,
+    borderRadius: VOIDBorderRadius.md,
     borderWidth: 1,
-    borderColor: BCH2Colors.border,
-    padding: BCH2Spacing.sm,
-    color: BCH2Colors.textPrimary,
-    fontSize: BCH2Typography.fontSize.base,
+    borderColor: VoidColors.border,
+    padding: VOIDSpacing.sm,
+    color: VoidColors.textPrimary,
+    fontSize: VOIDTypography.fontSize.base,
     fontFamily: 'monospace',
   },
   switchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: BCH2Colors.backgroundElevated,
-    borderRadius: BCH2BorderRadius.md,
-    padding: BCH2Spacing.sm,
+    backgroundColor: VoidColors.backgroundElevated,
+    borderRadius: VOIDBorderRadius.md,
+    padding: VOIDSpacing.sm,
     borderWidth: 1,
-    borderColor: BCH2Colors.border,
+    borderColor: VoidColors.border,
   },
   switchLabel: {
-    fontSize: BCH2Typography.fontSize.base,
-    color: BCH2Colors.textSecondary,
-    marginLeft: BCH2Spacing.sm,
+    fontSize: VOIDTypography.fontSize.base,
+    color: VoidColors.textSecondary,
+    marginLeft: VOIDSpacing.sm,
   },
   testButton: {
     backgroundColor: 'transparent',
-    borderRadius: BCH2BorderRadius.md,
-    paddingVertical: BCH2Spacing.sm,
+    borderRadius: VOIDBorderRadius.md,
+    paddingVertical: VOIDSpacing.sm,
     alignItems: 'center',
     borderWidth: 1,
-    marginBottom: BCH2Spacing.md,
+    marginBottom: VOIDSpacing.md,
   },
   testButtonDisabled: {
     opacity: 0.6,
   },
   testButtonText: {
-    fontSize: BCH2Typography.fontSize.base,
-    fontWeight: BCH2Typography.fontWeight.semibold,
+    fontSize: VOIDTypography.fontSize.base,
+    fontWeight: VOIDTypography.fontWeight.semibold,
   },
   statusBadge: {
-    paddingVertical: BCH2Spacing.sm,
-    paddingHorizontal: BCH2Spacing.md,
-    borderRadius: BCH2BorderRadius.md,
+    paddingVertical: VOIDSpacing.sm,
+    paddingHorizontal: VOIDSpacing.md,
+    borderRadius: VOIDBorderRadius.md,
     alignItems: 'center',
   },
   statusConnected: {
@@ -859,142 +859,142 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(252, 129, 129, 0.2)',
   },
   statusText: {
-    fontSize: BCH2Typography.fontSize.sm,
-    fontWeight: BCH2Typography.fontWeight.semibold,
-    color: BCH2Colors.textPrimary,
+    fontSize: VOIDTypography.fontSize.sm,
+    fontWeight: VOIDTypography.fontWeight.semibold,
+    color: VoidColors.textPrimary,
   },
   explorerCard: {
-    backgroundColor: BCH2Colors.backgroundCard,
-    borderRadius: BCH2BorderRadius.md,
-    padding: BCH2Spacing.md,
+    backgroundColor: VoidColors.backgroundCard,
+    borderRadius: VOIDBorderRadius.md,
+    padding: VOIDSpacing.md,
   },
   explorerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: BCH2Spacing.sm,
+    paddingVertical: VOIDSpacing.sm,
     borderBottomWidth: 1,
-    borderBottomColor: BCH2Colors.border,
+    borderBottomColor: VoidColors.border,
   },
   explorerLogo: {
     width: 32,
     height: 32,
-    marginRight: BCH2Spacing.md,
+    marginRight: VOIDSpacing.md,
   },
   explorerInfo: {
     flex: 1,
   },
   explorerLabel: {
-    fontSize: BCH2Typography.fontSize.sm,
-    color: BCH2Colors.textMuted,
+    fontSize: VOIDTypography.fontSize.sm,
+    color: VoidColors.textMuted,
   },
   explorerUrl: {
-    fontSize: BCH2Typography.fontSize.base,
+    fontSize: VOIDTypography.fontSize.base,
     fontFamily: 'monospace',
   },
   explorerArrow: {
-    fontSize: BCH2Typography.fontSize.xl,
-    color: BCH2Colors.textMuted,
+    fontSize: VOIDTypography.fontSize.xl,
+    color: VoidColors.textMuted,
   },
   infoCard: {
-    backgroundColor: BCH2Colors.backgroundCard,
-    borderRadius: BCH2BorderRadius.md,
-    padding: BCH2Spacing.md,
+    backgroundColor: VoidColors.backgroundCard,
+    borderRadius: VOIDBorderRadius.md,
+    padding: VOIDSpacing.md,
   },
   infoRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingVertical: BCH2Spacing.sm,
+    paddingVertical: VOIDSpacing.sm,
     borderBottomWidth: 1,
-    borderBottomColor: BCH2Colors.border,
+    borderBottomColor: VoidColors.border,
   },
   infoLabel: {
-    fontSize: BCH2Typography.fontSize.sm,
-    color: BCH2Colors.textMuted,
+    fontSize: VOIDTypography.fontSize.sm,
+    color: VoidColors.textMuted,
   },
   infoValue: {
-    fontSize: BCH2Typography.fontSize.sm,
-    color: BCH2Colors.textPrimary,
+    fontSize: VOIDTypography.fontSize.sm,
+    color: VoidColors.textPrimary,
   },
   infoValueMono: {
     fontFamily: 'monospace',
-    color: BCH2Colors.primary,
+    color: VoidColors.primary,
   },
   supportButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: BCH2Colors.backgroundCard,
-    borderRadius: BCH2BorderRadius.md,
-    padding: BCH2Spacing.md,
-    marginBottom: BCH2Spacing.sm,
+    backgroundColor: VoidColors.backgroundCard,
+    borderRadius: VOIDBorderRadius.md,
+    padding: VOIDSpacing.md,
+    marginBottom: VOIDSpacing.sm,
     borderWidth: 1,
-    borderColor: BCH2Colors.border,
+    borderColor: VoidColors.border,
   },
   supportIcon: {
     fontSize: 28,
-    marginRight: BCH2Spacing.md,
+    marginRight: VOIDSpacing.md,
   },
   supportText: {
     flex: 1,
   },
   supportTitle: {
-    fontSize: BCH2Typography.fontSize.base,
-    fontWeight: BCH2Typography.fontWeight.semibold,
-    color: BCH2Colors.textPrimary,
+    fontSize: VOIDTypography.fontSize.base,
+    fontWeight: VOIDTypography.fontWeight.semibold,
+    color: VoidColors.textPrimary,
   },
   supportDesc: {
-    fontSize: BCH2Typography.fontSize.sm,
-    color: BCH2Colors.textMuted,
+    fontSize: VOIDTypography.fontSize.sm,
+    color: VoidColors.textMuted,
     marginTop: 2,
   },
   aboutCard: {
-    backgroundColor: BCH2Colors.backgroundCard,
-    borderRadius: BCH2BorderRadius.md,
-    padding: BCH2Spacing.lg,
+    backgroundColor: VoidColors.backgroundCard,
+    borderRadius: VOIDBorderRadius.md,
+    padding: VOIDSpacing.lg,
     alignItems: 'center',
   },
   aboutTitle: {
-    fontSize: BCH2Typography.fontSize.lg,
-    fontWeight: BCH2Typography.fontWeight.bold,
-    color: BCH2Colors.primary,
-    marginBottom: BCH2Spacing.xs,
+    fontSize: VOIDTypography.fontSize.lg,
+    fontWeight: VOIDTypography.fontWeight.bold,
+    color: VoidColors.primary,
+    marginBottom: VOIDSpacing.xs,
   },
   aboutVersion: {
-    fontSize: BCH2Typography.fontSize.sm,
-    color: BCH2Colors.textMuted,
-    marginBottom: BCH2Spacing.md,
+    fontSize: VOIDTypography.fontSize.sm,
+    color: VoidColors.textMuted,
+    marginBottom: VOIDSpacing.md,
   },
   aboutDescription: {
-    fontSize: BCH2Typography.fontSize.sm,
-    color: BCH2Colors.textSecondary,
+    fontSize: VOIDTypography.fontSize.sm,
+    color: VoidColors.textSecondary,
     textAlign: 'center',
     lineHeight: 20,
-    marginBottom: BCH2Spacing.lg,
+    marginBottom: VOIDSpacing.lg,
   },
   aboutLinks: {
     flexDirection: 'row',
-    gap: BCH2Spacing.lg,
+    gap: VOIDSpacing.lg,
   },
   aboutLink: {
-    paddingVertical: BCH2Spacing.xs,
-    paddingHorizontal: BCH2Spacing.md,
+    paddingVertical: VOIDSpacing.xs,
+    paddingHorizontal: VOIDSpacing.md,
   },
   aboutLinkText: {
-    fontSize: BCH2Typography.fontSize.sm,
-    color: BCH2Colors.primary,
-    fontWeight: BCH2Typography.fontWeight.semibold,
+    fontSize: VOIDTypography.fontSize.sm,
+    color: VoidColors.primary,
+    fontWeight: VOIDTypography.fontWeight.semibold,
   },
   saveButton: {
-    backgroundColor: BCH2Colors.primary,
-    borderRadius: BCH2BorderRadius.md,
-    paddingVertical: BCH2Spacing.md,
+    backgroundColor: VoidColors.primary,
+    borderRadius: VOIDBorderRadius.md,
+    paddingVertical: VOIDSpacing.md,
     alignItems: 'center',
-    ...BCH2Shadows.glow,
+    ...VOIDShadows.glow,
   },
   saveButtonText: {
-    color: BCH2Colors.textPrimary,
-    fontSize: BCH2Typography.fontSize.lg,
-    fontWeight: BCH2Typography.fontWeight.bold,
+    color: VoidColors.textPrimary,
+    fontSize: VOIDTypography.fontSize.lg,
+    fontWeight: VOIDTypography.fontWeight.bold,
   },
 });
 
-export default BCH2SettingsScreen;
+export default VoidSettingsScreen;

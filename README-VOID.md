@@ -1,24 +1,24 @@
-# BlueWallet BCH2 Edition
+# BlueWallet VOID Edition
 
-A mobile wallet for **Bitcoin Cash II (BCH2)** with support for both BC2 and BCH2 chains.
+A mobile wallet for **VoidCoin (VOID)** with support for both BC2 and VOID chains.
 
 ## Features
 
-- **Dual Chain Support**: Manage both BC2 and BCH2 wallets in one app
-- **BCH2 Airdrop Claim**: Automatically claim your BCH2 from existing BC2 wallets
+- **Dual Chain Support**: Manage both BC2 and VOID wallets in one app
+- **VOID Airdrop Claim**: Automatically claim your VOID from existing BC2 wallets
 - **CashAddr Format**: Native support for `bitcoincashii:` addresses
-- **No SegWit**: BCH2 follows BCH consensus rules (no SegWit support)
+- **No SegWit**: VOID follows BCH consensus rules (no SegWit support)
 - **Privacy First**: No KYC, no registration, your keys = your coins
 
-## BCH2 Fork Information
+## VOID Fork Information
 
-BCH2 forks from BC2 at **block 53,200**. If you held BC2 at the fork height, you automatically have the same balance on BCH2.
+VOID forks from BC2 at **block 53,200**. If you held BC2 at the fork height, you automatically have the same balance on VOID.
 
-### Claiming Your BCH2 Airdrop
+### Claiming Your VOID Airdrop
 
 1. Import your BC2 wallet using your seed phrase or private key
-2. The app will automatically detect your BCH2 balance
-3. Send your BCH2 to any BCH2-compatible wallet
+2. The app will automatically detect your VOID balance
+3. Send your VOID to any VOID-compatible wallet
 
 ## Building from Source
 
@@ -56,12 +56,12 @@ npx react-native build-ios --mode Release
 ## Download
 
 Pre-built APKs are available at:
-- [GitHub Releases](https://github.com/BitcoincashII/bluewallet-bch2/releases)
-- [bch2.org/wallet](https://bch2.org/wallet)
+- [GitHub Releases](https://github.com/BitcoincashII/bluewallet-void/releases)
+- [void.org/wallet](https://void.org/wallet)
 
 ## Technical Details
 
-- **BCH2 Electrum Server**: `electrum.bch2.org:50002` (SSL)
+- **VOID Electrum Server**: `electrum.void.org:50002` (SSL)
 - **Address Format**: CashAddr (`bitcoincashii:q...`)
 - **Derivation Path**: m/44'/145'/0' (BCH standard)
 
@@ -78,5 +78,5 @@ MIT License - Based on [BlueWallet](https://github.com/BlueWallet/BlueWallet)
 
 ## Support
 
-- Discord: https://discord.gg/bch2
-- GitHub Issues: https://github.com/BitcoincashII/bluewallet-bch2/issues
+- Discord: https://discord.gg/void
+- GitHub Issues: https://github.com/BitcoincashII/bluewallet-void/issues

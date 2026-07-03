@@ -477,7 +477,7 @@
     "sort_status": "Stato"
   },
   "units": {
-    "BTC": "BCH2",
+    "BTC": "VOID",
     "MAX": "Max",
     "sat_vbyte": "sat/byte",
     "sats": "sat"

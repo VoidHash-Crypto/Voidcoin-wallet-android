@@ -1,6 +1,6 @@
 /**
- * BCH2 Airdrop Claim Wizard
- * Guided 5-step flow to claim BCH2 from BC2 wallets
+ * VOID Airdrop Claim Wizard
+ * Guided 5-step flow to claim VOID from VOID wallets
  */
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
@@ -16,9 +16,9 @@ import {
   Image,
 } from 'react-native';
 
-const BC2_LOGO = require('../../img/bc2-logo-small.png');
-const BCH2_LOGO = require('../../img/bch2-logo-small.png');
-import { BCH2Colors, BCH2Spacing, BCH2Typography, BCH2Shadows, BCH2BorderRadius } from '../../components/BCH2Theme';
+const VOID_LOGO = require('../../img/void-logo-small.png');
+const VOID_LOGO = require('../../img/void-logo-small.png');
+import { VoidColors, VOIDSpacing, VOIDTypography, VOIDShadows, VOIDBorderRadius } from '../../components/VoidTheme';
 import {
   claimFromWIF,
   claimFromMnemonic,
@@ -27,8 +27,8 @@ import {
   buildScanResult,
   AirdropClaimResult,
   AirdropScanResult,
-} from '../../class/bch2-airdrop';
-import { saveWallet } from '../../class/bch2-wallet-storage';
+} from '../../class/void-airdrop';
+import { saveWallet } from '../../class/void-wallet-storage';
 import { useNavigation } from '@react-navigation/native';
 import { PasswordInput, PasswordInputHandle } from '../../components/PasswordInput';
 import { useScreenProtect } from '../../hooks/useScreenProtect';
@@ -401,17 +401,17 @@ export const ClaimAirdropScreen: React.FC = () => {
     } else if (storedCredentials.type === 'wif') {
       Alert.alert(
         'WIF Import',
-        'To import a WIF private key, please use the "Add Wallet" screen and select "Import BCH2 Wallet".',
+        'To import a WIF private key, please use the "Add Wallet" screen and select "Import VOID Wallet".',
         [{ text: 'OK' }],
       );
     } else {
       // Descriptor — can't directly import, guide user
       Alert.alert(
         'Descriptor Wallet',
-        'Descriptor wallets cannot be directly imported. To claim your BCH2:\n\n' +
+        'Descriptor wallets cannot be directly imported. To claim your VOID:\n\n' +
         '1. Open Bitcoin Core console\n' +
         '2. Run: dumpprivkey <address>\n' +
-        '3. Use the WIF key with "Add Wallet" > "Import BCH2"',
+        '3. Use the WIF key with "Add Wallet" > "Import VOID"',
         [{ text: 'OK' }],
       );
     }
@@ -436,7 +436,7 @@ export const ClaimAirdropScreen: React.FC = () => {
 
     setImporting(true);
     try {
-      await saveWallet('Claimed BCH2 Wallet', storedCredentials!.value, 'bch2');
+      await saveWallet('Claimed VOID Wallet', storedCredentials!.value, 'void');
       // Clear sensitive data
       setWifInput('');
       setPhraseInput('');
@@ -463,23 +463,23 @@ export const ClaimAirdropScreen: React.FC = () => {
       <ScrollView style={styles.container} contentContainerStyle={styles.content}>
         {/* Header */}
         <View style={styles.headerCenter}>
-          <Image source={BCH2_LOGO} style={styles.headerLogo} resizeMode="contain" />
-          <Text style={styles.title}>Claim BCH2 Airdrop</Text>
+          <Image source={VOID_LOGO} style={styles.headerLogo} resizeMode="contain" />
+          <Text style={styles.title}>Claim VOID Airdrop</Text>
           <Text style={styles.subtitle}>
-            What wallet software holds your BC2/BTC keys?
+            What wallet software holds your VOID/BTC keys?
           </Text>
         </View>
 
         {/* Coin Conversion Visual */}
         <View style={styles.conversionCard}>
           <View style={styles.conversionCoin}>
-            <Image source={BC2_LOGO} style={styles.coinLogo} resizeMode="contain" />
-            <Text style={styles.coinLabel}>BC2</Text>
+            <Image source={VOID_LOGO} style={styles.coinLogo} resizeMode="contain" />
+            <Text style={styles.coinLabel}>VOID</Text>
           </View>
           <Text style={styles.conversionArrow}>{'\u2192'}</Text>
           <View style={styles.conversionCoin}>
-            <Image source={BCH2_LOGO} style={styles.coinLogo} resizeMode="contain" />
-            <Text style={styles.coinLabelAccent}>BCH2</Text>
+            <Image source={VOID_LOGO} style={styles.coinLogo} resizeMode="contain" />
+            <Text style={styles.coinLabelAccent}>VOID</Text>
           </View>
         </View>
 
@@ -597,7 +597,7 @@ export const ClaimAirdropScreen: React.FC = () => {
               value={wifInput}
               onChangeText={setWifInput}
               placeholder={effectiveConfig?.inputPlaceholder}
-              placeholderTextColor={BCH2Colors.textMuted}
+              placeholderTextColor={VoidColors.textMuted}
               autoCapitalize="none"
               autoCorrect={false}
               autoComplete="off"
@@ -613,7 +613,7 @@ export const ClaimAirdropScreen: React.FC = () => {
               value={phraseInput}
               onChangeText={setPhraseInput}
               placeholder={effectiveConfig?.inputPlaceholder}
-              placeholderTextColor={BCH2Colors.textMuted}
+              placeholderTextColor={VoidColors.textMuted}
               multiline
               numberOfLines={3}
               autoCapitalize="none"
@@ -630,7 +630,7 @@ export const ClaimAirdropScreen: React.FC = () => {
               value={descriptorInput}
               onChangeText={setDescriptorInput}
               placeholder={effectiveConfig?.inputPlaceholder}
-              placeholderTextColor={BCH2Colors.textMuted}
+              placeholderTextColor={VoidColors.textMuted}
               multiline
               numberOfLines={6}
               maxLength={5000}
@@ -653,7 +653,7 @@ export const ClaimAirdropScreen: React.FC = () => {
               value={passphrase}
               onChangeText={setPassphrase}
               placeholder="BIP39 passphrase if used..."
-              placeholderTextColor={BCH2Colors.textMuted}
+              placeholderTextColor={VoidColors.textMuted}
               secureTextEntry
               autoComplete="off"
               importantForAutofill="no"
@@ -671,9 +671,9 @@ export const ClaimAirdropScreen: React.FC = () => {
           disabled={!hasInput() || loading}
         >
           {loading ? (
-            <ActivityIndicator color={BCH2Colors.textPrimary} />
+            <ActivityIndicator color={VoidColors.textPrimary} />
           ) : (
-            <Text style={styles.primaryButtonText}>Scan for BCH2</Text>
+            <Text style={styles.primaryButtonText}>Scan for VOID</Text>
           )}
         </TouchableOpacity>
 
@@ -705,9 +705,9 @@ export const ClaimAirdropScreen: React.FC = () => {
         <StepProgress current={2} />
 
         <View style={styles.scanContainer}>
-          <ActivityIndicator size="large" color={BCH2Colors.primary} style={styles.scanSpinner} />
+          <ActivityIndicator size="large" color={VoidColors.primary} style={styles.scanSpinner} />
           <Text style={styles.scanTitle}>Scanning...</Text>
-          <Text style={styles.scanProgressText}>{scanProgress || 'Looking for claimable BCH2...'}</Text>
+          <Text style={styles.scanProgressText}>{scanProgress || 'Looking for claimable VOID...'}</Text>
         </View>
       </ScrollView>
     );
@@ -726,7 +726,7 @@ export const ClaimAirdropScreen: React.FC = () => {
         <StepProgress current={3} />
 
         <Text style={styles.stepTitle}>
-          {hasClaims ? 'BCH2 Found!' : 'No BCH2 Found'}
+          {hasClaims ? 'VOID Found!' : 'No VOID Found'}
         </Text>
 
         {/* Total Card */}
@@ -734,7 +734,7 @@ export const ClaimAirdropScreen: React.FC = () => {
           <View style={styles.totalCard}>
             <Text style={styles.totalLabel}>Total Claimable</Text>
             <Text style={styles.totalAmount}>
-              {formatBalance(scanResult.totalBalance)} BCH2
+              {formatBalance(scanResult.totalBalance)} VOID
             </Text>
           </View>
         )}
@@ -750,8 +750,8 @@ export const ClaimAirdropScreen: React.FC = () => {
 
         {/* Per-address Results */}
         {claims.map((claim, index) => {
-          const bc2 = claim.bc2Balance ?? 0;
-          const excess = claim.balance - Math.min(claim.balance, bc2);
+          const void = claim.voidBalance ?? 0;
+          const excess = claim.balance - Math.min(claim.balance, void);
           return (
             <View key={index} style={styles.resultCard}>
               {/* Address type badge */}
@@ -761,41 +761,41 @@ export const ClaimAirdropScreen: React.FC = () => {
                 </Text>
               </View>
 
-              {excess > 0 && bc2 === 0 && (
+              {excess > 0 && void === 0 && (
                 <View style={styles.warningBadge}>
-                  <Text style={styles.warningBadgeText}>No matching BC2 balance</Text>
+                  <Text style={styles.warningBadgeText}>No matching VOID balance</Text>
                 </View>
               )}
-              {excess > 0 && bc2 > 0 && (
+              {excess > 0 && void > 0 && (
                 <View style={styles.warningBadge}>
                   <Text style={styles.warningBadgeText}>
-                    {formatBalance(excess)} BCH2 exceeds BC2 balance
+                    {formatBalance(excess)} VOID exceeds VOID balance
                   </Text>
                 </View>
               )}
 
               <View style={styles.resultRow}>
-                <Text style={styles.resultLabel}>BC2 Address</Text>
+                <Text style={styles.resultLabel}>VOID Address</Text>
                 <Text style={styles.resultValue} numberOfLines={1} ellipsizeMode="middle">
                   {claim.address}
                 </Text>
               </View>
               <View style={styles.resultRow}>
-                <Text style={styles.resultLabel}>BCH2 Address</Text>
+                <Text style={styles.resultLabel}>VOID Address</Text>
                 <Text style={styles.resultValueAccent} numberOfLines={1} ellipsizeMode="middle">
-                  {claim.bch2Address}
+                  {claim.voidAddress}
                 </Text>
               </View>
               <View style={styles.resultRow}>
                 <Text style={styles.resultLabel}>Balance</Text>
                 <Text style={styles.resultBalance}>
-                  {formatBalance(claim.balance)} BCH2
+                  {formatBalance(claim.balance)} VOID
                 </Text>
               </View>
-              {bc2 > 0 && (
+              {void > 0 && (
                 <View style={styles.resultRow}>
-                  <Text style={styles.resultLabel}>BC2 Balance</Text>
-                  <Text style={styles.resultValue}>{formatBalance(bc2)} BC2</Text>
+                  <Text style={styles.resultLabel}>VOID Balance</Text>
+                  <Text style={styles.resultValue}>{formatBalance(void)} VOID</Text>
                 </View>
               )}
               {claim.derivationPath && (
@@ -812,7 +812,7 @@ export const ClaimAirdropScreen: React.FC = () => {
         {!hasClaims && (
           <View style={styles.emptyCard}>
             <Text style={styles.emptyText}>
-              No BCH2 balance found for this wallet. Make sure you had BC2 balance at fork block 53,200.
+              No VOID balance found for this wallet. Make sure you had VOID balance at fork block 53,200.
             </Text>
           </View>
         )}
@@ -825,7 +825,7 @@ export const ClaimAirdropScreen: React.FC = () => {
             disabled={importing || antiGamingBlocked}
           >
             {importing ? (
-              <ActivityIndicator color={BCH2Colors.textPrimary} />
+              <ActivityIndicator color={VoidColors.textPrimary} />
             ) : (
               <Text style={styles.primaryButtonText}>Import Wallet</Text>
             )}
@@ -870,7 +870,7 @@ export const ClaimAirdropScreen: React.FC = () => {
               disabled={importing}
             >
               {importing ? (
-                <ActivityIndicator color={BCH2Colors.textPrimary} />
+                <ActivityIndicator color={VoidColors.textPrimary} />
               ) : (
                 <Text style={styles.primaryButtonText}>Set Password & Import</Text>
               )}
@@ -914,11 +914,11 @@ export const ClaimAirdropScreen: React.FC = () => {
         <StepProgress current={4} />
 
         <View style={styles.successContainer}>
-          <Image source={BCH2_LOGO} style={styles.successLogo} resizeMode="contain" />
+          <Image source={VOID_LOGO} style={styles.successLogo} resizeMode="contain" />
           <Text style={styles.successTitle}>Wallet Imported!</Text>
           <Text style={styles.successSubtitle}>
-            Your BCH2 wallet has been imported with{' '}
-            {formatBalance(scanResult?.totalBalance ?? 0)} BCH2
+            Your VOID wallet has been imported with{' '}
+            {formatBalance(scanResult?.totalBalance ?? 0)} VOID
           </Text>
         </View>
 
@@ -942,41 +942,41 @@ export const ClaimAirdropScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: BCH2Colors.background,
+    backgroundColor: VoidColors.background,
   },
   content: {
-    padding: BCH2Spacing.lg,
-    paddingBottom: BCH2Spacing.xxl,
+    padding: VOIDSpacing.lg,
+    paddingBottom: VOIDSpacing.xxl,
   },
 
   // Header
   headerCenter: {
     alignItems: 'center',
-    marginBottom: BCH2Spacing.lg,
+    marginBottom: VOIDSpacing.lg,
   },
   headerLogo: {
     width: 56,
     height: 56,
-    marginBottom: BCH2Spacing.md,
+    marginBottom: VOIDSpacing.md,
   },
   title: {
-    fontSize: BCH2Typography.fontSize.xxl,
-    fontWeight: BCH2Typography.fontWeight.bold,
-    color: BCH2Colors.textPrimary,
+    fontSize: VOIDTypography.fontSize.xxl,
+    fontWeight: VOIDTypography.fontWeight.bold,
+    color: VoidColors.textPrimary,
     textAlign: 'center',
-    marginBottom: BCH2Spacing.xs,
+    marginBottom: VOIDSpacing.xs,
   },
   subtitle: {
-    fontSize: BCH2Typography.fontSize.base,
-    color: BCH2Colors.textSecondary,
+    fontSize: VOIDTypography.fontSize.base,
+    color: VoidColors.textSecondary,
     textAlign: 'center',
     lineHeight: 22,
   },
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: BCH2Spacing.md,
-    marginBottom: BCH2Spacing.md,
+    gap: VOIDSpacing.md,
+    marginBottom: VOIDSpacing.md,
   },
   walletIcon: {
     fontSize: 32,
@@ -984,19 +984,19 @@ const styles = StyleSheet.create({
     height: 48,
     textAlign: 'center',
     lineHeight: 48,
-    backgroundColor: BCH2Colors.backgroundCard,
-    borderRadius: BCH2BorderRadius.lg,
+    backgroundColor: VoidColors.backgroundCard,
+    borderRadius: VOIDBorderRadius.lg,
     overflow: 'hidden',
   },
   stepTitle: {
-    fontSize: BCH2Typography.fontSize.xl,
-    fontWeight: BCH2Typography.fontWeight.bold,
-    color: BCH2Colors.textPrimary,
-    marginBottom: BCH2Spacing.xs,
+    fontSize: VOIDTypography.fontSize.xl,
+    fontWeight: VOIDTypography.fontWeight.bold,
+    color: VoidColors.textPrimary,
+    marginBottom: VOIDSpacing.xs,
   },
   stepSubtitle: {
-    fontSize: BCH2Typography.fontSize.sm,
-    color: BCH2Colors.textSecondary,
+    fontSize: VOIDTypography.fontSize.sm,
+    color: VoidColors.textSecondary,
   },
 
   // Conversion Card
@@ -1004,10 +1004,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: BCH2Colors.backgroundCard,
-    borderRadius: BCH2BorderRadius.lg,
-    padding: BCH2Spacing.lg,
-    marginBottom: BCH2Spacing.lg,
+    backgroundColor: VoidColors.backgroundCard,
+    borderRadius: VOIDBorderRadius.lg,
+    padding: VOIDSpacing.lg,
+    marginBottom: VOIDSpacing.lg,
   },
   conversionCoin: {
     alignItems: 'center',
@@ -1015,54 +1015,54 @@ const styles = StyleSheet.create({
   coinLogo: {
     width: 48,
     height: 48,
-    marginBottom: BCH2Spacing.sm,
+    marginBottom: VOIDSpacing.sm,
   },
   coinLabel: {
-    fontSize: BCH2Typography.fontSize.lg,
-    fontWeight: BCH2Typography.fontWeight.bold,
-    color: BCH2Colors.bc2Primary,
+    fontSize: VOIDTypography.fontSize.lg,
+    fontWeight: VOIDTypography.fontWeight.bold,
+    color: VoidColors.voidPrimary,
   },
   coinLabelAccent: {
-    fontSize: BCH2Typography.fontSize.lg,
-    fontWeight: BCH2Typography.fontWeight.bold,
-    color: BCH2Colors.primary,
+    fontSize: VOIDTypography.fontSize.lg,
+    fontWeight: VOIDTypography.fontWeight.bold,
+    color: VoidColors.primary,
   },
   conversionArrow: {
     fontSize: 28,
-    color: BCH2Colors.textMuted,
-    marginHorizontal: BCH2Spacing.xl,
+    color: VoidColors.textMuted,
+    marginHorizontal: VOIDSpacing.xl,
   },
 
   // Wallet Type Grid
   walletTypeGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: BCH2Spacing.md,
-    marginBottom: BCH2Spacing.lg,
+    gap: VOIDSpacing.md,
+    marginBottom: VOIDSpacing.lg,
   },
   walletTypeCard: {
     width: '47%',
-    backgroundColor: BCH2Colors.backgroundCard,
-    borderRadius: BCH2BorderRadius.lg,
-    padding: BCH2Spacing.md,
+    backgroundColor: VoidColors.backgroundCard,
+    borderRadius: VOIDBorderRadius.lg,
+    padding: VOIDSpacing.md,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: BCH2Colors.border,
+    borderColor: VoidColors.border,
   },
   walletTypeIcon: {
     fontSize: 28,
-    marginBottom: BCH2Spacing.sm,
+    marginBottom: VOIDSpacing.sm,
     lineHeight: 36,
   },
   walletTypeName: {
-    fontSize: BCH2Typography.fontSize.base,
-    fontWeight: BCH2Typography.fontWeight.semibold,
-    color: BCH2Colors.textPrimary,
-    marginBottom: BCH2Spacing.xs,
+    fontSize: VOIDTypography.fontSize.base,
+    fontWeight: VOIDTypography.fontWeight.semibold,
+    color: VoidColors.textPrimary,
+    marginBottom: VOIDSpacing.xs,
   },
   walletTypeDesc: {
-    fontSize: BCH2Typography.fontSize.xs,
-    color: BCH2Colors.textMuted,
+    fontSize: VOIDTypography.fontSize.xs,
+    color: VoidColors.textMuted,
     textAlign: 'center',
   },
 
@@ -1071,114 +1071,114 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: BCH2Spacing.lg,
+    marginBottom: VOIDSpacing.lg,
   },
   stepDot: {
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: BCH2Colors.border,
+    backgroundColor: VoidColors.border,
     borderWidth: 2,
-    borderColor: BCH2Colors.border,
+    borderColor: VoidColors.border,
   },
   stepDotActive: {
-    backgroundColor: BCH2Colors.primary,
-    borderColor: BCH2Colors.primary,
-    ...BCH2Shadows.glow,
+    backgroundColor: VoidColors.primary,
+    borderColor: VoidColors.primary,
+    ...VOIDShadows.glow,
   },
   stepDotCompleted: {
-    backgroundColor: BCH2Colors.primary,
-    borderColor: BCH2Colors.primary,
+    backgroundColor: VoidColors.primary,
+    borderColor: VoidColors.primary,
   },
   stepLine: {
     width: 32,
     height: 2,
-    backgroundColor: BCH2Colors.border,
+    backgroundColor: VoidColors.border,
   },
   stepLineCompleted: {
-    backgroundColor: BCH2Colors.primary,
+    backgroundColor: VoidColors.primary,
   },
 
   // Security Note
   securityNote: {
-    backgroundColor: BCH2Colors.primaryGlow,
-    borderRadius: BCH2BorderRadius.md,
-    padding: BCH2Spacing.sm,
-    marginBottom: BCH2Spacing.md,
+    backgroundColor: VoidColors.primaryGlow,
+    borderRadius: VOIDBorderRadius.md,
+    padding: VOIDSpacing.sm,
+    marginBottom: VOIDSpacing.md,
     alignItems: 'center',
   },
   securityNoteText: {
-    fontSize: BCH2Typography.fontSize.sm,
-    color: BCH2Colors.primary,
-    fontWeight: BCH2Typography.fontWeight.medium,
+    fontSize: VOIDTypography.fontSize.sm,
+    color: VoidColors.primary,
+    fontWeight: VOIDTypography.fontWeight.medium,
   },
 
   // Warning Card
   warningCard: {
     backgroundColor: 'rgba(246, 173, 85, 0.1)',
-    borderRadius: BCH2BorderRadius.md,
-    padding: BCH2Spacing.md,
-    marginBottom: BCH2Spacing.md,
+    borderRadius: VOIDBorderRadius.md,
+    padding: VOIDSpacing.md,
+    marginBottom: VOIDSpacing.md,
     borderLeftWidth: 3,
-    borderLeftColor: BCH2Colors.warning,
+    borderLeftColor: VoidColors.warning,
   },
   warningText: {
-    fontSize: BCH2Typography.fontSize.sm,
-    color: BCH2Colors.warning,
+    fontSize: VOIDTypography.fontSize.sm,
+    color: VoidColors.warning,
     lineHeight: 20,
   },
 
   // Instructions
   instructionCard: {
-    backgroundColor: BCH2Colors.backgroundCard,
-    borderRadius: BCH2BorderRadius.lg,
-    padding: BCH2Spacing.lg,
-    marginBottom: BCH2Spacing.lg,
+    backgroundColor: VoidColors.backgroundCard,
+    borderRadius: VOIDBorderRadius.lg,
+    padding: VOIDSpacing.lg,
+    marginBottom: VOIDSpacing.lg,
   },
   instructionRow: {
     flexDirection: 'row',
-    marginBottom: BCH2Spacing.md,
+    marginBottom: VOIDSpacing.md,
     alignItems: 'flex-start',
   },
   instructionNumber: {
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: BCH2Colors.primaryGlow,
+    backgroundColor: VoidColors.primaryGlow,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: BCH2Spacing.sm,
+    marginRight: VOIDSpacing.sm,
     marginTop: 1,
   },
   instructionNumberText: {
-    fontSize: BCH2Typography.fontSize.xs,
-    fontWeight: BCH2Typography.fontWeight.bold,
-    color: BCH2Colors.primary,
+    fontSize: VOIDTypography.fontSize.xs,
+    fontWeight: VOIDTypography.fontWeight.bold,
+    color: VoidColors.primary,
   },
   instructionText: {
     flex: 1,
-    fontSize: BCH2Typography.fontSize.sm,
-    color: BCH2Colors.textSecondary,
+    fontSize: VOIDTypography.fontSize.sm,
+    color: VoidColors.textSecondary,
     lineHeight: 20,
   },
 
   // Input
   inputContainer: {
-    marginBottom: BCH2Spacing.md,
+    marginBottom: VOIDSpacing.md,
   },
   inputLabel: {
-    fontSize: BCH2Typography.fontSize.sm,
-    color: BCH2Colors.textSecondary,
-    marginBottom: BCH2Spacing.sm,
+    fontSize: VOIDTypography.fontSize.sm,
+    color: VoidColors.textSecondary,
+    marginBottom: VOIDSpacing.sm,
   },
   input: {
-    backgroundColor: BCH2Colors.backgroundCard,
-    borderRadius: BCH2BorderRadius.md,
+    backgroundColor: VoidColors.backgroundCard,
+    borderRadius: VOIDBorderRadius.md,
     borderWidth: 1,
-    borderColor: BCH2Colors.border,
-    padding: BCH2Spacing.md,
-    color: BCH2Colors.textPrimary,
-    fontSize: BCH2Typography.fontSize.base,
+    borderColor: VoidColors.border,
+    padding: VOIDSpacing.md,
+    color: VoidColors.textPrimary,
+    fontSize: VOIDTypography.fontSize.base,
     fontFamily: 'monospace',
   },
   inputMultiline: {
@@ -1186,76 +1186,76 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
   },
   helperText: {
-    fontSize: BCH2Typography.fontSize.xs,
-    color: BCH2Colors.textMuted,
-    marginTop: BCH2Spacing.xs,
+    fontSize: VOIDTypography.fontSize.xs,
+    color: VoidColors.textMuted,
+    marginTop: VOIDSpacing.xs,
   },
 
   // Mode Selector
   modeSelector: {
     flexDirection: 'row',
-    backgroundColor: BCH2Colors.backgroundCard,
-    borderRadius: BCH2BorderRadius.md,
-    padding: BCH2Spacing.xs,
-    marginBottom: BCH2Spacing.lg,
+    backgroundColor: VoidColors.backgroundCard,
+    borderRadius: VOIDBorderRadius.md,
+    padding: VOIDSpacing.xs,
+    marginBottom: VOIDSpacing.lg,
   },
   modeButton: {
     flex: 1,
-    paddingVertical: BCH2Spacing.sm,
+    paddingVertical: VOIDSpacing.sm,
     alignItems: 'center',
-    borderRadius: BCH2BorderRadius.sm,
+    borderRadius: VOIDBorderRadius.sm,
   },
   modeButtonActive: {
-    backgroundColor: BCH2Colors.primary,
+    backgroundColor: VoidColors.primary,
   },
   modeButtonText: {
-    fontSize: BCH2Typography.fontSize.sm,
-    color: BCH2Colors.textMuted,
-    fontWeight: BCH2Typography.fontWeight.medium,
+    fontSize: VOIDTypography.fontSize.sm,
+    color: VoidColors.textMuted,
+    fontWeight: VOIDTypography.fontWeight.medium,
   },
   modeButtonTextActive: {
-    color: BCH2Colors.textPrimary,
+    color: VoidColors.textPrimary,
   },
 
   // Buttons
   primaryButton: {
-    backgroundColor: BCH2Colors.primary,
-    borderRadius: BCH2BorderRadius.md,
-    paddingVertical: BCH2Spacing.md,
+    backgroundColor: VoidColors.primary,
+    borderRadius: VOIDBorderRadius.md,
+    paddingVertical: VOIDSpacing.md,
     alignItems: 'center',
-    marginTop: BCH2Spacing.md,
-    ...BCH2Shadows.glow,
+    marginTop: VOIDSpacing.md,
+    ...VOIDShadows.glow,
   },
   primaryButtonText: {
-    color: BCH2Colors.textPrimary,
-    fontSize: BCH2Typography.fontSize.lg,
-    fontWeight: BCH2Typography.fontWeight.bold,
+    color: VoidColors.textPrimary,
+    fontSize: VOIDTypography.fontSize.lg,
+    fontWeight: VOIDTypography.fontWeight.bold,
   },
   buttonDisabled: {
     opacity: 0.5,
   },
   backButton: {
-    paddingVertical: BCH2Spacing.md,
+    paddingVertical: VOIDSpacing.md,
     alignItems: 'center',
-    marginTop: BCH2Spacing.sm,
+    marginTop: VOIDSpacing.sm,
   },
   backButtonText: {
-    color: BCH2Colors.textSecondary,
-    fontSize: BCH2Typography.fontSize.base,
+    color: VoidColors.textSecondary,
+    fontSize: VOIDTypography.fontSize.base,
   },
 
   // Error
   errorCard: {
     backgroundColor: 'rgba(252, 129, 129, 0.1)',
-    borderRadius: BCH2BorderRadius.md,
-    padding: BCH2Spacing.md,
-    marginBottom: BCH2Spacing.md,
+    borderRadius: VOIDBorderRadius.md,
+    padding: VOIDSpacing.md,
+    marginBottom: VOIDSpacing.md,
     borderLeftWidth: 3,
-    borderLeftColor: BCH2Colors.error,
+    borderLeftColor: VoidColors.error,
   },
   errorText: {
-    fontSize: BCH2Typography.fontSize.sm,
-    color: BCH2Colors.error,
+    fontSize: VOIDTypography.fontSize.sm,
+    color: VoidColors.error,
     lineHeight: 20,
   },
 
@@ -1263,173 +1263,173 @@ const styles = StyleSheet.create({
   scanContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: BCH2Spacing.xxl,
+    paddingVertical: VOIDSpacing.xxl,
   },
   scanSpinner: {
-    marginBottom: BCH2Spacing.lg,
+    marginBottom: VOIDSpacing.lg,
   },
   scanTitle: {
-    fontSize: BCH2Typography.fontSize.xl,
-    fontWeight: BCH2Typography.fontWeight.bold,
-    color: BCH2Colors.textPrimary,
-    marginBottom: BCH2Spacing.sm,
+    fontSize: VOIDTypography.fontSize.xl,
+    fontWeight: VOIDTypography.fontWeight.bold,
+    color: VoidColors.textPrimary,
+    marginBottom: VOIDSpacing.sm,
   },
   scanProgressText: {
-    fontSize: BCH2Typography.fontSize.sm,
-    color: BCH2Colors.textMuted,
+    fontSize: VOIDTypography.fontSize.sm,
+    color: VoidColors.textMuted,
   },
 
   // Results
   totalCard: {
-    backgroundColor: BCH2Colors.primaryGlow,
-    borderRadius: BCH2BorderRadius.lg,
-    padding: BCH2Spacing.lg,
-    marginBottom: BCH2Spacing.md,
+    backgroundColor: VoidColors.primaryGlow,
+    borderRadius: VOIDBorderRadius.lg,
+    padding: VOIDSpacing.lg,
+    marginBottom: VOIDSpacing.md,
     borderWidth: 1,
-    borderColor: BCH2Colors.primary,
+    borderColor: VoidColors.primary,
     alignItems: 'center',
   },
   totalLabel: {
-    fontSize: BCH2Typography.fontSize.sm,
-    color: BCH2Colors.textSecondary,
-    marginBottom: BCH2Spacing.xs,
+    fontSize: VOIDTypography.fontSize.sm,
+    color: VoidColors.textSecondary,
+    marginBottom: VOIDSpacing.xs,
   },
   totalAmount: {
-    fontSize: BCH2Typography.fontSize.xxl,
-    fontWeight: BCH2Typography.fontWeight.bold,
-    color: BCH2Colors.primary,
+    fontSize: VOIDTypography.fontSize.xxl,
+    fontWeight: VOIDTypography.fontWeight.bold,
+    color: VoidColors.primary,
     fontFamily: 'monospace',
   },
   resultCard: {
-    backgroundColor: BCH2Colors.backgroundCard,
-    borderRadius: BCH2BorderRadius.md,
-    padding: BCH2Spacing.md,
-    marginBottom: BCH2Spacing.sm,
+    backgroundColor: VoidColors.backgroundCard,
+    borderRadius: VOIDBorderRadius.md,
+    padding: VOIDSpacing.md,
+    marginBottom: VOIDSpacing.sm,
   },
   addressTypeBadge: {
-    backgroundColor: BCH2Colors.primaryGlow,
-    borderRadius: BCH2BorderRadius.sm,
-    paddingHorizontal: BCH2Spacing.sm,
+    backgroundColor: VoidColors.primaryGlow,
+    borderRadius: VOIDBorderRadius.sm,
+    paddingHorizontal: VOIDSpacing.sm,
     paddingVertical: 2,
     alignSelf: 'flex-start',
-    marginBottom: BCH2Spacing.sm,
+    marginBottom: VOIDSpacing.sm,
   },
   addressTypeBadgeText: {
-    fontSize: BCH2Typography.fontSize.xs,
-    color: BCH2Colors.primary,
-    fontWeight: BCH2Typography.fontWeight.medium,
+    fontSize: VOIDTypography.fontSize.xs,
+    color: VoidColors.primary,
+    fontWeight: VOIDTypography.fontWeight.medium,
   },
   warningBadge: {
     backgroundColor: 'rgba(246, 173, 85, 0.15)',
-    borderRadius: BCH2BorderRadius.sm,
-    paddingHorizontal: BCH2Spacing.sm,
-    paddingVertical: BCH2Spacing.xs,
-    marginBottom: BCH2Spacing.sm,
+    borderRadius: VOIDBorderRadius.sm,
+    paddingHorizontal: VOIDSpacing.sm,
+    paddingVertical: VOIDSpacing.xs,
+    marginBottom: VOIDSpacing.sm,
   },
   warningBadgeText: {
-    color: BCH2Colors.warning,
-    fontSize: BCH2Typography.fontSize.xs,
-    fontWeight: BCH2Typography.fontWeight.medium,
+    color: VoidColors.warning,
+    fontSize: VOIDTypography.fontSize.xs,
+    fontWeight: VOIDTypography.fontWeight.medium,
   },
   resultRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: BCH2Spacing.xs,
+    paddingVertical: VOIDSpacing.xs,
   },
   resultLabel: {
-    fontSize: BCH2Typography.fontSize.sm,
-    color: BCH2Colors.textMuted,
+    fontSize: VOIDTypography.fontSize.sm,
+    color: VoidColors.textMuted,
   },
   resultValue: {
-    fontSize: BCH2Typography.fontSize.sm,
-    color: BCH2Colors.textSecondary,
+    fontSize: VOIDTypography.fontSize.sm,
+    color: VoidColors.textSecondary,
     fontFamily: 'monospace',
     maxWidth: '60%',
   },
   resultValueAccent: {
-    fontSize: BCH2Typography.fontSize.sm,
-    color: BCH2Colors.primary,
+    fontSize: VOIDTypography.fontSize.sm,
+    color: VoidColors.primary,
     fontFamily: 'monospace',
     maxWidth: '60%',
   },
   resultValueMono: {
-    fontSize: BCH2Typography.fontSize.xs,
-    color: BCH2Colors.textMuted,
+    fontSize: VOIDTypography.fontSize.xs,
+    color: VoidColors.textMuted,
     fontFamily: 'monospace',
     maxWidth: '60%',
   },
   resultBalance: {
-    fontSize: BCH2Typography.fontSize.md,
-    fontWeight: BCH2Typography.fontWeight.bold,
-    color: BCH2Colors.success,
+    fontSize: VOIDTypography.fontSize.md,
+    fontWeight: VOIDTypography.fontWeight.bold,
+    color: VoidColors.success,
     fontFamily: 'monospace',
   },
   emptyCard: {
-    backgroundColor: BCH2Colors.backgroundCard,
-    borderRadius: BCH2BorderRadius.md,
-    padding: BCH2Spacing.lg,
+    backgroundColor: VoidColors.backgroundCard,
+    borderRadius: VOIDBorderRadius.md,
+    padding: VOIDSpacing.lg,
     alignItems: 'center',
-    marginBottom: BCH2Spacing.md,
+    marginBottom: VOIDSpacing.md,
   },
   emptyText: {
-    fontSize: BCH2Typography.fontSize.sm,
-    color: BCH2Colors.textMuted,
+    fontSize: VOIDTypography.fontSize.sm,
+    color: VoidColors.textMuted,
     textAlign: 'center',
     lineHeight: 20,
   },
 
   // Password Step
   passwordStepCard: {
-    backgroundColor: BCH2Colors.backgroundCard,
-    borderRadius: BCH2BorderRadius.lg,
-    padding: BCH2Spacing.lg,
-    marginTop: BCH2Spacing.md,
+    backgroundColor: VoidColors.backgroundCard,
+    borderRadius: VOIDBorderRadius.lg,
+    padding: VOIDSpacing.lg,
+    marginTop: VOIDSpacing.md,
     borderWidth: 1,
-    borderColor: BCH2Colors.primary,
+    borderColor: VoidColors.primary,
   },
   passwordStepTitle: {
-    fontSize: BCH2Typography.fontSize.lg,
-    fontWeight: BCH2Typography.fontWeight.bold,
-    color: BCH2Colors.textPrimary,
+    fontSize: VOIDTypography.fontSize.lg,
+    fontWeight: VOIDTypography.fontWeight.bold,
+    color: VoidColors.textPrimary,
     textAlign: 'center',
-    marginBottom: BCH2Spacing.xs,
+    marginBottom: VOIDSpacing.xs,
   },
   passwordStepSubtitle: {
-    fontSize: BCH2Typography.fontSize.sm,
-    color: BCH2Colors.textSecondary,
+    fontSize: VOIDTypography.fontSize.sm,
+    color: VoidColors.textSecondary,
     textAlign: 'center',
-    marginBottom: BCH2Spacing.lg,
+    marginBottom: VOIDSpacing.lg,
   },
   passwordInputGroup: {
-    marginBottom: BCH2Spacing.md,
+    marginBottom: VOIDSpacing.md,
   },
   passwordError: {
-    color: BCH2Colors.error,
-    fontSize: BCH2Typography.fontSize.sm,
+    color: VoidColors.error,
+    fontSize: VOIDTypography.fontSize.sm,
     textAlign: 'center',
-    marginBottom: BCH2Spacing.md,
+    marginBottom: VOIDSpacing.md,
   },
 
   // Success
   successContainer: {
     alignItems: 'center',
-    paddingVertical: BCH2Spacing.xxl,
+    paddingVertical: VOIDSpacing.xxl,
   },
   successLogo: {
     width: 72,
     height: 72,
-    marginBottom: BCH2Spacing.lg,
+    marginBottom: VOIDSpacing.lg,
   },
   successTitle: {
-    fontSize: BCH2Typography.fontSize.xxl,
-    fontWeight: BCH2Typography.fontWeight.bold,
-    color: BCH2Colors.primary,
-    marginBottom: BCH2Spacing.sm,
+    fontSize: VOIDTypography.fontSize.xxl,
+    fontWeight: VOIDTypography.fontWeight.bold,
+    color: VoidColors.primary,
+    marginBottom: VOIDSpacing.sm,
   },
   successSubtitle: {
-    fontSize: BCH2Typography.fontSize.base,
-    color: BCH2Colors.textSecondary,
+    fontSize: VOIDTypography.fontSize.base,
+    color: VoidColors.textSecondary,
     textAlign: 'center',
     lineHeight: 22,
   },

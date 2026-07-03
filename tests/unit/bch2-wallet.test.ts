@@ -1,7 +1,7 @@
 import assert from 'assert';
 
-// Mock BCH2Electrum before importing the wallet
-jest.mock('../../blue_modules/BCH2Electrum', () => ({
+// Mock VoidElectrum before importing the wallet
+jest.mock('../../blue_modules/VoidElectrum', () => ({
   getBalanceByAddress: jest.fn(),
   getTransactionsByAddress: jest.fn(),
   getUtxosByAddress: jest.fn(),
@@ -14,12 +14,12 @@ jest.mock('../../class/rng', () => ({
   randomBytes: jest.fn(() => Promise.resolve(Buffer.alloc(32, 0x42))),
 }));
 
-import { BCH2Wallet } from '../../class/wallets/bch2-wallet';
+import { VoidWallet } from '../../class/wallets/void-wallet';
 
 // ---------------------------------------------------------------------------
 // CashAddr test vectors
 // ---------------------------------------------------------------------------
-// A known 20-byte P2PKH hash and its expected BCH2 CashAddr were produced by
+// A known 20-byte P2PKH hash and its expected VOID CashAddr were produced by
 // encoding through the wallet's own encoder (which matches the CashAddr spec).
 // We also re-derive them independently below.
 
@@ -93,7 +93,7 @@ const REF_P2SH_ADDR = encodeCashAddr('bitcoincashii', 1, KNOWN_HASH); // type 1 
 // Tests
 // ---------------------------------------------------------------------------
 
-describe('BCH2Wallet', () => {
+describe('VoidWallet', () => {
   // -----------------------------------------------------------------------
   // CashAddr encoding / decoding
   // -----------------------------------------------------------------------
@@ -111,11 +111,11 @@ describe('BCH2Wallet', () => {
     });
 
     it('round-trips through isValidAddress for P2PKH', () => {
-      assert.strictEqual(BCH2Wallet.isValidAddress(REF_P2PKH_ADDR), true);
+      assert.strictEqual(VoidWallet.isValidAddress(REF_P2PKH_ADDR), true);
     });
 
     it('round-trips through isValidAddress for P2SH', () => {
-      assert.strictEqual(BCH2Wallet.isValidAddress(REF_P2SH_ADDR), true);
+      assert.strictEqual(VoidWallet.isValidAddress(REF_P2SH_ADDR), true);
     });
 
     it('polymod checksum validation passes for a valid address', () => {
@@ -143,29 +143,29 @@ describe('BCH2Wallet', () => {
       const originalChar = chars[idx];
       chars[idx] = CHARSET[(CHARSET.indexOf(originalChar) + 1) % CHARSET.length];
       const tampered = 'bitcoincashii:' + chars.join('');
-      assert.strictEqual(BCH2Wallet.isValidAddress(tampered), false);
+      assert.strictEqual(VoidWallet.isValidAddress(tampered), false);
     });
 
     it('rejects bitcoincash: prefix (wrong chain)', () => {
-      // Take a valid BCH2 address and switch the prefix
+      // Take a valid VOID address and switch the prefix
       const wrongPrefix = REF_P2PKH_ADDR.replace('bitcoincashii:', 'bitcoincash:');
-      assert.strictEqual(BCH2Wallet.isValidAddress(wrongPrefix), false);
+      assert.strictEqual(VoidWallet.isValidAddress(wrongPrefix), false);
     });
 
     it('rejects invalid checksums', () => {
       // Truncate last char from a valid address
       const truncated = REF_P2PKH_ADDR.slice(0, -1);
-      assert.strictEqual(BCH2Wallet.isValidAddress(truncated), false);
+      assert.strictEqual(VoidWallet.isValidAddress(truncated), false);
 
       // Append extra character
       const extended = REF_P2PKH_ADDR + 'q';
-      assert.strictEqual(BCH2Wallet.isValidAddress(extended), false);
+      assert.strictEqual(VoidWallet.isValidAddress(extended), false);
     });
 
     it('handles P2PKH (type 0) and P2SH (type 1) addresses', () => {
       // Both should validate
-      assert.strictEqual(BCH2Wallet.isValidAddress(REF_P2PKH_ADDR), true);
-      assert.strictEqual(BCH2Wallet.isValidAddress(REF_P2SH_ADDR), true);
+      assert.strictEqual(VoidWallet.isValidAddress(REF_P2PKH_ADDR), true);
+      assert.strictEqual(VoidWallet.isValidAddress(REF_P2SH_ADDR), true);
 
       // And they should differ
       assert.notStrictEqual(REF_P2PKH_ADDR, REF_P2SH_ADDR);
@@ -176,28 +176,28 @@ describe('BCH2Wallet', () => {
   // Address validation
   // -----------------------------------------------------------------------
   describe('isValidAddress', () => {
-    it('returns true for a valid BCH2 CashAddr', () => {
-      assert.strictEqual(BCH2Wallet.isValidAddress(REF_P2PKH_ADDR), true);
+    it('returns true for a valid VOID CashAddr', () => {
+      assert.strictEqual(VoidWallet.isValidAddress(REF_P2PKH_ADDR), true);
     });
 
     it('returns false for invalid / empty / null-ish inputs', () => {
-      assert.strictEqual(BCH2Wallet.isValidAddress(''), false);
-      assert.strictEqual(BCH2Wallet.isValidAddress('not-an-address'), false);
-      assert.strictEqual(BCH2Wallet.isValidAddress('bitcoincashii:'), false);
+      assert.strictEqual(VoidWallet.isValidAddress(''), false);
+      assert.strictEqual(VoidWallet.isValidAddress('not-an-address'), false);
+      assert.strictEqual(VoidWallet.isValidAddress('bitcoincashii:'), false);
       // @ts-ignore: test null/undefined
-      assert.strictEqual(BCH2Wallet.isValidAddress(null as any), false);
+      assert.strictEqual(VoidWallet.isValidAddress(null as any), false);
       // @ts-ignore
-      assert.strictEqual(BCH2Wallet.isValidAddress(undefined as any), false);
+      assert.strictEqual(VoidWallet.isValidAddress(undefined as any), false);
     });
 
     it('returns false for a legacy Bitcoin address', () => {
       // A typical mainnet P2PKH Bitcoin address
-      assert.strictEqual(BCH2Wallet.isValidAddress('1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa'), false);
+      assert.strictEqual(VoidWallet.isValidAddress('1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa'), false);
     });
 
-    it('returns false for a BCH (not BCH2) address', () => {
+    it('returns false for a BCH (not VOID) address', () => {
       // bitcoincash: prefix should be rejected
-      assert.strictEqual(BCH2Wallet.isValidAddress('bitcoincash:qpm2qsznhks23z7629mms6s4cwef74vcwvy22gdx6a'), false);
+      assert.strictEqual(VoidWallet.isValidAddress('bitcoincash:qpm2qsznhks23z7629mms6s4cwef74vcwvy22gdx6a'), false);
     });
   });
 
@@ -206,25 +206,25 @@ describe('BCH2Wallet', () => {
   // -----------------------------------------------------------------------
   describe('Wallet properties', () => {
     it('isSegwit() returns false', () => {
-      const w = new BCH2Wallet();
+      const w = new VoidWallet();
       assert.strictEqual(w.isSegwit(), false);
     });
 
     it('allowRBF() returns false', () => {
-      const w = new BCH2Wallet();
+      const w = new VoidWallet();
       assert.strictEqual(w.allowRBF(), false);
     });
 
-    it('type is bch2Legacy', () => {
-      const w = new BCH2Wallet();
-      assert.strictEqual(w.type, 'bch2Legacy');
-      assert.strictEqual(BCH2Wallet.type, 'bch2Legacy');
+    it('type is voidLegacy', () => {
+      const w = new VoidWallet();
+      assert.strictEqual(w.type, 'voidLegacy');
+      assert.strictEqual(VoidWallet.type, 'voidLegacy');
     });
 
-    it('typeReadable is "BCH2 (CashAddr)"', () => {
-      const w = new BCH2Wallet();
-      assert.strictEqual(w.typeReadable, 'BCH2 (CashAddr)');
-      assert.strictEqual(BCH2Wallet.typeReadable, 'BCH2 (CashAddr)');
+    it('typeReadable is "VOID (CashAddr)"', () => {
+      const w = new VoidWallet();
+      assert.strictEqual(w.typeReadable, 'VOID (CashAddr)');
+      assert.strictEqual(VoidWallet.typeReadable, 'VOID (CashAddr)');
     });
   });
 
@@ -235,8 +235,8 @@ describe('BCH2Wallet', () => {
     // Use a known WIF so we get a deterministic address
     const TEST_WIF = '5HueCGU8rMjxEXxiPuD5BDku4MkFqeZyd4dZ1jvhTVqvbTLvyTJ';
 
-    function createWalletWithAddress(): BCH2Wallet {
-      const w = new BCH2Wallet();
+    function createWalletWithAddress(): VoidWallet {
+      const w = new VoidWallet();
       w.setSecret(TEST_WIF);
       // Force address generation
       const addr = w.getAddress();
@@ -262,7 +262,7 @@ describe('BCH2Wallet', () => {
       assert.strictEqual(w.weOwnAddress(addr.toUpperCase()), true);
 
       // Mixed case
-      const mixed = 'BitcoinCashII:' + bare;
+      const mixed = 'VoidCoin:' + bare;
       assert.strictEqual(w.weOwnAddress(mixed), true);
     });
 
@@ -284,9 +284,9 @@ describe('BCH2Wallet', () => {
   // directly, but we verify the static/instance contract)
   // -----------------------------------------------------------------------
   describe('getDerivationPath', () => {
-    it('BCH2 wallets do not use segwit derivation paths', () => {
-      const w = new BCH2Wallet();
-      // BCH2 is P2PKH; the derivation path for HD would be m/44'/145'/0'
+    it('VOID wallets do not use segwit derivation paths', () => {
+      const w = new VoidWallet();
+      // VOID is P2PKH; the derivation path for HD would be m/44'/145'/0'
       // The single-address wallet does not set _derivationPath itself, but
       // we verify no segwit path is set and isSegwit is false.
       assert.strictEqual(w.isSegwit(), false);
@@ -300,9 +300,9 @@ describe('BCH2Wallet', () => {
 // fetchBalance, fetchTransactions, fetchUtxos, getTransactions, getUtxos
 // ---------------------------------------------------------------------------
 
-const BCH2Electrum = require('../../blue_modules/BCH2Electrum');
+const VoidElectrum = require('../../blue_modules/VoidElectrum');
 
-describe('BCH2Wallet generate and data fetching', () => {
+describe('VoidWallet generate and data fetching', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -312,7 +312,7 @@ describe('BCH2Wallet generate and data fetching', () => {
   // -----------------------------------------------------------------------
   describe('generate()', () => {
     it('creates a valid WIF secret', async () => {
-      const w = new BCH2Wallet();
+      const w = new VoidWallet();
       assert.strictEqual(w.secret, ''); // empty before generate
       await w.generate();
       // WIF keys start with K, L (compressed) or 5 (uncompressed)
@@ -324,7 +324,7 @@ describe('BCH2Wallet generate and data fetching', () => {
       // Verify it produces a valid address
       const addr = w.getAddress();
       assert.ok(addr, 'generated WIF should produce a valid address');
-      assert.ok((addr as string).startsWith('bitcoincashii:'), 'address should have BCH2 prefix');
+      assert.ok((addr as string).startsWith('bitcoincashii:'), 'address should have VOID prefix');
     });
   });
 
@@ -333,7 +333,7 @@ describe('BCH2Wallet generate and data fetching', () => {
   // -----------------------------------------------------------------------
   describe('getAddress() error path', () => {
     it('returns false when no secret is set', () => {
-      const w = new BCH2Wallet();
+      const w = new VoidWallet();
       // secret is '' by default, ECPair.fromWIF('') will throw
       const result = w.getAddress();
       assert.strictEqual(result, false);
@@ -345,7 +345,7 @@ describe('BCH2Wallet generate and data fetching', () => {
   // -----------------------------------------------------------------------
   describe('getAllExternalAddresses() empty case', () => {
     it('returns [] when no address can be derived', () => {
-      const w = new BCH2Wallet();
+      const w = new VoidWallet();
       // No secret set, getAddress() returns false
       const addresses = w.getAllExternalAddresses();
       assert.deepStrictEqual(addresses, []);
@@ -357,10 +357,10 @@ describe('BCH2Wallet generate and data fetching', () => {
   // -----------------------------------------------------------------------
   describe('fetchBalance()', () => {
     it('updates balance from mocked Electrum', async () => {
-      const w = new BCH2Wallet();
+      const w = new VoidWallet();
       w.setSecret('5HueCGU8rMjxEXxiPuD5BDku4MkFqeZyd4dZ1jvhTVqvbTLvyTJ');
 
-      BCH2Electrum.getBalanceByAddress.mockResolvedValue({
+      VoidElectrum.getBalanceByAddress.mockResolvedValue({
         confirmed: 123456,
         unconfirmed: 7890,
       });
@@ -373,10 +373,10 @@ describe('BCH2Wallet generate and data fetching', () => {
     });
 
     it('handles Electrum error gracefully', async () => {
-      const w = new BCH2Wallet();
+      const w = new VoidWallet();
       w.setSecret('5HueCGU8rMjxEXxiPuD5BDku4MkFqeZyd4dZ1jvhTVqvbTLvyTJ');
 
-      BCH2Electrum.getBalanceByAddress.mockRejectedValue(new Error('Connection refused'));
+      VoidElectrum.getBalanceByAddress.mockRejectedValue(new Error('Connection refused'));
 
       // Should not throw
       await w.fetchBalance();
@@ -391,15 +391,15 @@ describe('BCH2Wallet generate and data fetching', () => {
   // -----------------------------------------------------------------------
   describe('fetchTransactions()', () => {
     it('populates _transactions from mocked history', async () => {
-      const w = new BCH2Wallet();
+      const w = new VoidWallet();
       w.setSecret('5HueCGU8rMjxEXxiPuD5BDku4MkFqeZyd4dZ1jvhTVqvbTLvyTJ');
 
-      BCH2Electrum.getTransactionsByAddress.mockResolvedValue([
+      VoidElectrum.getTransactionsByAddress.mockResolvedValue([
         { tx_hash: 'aabbccdd11223344aabbccdd11223344aabbccdd11223344aabbccdd11223344', height: 95 },
         { tx_hash: 'eeff0011eeff0011eeff0011eeff0011eeff0011eeff0011eeff0011eeff0011', height: 98 },
       ]);
 
-      BCH2Electrum.getTransaction.mockImplementation(async (txid: string) => ({
+      VoidElectrum.getTransaction.mockImplementation(async (txid: string) => ({
         txid,
         version: 1,
         size: 226,
@@ -412,7 +412,7 @@ describe('BCH2Wallet generate and data fetching', () => {
         vout: [],
       }));
 
-      BCH2Electrum.getLatestBlock.mockReturnValue({ height: 100, time: 1700000000 });
+      VoidElectrum.getLatestBlock.mockReturnValue({ height: 100, time: 1700000000 });
 
       await w.fetchTransactions();
 
@@ -430,10 +430,10 @@ describe('BCH2Wallet generate and data fetching', () => {
   // -----------------------------------------------------------------------
   describe('fetchUtxos()', () => {
     it('populates _utxo from mocked Electrum', async () => {
-      const w = new BCH2Wallet();
+      const w = new VoidWallet();
       w.setSecret('5HueCGU8rMjxEXxiPuD5BDku4MkFqeZyd4dZ1jvhTVqvbTLvyTJ');
 
-      BCH2Electrum.getUtxosByAddress.mockResolvedValue([
+      VoidElectrum.getUtxosByAddress.mockResolvedValue([
         { txid: 'aa'.repeat(32), vout: 0, value: 50000, height: 90 },
         { txid: 'bb'.repeat(32), vout: 1, value: 30000, height: 92 },
       ]);
@@ -460,7 +460,7 @@ describe('BCH2Wallet generate and data fetching', () => {
   // -----------------------------------------------------------------------
   describe('getTransactions() / getUtxos() return stored data', () => {
     it('returns empty arrays by default', () => {
-      const w = new BCH2Wallet();
+      const w = new VoidWallet();
       assert.deepStrictEqual(w.getTransactions(), []);
       assert.deepStrictEqual(w.getUtxos(), []);
     });
@@ -472,7 +472,7 @@ describe('BCH2Wallet generate and data fetching', () => {
 // field defaults in fetchTransactions
 // ---------------------------------------------------------------------------
 
-describe('BCH2Wallet early-return and edge-case paths', () => {
+describe('VoidWallet early-return and edge-case paths', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -482,7 +482,7 @@ describe('BCH2Wallet early-return and edge-case paths', () => {
   // -----------------------------------------------------------------------
   describe('fetchBalance with no secret', () => {
     it('does not throw and balance remains 0 when no secret is set', async () => {
-      const w = new BCH2Wallet();
+      const w = new VoidWallet();
       // No secret set => getAddress() returns false => early return
       assert.strictEqual(w.getAddress(), false);
 
@@ -491,7 +491,7 @@ describe('BCH2Wallet early-return and edge-case paths', () => {
       assert.strictEqual(w.balance, 0);
       assert.strictEqual(w.unconfirmed_balance, 0);
       // getBalanceByAddress should never have been called
-      expect(BCH2Electrum.getBalanceByAddress).not.toHaveBeenCalled();
+      expect(VoidElectrum.getBalanceByAddress).not.toHaveBeenCalled();
     });
   });
 
@@ -500,13 +500,13 @@ describe('BCH2Wallet early-return and edge-case paths', () => {
   // -----------------------------------------------------------------------
   describe('fetchTransactions with no secret', () => {
     it('does not throw and transactions remain empty when no secret is set', async () => {
-      const w = new BCH2Wallet();
+      const w = new VoidWallet();
       assert.strictEqual(w.getAddress(), false);
 
       await w.fetchTransactions(); // should not throw
 
       assert.deepStrictEqual(w.getTransactions(), []);
-      expect(BCH2Electrum.getTransactionsByAddress).not.toHaveBeenCalled();
+      expect(VoidElectrum.getTransactionsByAddress).not.toHaveBeenCalled();
     });
   });
 
@@ -515,14 +515,14 @@ describe('BCH2Wallet early-return and edge-case paths', () => {
   // -----------------------------------------------------------------------
   describe('fetchUtxos with no secret', () => {
     it('does not throw and returns empty array when no secret is set', async () => {
-      const w = new BCH2Wallet();
+      const w = new VoidWallet();
       assert.strictEqual(w.getAddress(), false);
 
       const result = await w.fetchUtxos(); // should not throw
 
       assert.deepStrictEqual(result, []);
       assert.deepStrictEqual(w.getUtxos(), []);
-      expect(BCH2Electrum.getUtxosByAddress).not.toHaveBeenCalled();
+      expect(VoidElectrum.getUtxosByAddress).not.toHaveBeenCalled();
     });
   });
 
@@ -531,19 +531,19 @@ describe('BCH2Wallet early-return and edge-case paths', () => {
   // -----------------------------------------------------------------------
   describe('fetchTransactions skips null getTransaction', () => {
     it('only includes transactions where getTransaction returns non-null', async () => {
-      const w = new BCH2Wallet();
+      const w = new VoidWallet();
       w.setSecret('5HueCGU8rMjxEXxiPuD5BDku4MkFqeZyd4dZ1jvhTVqvbTLvyTJ');
 
       const TX_HASH_1 = 'aa'.repeat(32);
       const TX_HASH_2 = 'bb'.repeat(32);
 
-      BCH2Electrum.getTransactionsByAddress.mockResolvedValue([
+      VoidElectrum.getTransactionsByAddress.mockResolvedValue([
         { tx_hash: TX_HASH_1, height: 50 },
         { tx_hash: TX_HASH_2, height: 51 },
       ]);
 
       // First tx returns null, second returns valid data
-      BCH2Electrum.getTransaction.mockImplementation(async (txid: string) => {
+      VoidElectrum.getTransaction.mockImplementation(async (txid: string) => {
         if (txid === TX_HASH_1) return null;
         return {
           txid,
@@ -559,7 +559,7 @@ describe('BCH2Wallet early-return and edge-case paths', () => {
         };
       });
 
-      BCH2Electrum.getLatestBlock.mockReturnValue({ height: 100, time: 1700000000 });
+      VoidElectrum.getLatestBlock.mockReturnValue({ height: 100, time: 1700000000 });
 
       await w.fetchTransactions();
 
@@ -574,18 +574,18 @@ describe('BCH2Wallet early-return and edge-case paths', () => {
   // -----------------------------------------------------------------------
   describe('fetchTransactions uses field defaults', () => {
     it('applies default version=1, size=0, and reasonable blocktime when fields are missing', async () => {
-      const w = new BCH2Wallet();
+      const w = new VoidWallet();
       w.setSecret('5HueCGU8rMjxEXxiPuD5BDku4MkFqeZyd4dZ1jvhTVqvbTLvyTJ');
 
       const TX_HASH = 'cc'.repeat(32);
       const beforeTime = Math.floor(Date.now() / 1000);
 
-      BCH2Electrum.getTransactionsByAddress.mockResolvedValue([
+      VoidElectrum.getTransactionsByAddress.mockResolvedValue([
         { tx_hash: TX_HASH, height: 80 },
       ]);
 
       // Return a tx object missing version, size, and blocktime
-      BCH2Electrum.getTransaction.mockResolvedValue({
+      VoidElectrum.getTransaction.mockResolvedValue({
         txid: TX_HASH,
         // version: intentionally missing
         // size: intentionally missing
@@ -598,7 +598,7 @@ describe('BCH2Wallet early-return and edge-case paths', () => {
         vout: [],
       });
 
-      BCH2Electrum.getLatestBlock.mockReturnValue({ height: 100, time: 1700000000 });
+      VoidElectrum.getLatestBlock.mockReturnValue({ height: 100, time: 1700000000 });
 
       await w.fetchTransactions();
 
@@ -622,11 +622,11 @@ describe('BCH2Wallet early-return and edge-case paths', () => {
 // error catch paths
 // ---------------------------------------------------------------------------
 
-describe('BCH2Wallet isValidAddress edge cases', () => {
+describe('VoidWallet isValidAddress edge cases', () => {
   describe('rejects bchtest: prefix', () => {
     it('returns false for a bchtest: prefixed address', () => {
       assert.strictEqual(
-        BCH2Wallet.isValidAddress('bchtest:qr95sy3j9xwd2ap32xkykttr4cvcu7as5yc93ky292'),
+        VoidWallet.isValidAddress('bchtest:qr95sy3j9xwd2ap32xkykttr4cvcu7as5yc93ky292'),
         false,
       );
     });
@@ -640,24 +640,24 @@ describe('BCH2Wallet isValidAddress edge cases', () => {
       const hash32 = Buffer.alloc(32, 0xab);
       const addr32 = encodeCashAddr('bitcoincashii', 0, hash32);
       // Verify the address was constructed with our prefix
-      assert.ok(addr32.startsWith('bitcoincashii:'), 'Test address should have BCH2 prefix');
+      assert.ok(addr32.startsWith('bitcoincashii:'), 'Test address should have VOID prefix');
       // The 32-byte hash encodes to more 5-bit groups, producing data.length > 42
-      assert.strictEqual(BCH2Wallet.isValidAddress(addr32), false);
+      assert.strictEqual(VoidWallet.isValidAddress(addr32), false);
     });
   });
 });
 
-describe('BCH2Wallet fetchTransactions/fetchUtxos error catch paths', () => {
+describe('VoidWallet fetchTransactions/fetchUtxos error catch paths', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   describe('fetchTransactions error catch', () => {
     it('catches errors from getTransactionsByAddress and does not throw', async () => {
-      const w = new BCH2Wallet();
+      const w = new VoidWallet();
       w.setSecret('5HueCGU8rMjxEXxiPuD5BDku4MkFqeZyd4dZ1jvhTVqvbTLvyTJ');
 
-      BCH2Electrum.getTransactionsByAddress.mockRejectedValue(new Error('Electrum timeout'));
+      VoidElectrum.getTransactionsByAddress.mockRejectedValue(new Error('Electrum timeout'));
 
       // Should NOT throw — error is caught at lines 123-125
       await w.fetchTransactions();
@@ -669,10 +669,10 @@ describe('BCH2Wallet fetchTransactions/fetchUtxos error catch paths', () => {
 
   describe('fetchUtxos error catch', () => {
     it('catches errors from getUtxosByAddress and returns empty array', async () => {
-      const w = new BCH2Wallet();
+      const w = new VoidWallet();
       w.setSecret('5HueCGU8rMjxEXxiPuD5BDku4MkFqeZyd4dZ1jvhTVqvbTLvyTJ');
 
-      BCH2Electrum.getUtxosByAddress.mockRejectedValue(new Error('Network failure'));
+      VoidElectrum.getUtxosByAddress.mockRejectedValue(new Error('Network failure'));
 
       // Should NOT throw — error is caught at lines 147-150
       const result = await w.fetchUtxos();
@@ -687,7 +687,7 @@ describe('BCH2Wallet fetchTransactions/fetchUtxos error catch paths', () => {
 // fetchUtxos, getAddress caching
 // ---------------------------------------------------------------------------
 
-describe('BCH2Wallet gap coverage tests', () => {
+describe('VoidWallet gap coverage tests', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -697,7 +697,7 @@ describe('BCH2Wallet gap coverage tests', () => {
   // -----------------------------------------------------------------------
   describe('weOwnAddress with bchtest: prefix', () => {
     it('returns false for a bchtest: prefixed address', () => {
-      const w = new BCH2Wallet();
+      const w = new VoidWallet();
       w.setSecret('5HueCGU8rMjxEXxiPuD5BDku4MkFqeZyd4dZ1jvhTVqvbTLvyTJ');
       const addr = w.getAddress() as string;
       assert.ok(addr, 'Wallet should have an address');
@@ -715,7 +715,7 @@ describe('BCH2Wallet gap coverage tests', () => {
     it('returns false when decoded data length is less than 34', () => {
       // Construct a very short payload using valid CHARSET chars (only 10 chars)
       const shortAddr = 'bitcoincashii:qpzry9x8gf';
-      assert.strictEqual(BCH2Wallet.isValidAddress(shortAddr), false);
+      assert.strictEqual(VoidWallet.isValidAddress(shortAddr), false);
     });
 
     it('returns false when decoded data length is greater than 42', () => {
@@ -723,14 +723,14 @@ describe('BCH2Wallet gap coverage tests', () => {
       const hash32 = Buffer.alloc(32, 0xab);
       const addr32 = encodeCashAddr('bitcoincashii', 0, hash32);
       assert.ok(addr32.startsWith('bitcoincashii:'));
-      assert.strictEqual(BCH2Wallet.isValidAddress(addr32), false);
+      assert.strictEqual(VoidWallet.isValidAddress(addr32), false);
     });
 
     it('returns false for exactly 33 decoded characters (boundary: < 34)', () => {
       // 33 valid CHARSET characters, which is below the minimum of 34
       const chars33 = 'qpzry9x8gf2tvdw0s3jn54khce6mua7lq';
       assert.strictEqual(chars33.length, 33);
-      assert.strictEqual(BCH2Wallet.isValidAddress('bitcoincashii:' + chars33), false);
+      assert.strictEqual(VoidWallet.isValidAddress('bitcoincashii:' + chars33), false);
     });
   });
 
@@ -739,19 +739,19 @@ describe('BCH2Wallet gap coverage tests', () => {
   // -----------------------------------------------------------------------
   describe('isValidAddress non-string input', () => {
     it('returns false for null', () => {
-      assert.strictEqual(BCH2Wallet.isValidAddress(null as any), false);
+      assert.strictEqual(VoidWallet.isValidAddress(null as any), false);
     });
 
     it('returns false for undefined', () => {
-      assert.strictEqual(BCH2Wallet.isValidAddress(undefined as any), false);
+      assert.strictEqual(VoidWallet.isValidAddress(undefined as any), false);
     });
 
     it('returns false for a number', () => {
-      assert.strictEqual(BCH2Wallet.isValidAddress(12345 as any), false);
+      assert.strictEqual(VoidWallet.isValidAddress(12345 as any), false);
     });
 
     it('returns false for an object', () => {
-      assert.strictEqual(BCH2Wallet.isValidAddress({} as any), false);
+      assert.strictEqual(VoidWallet.isValidAddress({} as any), false);
     });
   });
 
@@ -760,11 +760,11 @@ describe('BCH2Wallet gap coverage tests', () => {
   // -----------------------------------------------------------------------
   describe('isValidAddress empty string after prefix removal', () => {
     it('returns false for "bitcoincashii:" with nothing after it', () => {
-      assert.strictEqual(BCH2Wallet.isValidAddress('bitcoincashii:'), false);
+      assert.strictEqual(VoidWallet.isValidAddress('bitcoincashii:'), false);
     });
 
     it('returns false for prefix followed by a single character', () => {
-      assert.strictEqual(BCH2Wallet.isValidAddress('bitcoincashii:q'), false);
+      assert.strictEqual(VoidWallet.isValidAddress('bitcoincashii:q'), false);
     });
   });
 
@@ -773,17 +773,17 @@ describe('BCH2Wallet gap coverage tests', () => {
   // -----------------------------------------------------------------------
   describe('fetchTransactions with null blocktime', () => {
     it('handles null blocktime gracefully (uses Date.now()/1000 fallback)', async () => {
-      const w = new BCH2Wallet();
+      const w = new VoidWallet();
       w.setSecret('5HueCGU8rMjxEXxiPuD5BDku4MkFqeZyd4dZ1jvhTVqvbTLvyTJ');
 
       const TX_HASH = 'dd'.repeat(32);
       const beforeTime = Math.floor(Date.now() / 1000);
 
-      BCH2Electrum.getTransactionsByAddress.mockResolvedValue([
+      VoidElectrum.getTransactionsByAddress.mockResolvedValue([
         { tx_hash: TX_HASH, height: 50 },
       ]);
 
-      BCH2Electrum.getTransaction.mockResolvedValue({
+      VoidElectrum.getTransaction.mockResolvedValue({
         txid: TX_HASH,
         version: 2,
         size: 250,
@@ -796,7 +796,7 @@ describe('BCH2Wallet gap coverage tests', () => {
         vout: [],
       });
 
-      BCH2Electrum.getLatestBlock.mockReturnValue({ height: 100, time: 1700000000 });
+      VoidElectrum.getLatestBlock.mockReturnValue({ height: 100, time: 1700000000 });
 
       await w.fetchTransactions();
 
@@ -814,11 +814,11 @@ describe('BCH2Wallet gap coverage tests', () => {
   // -----------------------------------------------------------------------
   describe('fetchTransactions with empty history', () => {
     it('returns empty array when history is empty', async () => {
-      const w = new BCH2Wallet();
+      const w = new VoidWallet();
       w.setSecret('5HueCGU8rMjxEXxiPuD5BDku4MkFqeZyd4dZ1jvhTVqvbTLvyTJ');
 
-      BCH2Electrum.getTransactionsByAddress.mockResolvedValue([]);
-      BCH2Electrum.getLatestBlock.mockReturnValue({ height: 100, time: 1700000000 });
+      VoidElectrum.getTransactionsByAddress.mockResolvedValue([]);
+      VoidElectrum.getLatestBlock.mockReturnValue({ height: 100, time: 1700000000 });
 
       await w.fetchTransactions();
 
@@ -826,7 +826,7 @@ describe('BCH2Wallet gap coverage tests', () => {
       assert.strictEqual(txs.length, 0);
       assert.deepStrictEqual(txs, []);
       // getTransaction should never have been called since history was empty
-      expect(BCH2Electrum.getTransaction).not.toHaveBeenCalled();
+      expect(VoidElectrum.getTransaction).not.toHaveBeenCalled();
     });
   });
 
@@ -835,14 +835,14 @@ describe('BCH2Wallet gap coverage tests', () => {
   // -----------------------------------------------------------------------
   describe('fetchUtxos with null/undefined in UTXO array', () => {
     it('handles null/undefined UTXO elements via spread operator', async () => {
-      const w = new BCH2Wallet();
+      const w = new VoidWallet();
       w.setSecret('5HueCGU8rMjxEXxiPuD5BDku4MkFqeZyd4dZ1jvhTVqvbTLvyTJ');
 
       // The source uses utxos.map(u => ({...u, address, wif})).
       // When server returns an array with valid entries, we verify the mapping.
       // Note: If null elements were present, the spread operator on null
       // would not throw in modern JS, but the value/txid fields would be undefined.
-      BCH2Electrum.getUtxosByAddress.mockResolvedValue([
+      VoidElectrum.getUtxosByAddress.mockResolvedValue([
         { txid: 'aa'.repeat(32), vout: 0, value: 10000, height: 80 },
         { txid: 'bb'.repeat(32), vout: 1, value: 20000, height: 81 },
       ]);
@@ -866,7 +866,7 @@ describe('BCH2Wallet gap coverage tests', () => {
   // -----------------------------------------------------------------------
   describe('getAddress caching behavior', () => {
     it('calling getAddress twice returns the same cached value', () => {
-      const w = new BCH2Wallet();
+      const w = new VoidWallet();
       w.setSecret('5HueCGU8rMjxEXxiPuD5BDku4MkFqeZyd4dZ1jvhTVqvbTLvyTJ');
 
       const addr1 = w.getAddress();
@@ -878,7 +878,7 @@ describe('BCH2Wallet gap coverage tests', () => {
     });
 
     it('caching uses _address field', () => {
-      const w = new BCH2Wallet();
+      const w = new VoidWallet();
       w.setSecret('5HueCGU8rMjxEXxiPuD5BDku4MkFqeZyd4dZ1jvhTVqvbTLvyTJ');
 
       // Before first call, _address should be undefined/empty
@@ -901,7 +901,7 @@ describe('BCH2Wallet gap coverage tests', () => {
 // Edge case gap tests
 // ---------------------------------------------------------------------------
 
-describe('BCH2Wallet edge case gap tests', () => {
+describe('VoidWallet edge case gap tests', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -911,18 +911,18 @@ describe('BCH2Wallet edge case gap tests', () => {
   // -----------------------------------------------------------------------
   describe('fetchTransactions() all transactions null', () => {
     it('returns empty array when getTransaction returns null for every tx_hash', async () => {
-      const w = new BCH2Wallet();
+      const w = new VoidWallet();
       w.setSecret('5HueCGU8rMjxEXxiPuD5BDku4MkFqeZyd4dZ1jvhTVqvbTLvyTJ');
 
-      BCH2Electrum.getTransactionsByAddress.mockResolvedValue([
+      VoidElectrum.getTransactionsByAddress.mockResolvedValue([
         { tx_hash: 'aa'.repeat(32), height: 50 },
         { tx_hash: 'bb'.repeat(32), height: 51 },
         { tx_hash: 'cc'.repeat(32), height: 52 },
       ]);
 
       // ALL getTransaction calls return null
-      BCH2Electrum.getTransaction.mockResolvedValue(null);
-      BCH2Electrum.getLatestBlock.mockReturnValue({ height: 100, time: 1700000000 });
+      VoidElectrum.getTransaction.mockResolvedValue(null);
+      VoidElectrum.getLatestBlock.mockReturnValue({ height: 100, time: 1700000000 });
 
       await w.fetchTransactions();
 
@@ -930,7 +930,7 @@ describe('BCH2Wallet edge case gap tests', () => {
       assert.strictEqual(txs.length, 0);
       assert.deepStrictEqual(txs, []);
       // getTransaction should have been called 3 times (once per history entry)
-      expect(BCH2Electrum.getTransaction).toHaveBeenCalledTimes(3);
+      expect(VoidElectrum.getTransaction).toHaveBeenCalledTimes(3);
     });
   });
 
@@ -939,17 +939,17 @@ describe('BCH2Wallet edge case gap tests', () => {
   // -----------------------------------------------------------------------
   describe('fetchTransactions() blocktime=0', () => {
     it('uses Date.now()/1000 fallback when blocktime is 0 (falsy)', async () => {
-      const w = new BCH2Wallet();
+      const w = new VoidWallet();
       w.setSecret('5HueCGU8rMjxEXxiPuD5BDku4MkFqeZyd4dZ1jvhTVqvbTLvyTJ');
 
       const TX_HASH = 'ee'.repeat(32);
       const beforeTime = Math.floor(Date.now() / 1000);
 
-      BCH2Electrum.getTransactionsByAddress.mockResolvedValue([
+      VoidElectrum.getTransactionsByAddress.mockResolvedValue([
         { tx_hash: TX_HASH, height: 90 },
       ]);
 
-      BCH2Electrum.getTransaction.mockResolvedValue({
+      VoidElectrum.getTransaction.mockResolvedValue({
         txid: TX_HASH,
         version: 1,
         size: 200,
@@ -962,7 +962,7 @@ describe('BCH2Wallet edge case gap tests', () => {
         vout: [],
       });
 
-      BCH2Electrum.getLatestBlock.mockReturnValue({ height: 100, time: 1700000000 });
+      VoidElectrum.getLatestBlock.mockReturnValue({ height: 100, time: 1700000000 });
 
       await w.fetchTransactions();
 
@@ -988,7 +988,7 @@ describe('BCH2Wallet edge case gap tests', () => {
       // Plus 8 checksum groups = 42 total characters in the bare address
       // The data (payload without checksum) used in validation = 34 groups
       // Our REF_P2PKH_ADDR is exactly this case
-      assert.strictEqual(BCH2Wallet.isValidAddress(REF_P2PKH_ADDR), true);
+      assert.strictEqual(VoidWallet.isValidAddress(REF_P2PKH_ADDR), true);
 
       // Verify the bare address payload length (minus 8 checksum chars) is 34
       const bare = REF_P2PKH_ADDR.slice('bitcoincashii:'.length);
@@ -1000,7 +1000,7 @@ describe('BCH2Wallet edge case gap tests', () => {
       // 20-byte hash produces 34 five-bit data groups (the minimum)
       const hash20 = Buffer.alloc(20, 0xab);
       const addr20 = encodeCashAddr('bitcoincashii', 0, hash20);
-      assert.strictEqual(BCH2Wallet.isValidAddress(addr20), true);
+      assert.strictEqual(VoidWallet.isValidAddress(addr20), true);
     });
 
     it('validates that decoded data length of 42 is accepted (maximum boundary)', () => {
@@ -1011,14 +1011,14 @@ describe('BCH2Wallet edge case gap tests', () => {
       // so they produce data.length = 42 (the maximum boundary).
       const bare = REF_P2PKH_ADDR.slice('bitcoincashii:'.length);
       assert.strictEqual(bare.length, 42); // exactly at the max boundary
-      assert.strictEqual(BCH2Wallet.isValidAddress(REF_P2PKH_ADDR), true);
+      assert.strictEqual(VoidWallet.isValidAddress(REF_P2PKH_ADDR), true);
     });
 
     it('rejects addresses with decoded data length > 42 (24-byte hash)', () => {
       // 24-byte hash: payload = ceil((8 + 192) / 5) = 40, total = 40 + 8 = 48 > 42
       const hash24 = Buffer.alloc(24, 0xcd);
       const addr24 = encodeCashAddr('bitcoincashii', 0, hash24);
-      assert.strictEqual(BCH2Wallet.isValidAddress(addr24), false);
+      assert.strictEqual(VoidWallet.isValidAddress(addr24), false);
     });
   });
 
@@ -1027,11 +1027,11 @@ describe('BCH2Wallet edge case gap tests', () => {
   // -----------------------------------------------------------------------
   describe('fetchUtxos() Electrum throws (verify _utxo not corrupted)', () => {
     it('returns empty array and preserves existing _utxo when Electrum throws', async () => {
-      const w = new BCH2Wallet();
+      const w = new VoidWallet();
       w.setSecret('5HueCGU8rMjxEXxiPuD5BDku4MkFqeZyd4dZ1jvhTVqvbTLvyTJ');
 
       // First, populate _utxo with valid data
-      BCH2Electrum.getUtxosByAddress.mockResolvedValue([
+      VoidElectrum.getUtxosByAddress.mockResolvedValue([
         { txid: 'aa'.repeat(32), vout: 0, value: 50000, height: 90 },
       ]);
       await w.fetchUtxos();
@@ -1039,7 +1039,7 @@ describe('BCH2Wallet edge case gap tests', () => {
       assert.strictEqual(w.getUtxos()[0].value, 50000);
 
       // Now make Electrum throw on second call
-      BCH2Electrum.getUtxosByAddress.mockRejectedValue(new Error('Electrum connection lost'));
+      VoidElectrum.getUtxosByAddress.mockRejectedValue(new Error('Electrum connection lost'));
 
       const result = await w.fetchUtxos();
 
@@ -1057,16 +1057,16 @@ describe('BCH2Wallet edge case gap tests', () => {
   // -----------------------------------------------------------------------
   describe('fetchTransactions() with undefined block height', () => {
     it('handles undefined getLatestBlock().height gracefully', async () => {
-      const w = new BCH2Wallet();
+      const w = new VoidWallet();
       w.setSecret('5HueCGU8rMjxEXxiPuD5BDku4MkFqeZyd4dZ1jvhTVqvbTLvyTJ');
 
       const TX_HASH = 'ff'.repeat(32);
 
-      BCH2Electrum.getTransactionsByAddress.mockResolvedValue([
+      VoidElectrum.getTransactionsByAddress.mockResolvedValue([
         { tx_hash: TX_HASH, height: 50 },
       ]);
 
-      BCH2Electrum.getTransaction.mockResolvedValue({
+      VoidElectrum.getTransaction.mockResolvedValue({
         txid: TX_HASH,
         version: 1,
         size: 200,
@@ -1080,13 +1080,13 @@ describe('BCH2Wallet edge case gap tests', () => {
       });
 
       // getLatestBlock() returns { height: undefined, time: undefined }
-      BCH2Electrum.getLatestBlock.mockReturnValue({ height: undefined, time: undefined });
+      VoidElectrum.getLatestBlock.mockReturnValue({ height: undefined, time: undefined });
 
       await w.fetchTransactions();
 
       const txs = w.getTransactions();
       assert.strictEqual(txs.length, 1);
-      // blockHeight = BCH2Electrum.getLatestBlock().height || 0 => undefined || 0 = 0
+      // blockHeight = VoidElectrum.getLatestBlock().height || 0 => undefined || 0 = 0
       // confirmations = tx.height > 0 ? blockHeight - tx.height + 1 : 0
       //               = 50 > 0 ? 0 - 50 + 1 : 0 = -49
       // The code does NOT clamp to 0, so confirmations = -49
@@ -1099,17 +1099,17 @@ describe('BCH2Wallet edge case gap tests', () => {
   // -----------------------------------------------------------------------
   describe('getAllExternalAddresses() with secret set', () => {
     it('returns array with single address when secret is set', () => {
-      const w = new BCH2Wallet();
+      const w = new VoidWallet();
       w.setSecret('5HueCGU8rMjxEXxiPuD5BDku4MkFqeZyd4dZ1jvhTVqvbTLvyTJ');
 
       const addresses = w.getAllExternalAddresses();
       assert.strictEqual(addresses.length, 1);
-      assert.ok(addresses[0].startsWith('bitcoincashii:'), 'address should have BCH2 prefix');
+      assert.ok(addresses[0].startsWith('bitcoincashii:'), 'address should have VOID prefix');
       assert.strictEqual(addresses[0], w.getAddress());
     });
 
     it('returns empty array when no secret is set', () => {
-      const w = new BCH2Wallet();
+      const w = new VoidWallet();
       const addresses = w.getAllExternalAddresses();
       assert.deepStrictEqual(addresses, []);
     });
@@ -1122,7 +1122,7 @@ describe('BCH2Wallet edge case gap tests', () => {
     const TEST_WIF = '5HueCGU8rMjxEXxiPuD5BDku4MkFqeZyd4dZ1jvhTVqvbTLvyTJ';
 
     it('returns true for fully uppercase CashAddr payload', () => {
-      const w = new BCH2Wallet();
+      const w = new VoidWallet();
       w.setSecret(TEST_WIF);
       const addr = w.getAddress() as string;
       assert.ok(addr);
@@ -1134,7 +1134,7 @@ describe('BCH2Wallet edge case gap tests', () => {
     });
 
     it('returns true for alternating case CashAddr payload', () => {
-      const w = new BCH2Wallet();
+      const w = new VoidWallet();
       w.setSecret(TEST_WIF);
       const addr = w.getAddress() as string;
       assert.ok(addr);
@@ -1150,7 +1150,7 @@ describe('BCH2Wallet edge case gap tests', () => {
     });
 
     it('returns true for fully uppercase address including prefix', () => {
-      const w = new BCH2Wallet();
+      const w = new VoidWallet();
       w.setSecret(TEST_WIF);
       const addr = w.getAddress() as string;
       assert.ok(addr);
@@ -1159,7 +1159,7 @@ describe('BCH2Wallet edge case gap tests', () => {
     });
 
     it('returns true for fully lowercase address', () => {
-      const w = new BCH2Wallet();
+      const w = new VoidWallet();
       w.setSecret(TEST_WIF);
       const addr = w.getAddress() as string;
       assert.ok(addr);

@@ -16,7 +16,7 @@ import {
   Platform,
 } from 'react-native';
 import { PasswordInput, PasswordInputHandle } from './PasswordInput';
-import { BCH2Colors, BCH2Spacing, BCH2Typography, BCH2BorderRadius } from './BCH2Theme';
+import { VoidColors, VOIDSpacing, VOIDTypography, VOIDBorderRadius } from './VoidTheme';
 
 interface PasswordModalProps {
   visible: boolean;
@@ -113,58 +113,58 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: BCH2Spacing.lg,
+    padding: VOIDSpacing.lg,
   },
   container: {
-    backgroundColor: BCH2Colors.backgroundCard,
-    borderRadius: BCH2BorderRadius.lg,
-    padding: BCH2Spacing.xl,
+    backgroundColor: VoidColors.backgroundCard,
+    borderRadius: VOIDBorderRadius.lg,
+    padding: VOIDSpacing.xl,
     width: '100%',
     maxWidth: 400,
   },
   title: {
-    fontSize: BCH2Typography.fontSize.xl,
-    fontWeight: BCH2Typography.fontWeight.bold,
-    color: BCH2Colors.textPrimary,
+    fontSize: VOIDTypography.fontSize.xl,
+    fontWeight: VOIDTypography.fontWeight.bold,
+    color: VoidColors.textPrimary,
     textAlign: 'center',
-    marginBottom: BCH2Spacing.sm,
+    marginBottom: VOIDSpacing.sm,
   },
   subtitle: {
-    fontSize: BCH2Typography.fontSize.sm,
-    color: BCH2Colors.textSecondary,
+    fontSize: VOIDTypography.fontSize.sm,
+    color: VoidColors.textSecondary,
     textAlign: 'center',
-    marginBottom: BCH2Spacing.xl,
+    marginBottom: VOIDSpacing.xl,
   },
   inputWrapper: {
-    marginBottom: BCH2Spacing.xl,
+    marginBottom: VOIDSpacing.xl,
   },
   buttons: {
     flexDirection: 'row',
-    gap: BCH2Spacing.md,
+    gap: VOIDSpacing.md,
   },
   cancelButton: {
     flex: 1,
-    paddingVertical: BCH2Spacing.md,
-    borderRadius: BCH2BorderRadius.md,
+    paddingVertical: VOIDSpacing.md,
+    borderRadius: VOIDBorderRadius.md,
     borderWidth: 1,
-    borderColor: BCH2Colors.border,
+    borderColor: VoidColors.border,
     alignItems: 'center',
   },
   cancelText: {
-    color: BCH2Colors.textSecondary,
-    fontSize: BCH2Typography.fontSize.base,
-    fontWeight: BCH2Typography.fontWeight.medium,
+    color: VoidColors.textSecondary,
+    fontSize: VOIDTypography.fontSize.base,
+    fontWeight: VOIDTypography.fontWeight.medium,
   },
   submitButton: {
     flex: 1,
-    paddingVertical: BCH2Spacing.md,
-    borderRadius: BCH2BorderRadius.md,
-    backgroundColor: BCH2Colors.primary,
+    paddingVertical: VOIDSpacing.md,
+    borderRadius: VOIDBorderRadius.md,
+    backgroundColor: VoidColors.primary,
     alignItems: 'center',
   },
   submitText: {
-    color: BCH2Colors.textPrimary,
-    fontSize: BCH2Typography.fontSize.base,
-    fontWeight: BCH2Typography.fontWeight.bold,
+    color: VoidColors.textPrimary,
+    fontSize: VOIDTypography.fontSize.base,
+    fontWeight: VOIDTypography.fontWeight.bold,
   },
 });

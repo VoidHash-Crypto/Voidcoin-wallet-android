@@ -6,7 +6,7 @@ import './shim.js';
 import React, { useEffect } from 'react';
 import { AppRegistry, LogBox } from 'react-native';
 
-import BCH2App from './BCH2App';
+import VoidApp from './VoidApp';
 
 if (!Error.captureStackTrace) {
   // captureStackTrace is only available when debugging
@@ -20,4 +20,4 @@ LogBox.ignoreLogs([
   'Non-serializable values were found in the navigation state',
 ]);
 
-AppRegistry.registerComponent('BlueWallet', () => BCH2App);
+AppRegistry.registerComponent('BlueWallet', () => VoidApp);

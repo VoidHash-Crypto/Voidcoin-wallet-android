@@ -1,15 +1,15 @@
 /**
- * BCH2 App Entry Point
- * Main app with BCH2 navigation
+ * VOID App Entry Point
+ * Main app with VOID navigation
  */
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { StatusBar, View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, AppState, Alert } from 'react-native';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { BCH2Navigator } from './navigation/BCH2Navigator';
-import { BCH2Colors } from './components/BCH2Theme';
-import BCH2Electrum from './blue_modules/BCH2Electrum';
+import { VoidNavigator } from './navigation/VoidNavigator';
+import { VoidColors } from './components/VoidTheme';
+import VoidElectrum from './blue_modules/VoidElectrum';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   getAppPassword,
@@ -18,26 +18,26 @@ import {
   isBiometricEnabled,
   authenticateWithBiometric,
   getAutoLockTimeout,
-} from './screen/bch2/BCH2AppPassword';
+} from './screen/void/VoidAppPassword';
 
 const MAX_UNLOCK_ATTEMPTS = 10;
 
-// BCH2 Dark Theme
-const BCH2Theme = {
+// VOID Dark Theme
+const VoidTheme = {
   ...DefaultTheme,
   dark: true,
   colors: {
     ...DefaultTheme.colors,
-    primary: BCH2Colors.primary,
-    background: BCH2Colors.background,
-    card: BCH2Colors.backgroundCard,
-    text: BCH2Colors.textPrimary,
-    border: BCH2Colors.border,
-    notification: BCH2Colors.primary,
+    primary: VoidColors.primary,
+    background: VoidColors.background,
+    card: VoidColors.backgroundCard,
+    text: VoidColors.textPrimary,
+    border: VoidColors.border,
+    notification: VoidColors.primary,
   },
 };
 
-const BCH2App: React.FC = () => {
+const VoidApp: React.FC = () => {
   const [isConnecting, setIsConnecting] = useState(true);
   const [connectionStatus, setConnectionStatus] = useState<'connected' | 'offline' | 'connecting'>('connecting');
   const [locked, setLocked] = useState(false);
@@ -178,12 +178,12 @@ const BCH2App: React.FC = () => {
   if (isConnecting) {
     return (
       <View style={styles.loadingContainer}>
-        <StatusBar barStyle="light-content" backgroundColor={BCH2Colors.background} />
+        <StatusBar barStyle="light-content" backgroundColor={VoidColors.background} />
         <View style={styles.logoContainer}>
-          <Text style={styles.logoText}>BCH2</Text>
+          <Text style={styles.logoText}>VOID</Text>
           <Text style={styles.logoSubtext}>Wallet</Text>
         </View>
-        <ActivityIndicator size="large" color={BCH2Colors.primary} style={styles.spinner} />
+        <ActivityIndicator size="large" color={VoidColors.primary} style={styles.spinner} />
         <Text style={styles.loadingText}>Initializing...</Text>
       </View>
     );
@@ -193,9 +193,9 @@ const BCH2App: React.FC = () => {
     const hasPasswordSet = unlockAttempts > 0 || passwordInput.length > 0 || !biometricReady;
     return (
       <View style={styles.loadingContainer}>
-        <StatusBar barStyle="light-content" backgroundColor={BCH2Colors.background} />
+        <StatusBar barStyle="light-content" backgroundColor={VoidColors.background} />
         <View style={styles.logoContainer}>
-          <Text style={styles.logoText}>BCH2</Text>
+          <Text style={styles.logoText}>VOID</Text>
           <Text style={styles.logoSubtext}>Wallet</Text>
         </View>
 
@@ -219,7 +219,7 @@ const BCH2App: React.FC = () => {
             <TextInput
               style={styles.passwordInput}
               placeholder="Enter password"
-              placeholderTextColor={BCH2Colors.textMuted}
+              placeholderTextColor={VoidColors.textMuted}
               secureTextEntry
               value={passwordInput}
               onChangeText={(t) => { setPasswordInput(t); setPasswordError(''); }}
@@ -238,9 +238,9 @@ const BCH2App: React.FC = () => {
 
   return (
     <SafeAreaProvider>
-      <StatusBar barStyle="light-content" backgroundColor={BCH2Colors.background} />
-      <NavigationContainer theme={BCH2Theme}>
-        <BCH2Navigator />
+      <StatusBar barStyle="light-content" backgroundColor={VoidColors.background} />
+      <NavigationContainer theme={VoidTheme}>
+        <VoidNavigator />
       </NavigationContainer>
     </SafeAreaProvider>
   );
@@ -249,7 +249,7 @@ const BCH2App: React.FC = () => {
 const styles = StyleSheet.create({
   loadingContainer: {
     flex: 1,
-    backgroundColor: BCH2Colors.background,
+    backgroundColor: VoidColors.background,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -261,11 +261,11 @@ const styles = StyleSheet.create({
   logoText: {
     fontSize: 48,
     fontWeight: 'bold',
-    color: BCH2Colors.primary,
+    color: VoidColors.primary,
   },
   logoSubtext: {
     fontSize: 24,
-    color: BCH2Colors.textSecondary,
+    color: VoidColors.textSecondary,
     marginLeft: 8,
   },
   spinner: {
@@ -273,53 +273,53 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 14,
-    color: BCH2Colors.textMuted,
+    color: VoidColors.textMuted,
   },
   biometricButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: BCH2Colors.primaryGlow,
+    backgroundColor: VoidColors.primaryGlow,
     borderRadius: 12,
     paddingVertical: 16,
     paddingHorizontal: 32,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: BCH2Colors.primary,
+    borderColor: VoidColors.primary,
   },
   biometricIcon: {
     fontSize: 24,
     marginRight: 12,
   },
   biometricButtonText: {
-    color: BCH2Colors.primary,
+    color: VoidColors.primary,
     fontSize: 16,
     fontWeight: '600',
   },
   orText: {
-    color: BCH2Colors.textMuted,
+    color: VoidColors.textMuted,
     fontSize: 14,
     marginBottom: 12,
     marginTop: 4,
   },
   passwordInput: {
     width: '80%',
-    backgroundColor: BCH2Colors.backgroundSecondary,
+    backgroundColor: VoidColors.backgroundSecondary,
     borderRadius: 12,
     padding: 16,
     fontSize: 16,
-    color: BCH2Colors.textPrimary,
+    color: VoidColors.textPrimary,
     borderWidth: 1,
-    borderColor: BCH2Colors.border,
+    borderColor: VoidColors.border,
     marginBottom: 12,
     textAlign: 'center',
   },
   errorText: {
-    color: BCH2Colors.error,
+    color: VoidColors.error,
     fontSize: 14,
     marginBottom: 12,
   },
   unlockButton: {
-    backgroundColor: BCH2Colors.primary,
+    backgroundColor: VoidColors.primary,
     borderRadius: 12,
     paddingVertical: 14,
     paddingHorizontal: 48,
@@ -331,4 +331,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default BCH2App;
+export default VoidApp;

@@ -15,8 +15,8 @@ export const NOTIFICATIONS_NO_AND_DONT_ASK_FLAG = 'NOTIFICATIONS_NO_AND_DONT_ASK
 let alreadyConfigured = false;
 let baseURI = groundControlUri;
 
-// TODO: BCH2 push notification server is not yet available.
-// All GroundControl network calls are disabled until a BCH2-compatible
+// TODO: VOID push notification server is not yet available.
+// All GroundControl network calls are disabled until a VOID-compatible
 // push notification server is deployed and its URL is set in constants.ts.
 
 type TPushToken = {
@@ -142,7 +142,7 @@ export const tryToObtainPermissions = async () => {
  */
 export const majorTomToGroundControl = async (addresses: string[], hashes: string[], txids: string[]) => {
   if (!isGroundControlConfigured) {
-    console.debug('majorTomToGroundControl: Skipped - no BCH2 push notification server configured');
+    console.debug('majorTomToGroundControl: Skipped - no VOID push notification server configured');
     return;
   }
 
@@ -240,7 +240,7 @@ export const checkPermissions = async () => {
  */
 export const setLevels = async (levelAll: boolean) => {
   if (!isGroundControlConfigured) {
-    console.debug('setLevels: Skipped - no BCH2 push notification server configured');
+    console.debug('setLevels: Skipped - no VOID push notification server configured');
     if (!levelAll) {
       PushNotification.removeAllDeliveredNotifications();
       PushNotification.setApplicationIconBadgeNumber(0);
@@ -303,7 +303,7 @@ export const addNotification = async (notification: TPayload) => {
 
 const postTokenConfig = async () => {
   if (!isGroundControlConfigured) {
-    console.debug('postTokenConfig: Skipped - no BCH2 push notification server configured');
+    console.debug('postTokenConfig: Skipped - no VOID push notification server configured');
     return;
   }
 
@@ -506,7 +506,7 @@ const getLevels = async () => {
  */
 export const unsubscribe = async (addresses: string[], hashes: string[], txids: string[]) => {
   if (!isGroundControlConfigured) {
-    console.debug('unsubscribe: Skipped - no BCH2 push notification server configured');
+    console.debug('unsubscribe: Skipped - no VOID push notification server configured');
     return;
   }
 

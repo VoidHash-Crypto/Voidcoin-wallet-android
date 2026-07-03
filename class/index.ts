@@ -20,5 +20,5 @@ export * from './wallets/segwit-p2sh-wallet';
 export * from './wallets/slip39-wallets';
 export * from './wallets/taproot-wallet';
 export * from './wallets/watch-only-wallet';
-export * from './wallets/bch2-wallet';
-export * from './bch2-airdrop';
+export * from './wallets/void-wallet';
+export * from './void-airdrop';

@@ -146,8 +146,8 @@ class DeeplinkSchemaMatch {
         },
       ]);
     } else if (event.url.toLowerCase().startsWith('bitcoincashii:')) {
-      // BCH2 CashAddr payment URI — not yet wired up
-      // TODO: Implement proper URI parsing (address, amount, label) and route to BCH2Send
+      // VOID CashAddr payment URI — not yet wired up
+      // TODO: Implement proper URI parsing (address, amount, label) and route to VoidSend
       return;
     } else if (DeeplinkSchemaMatch.isBitcoinAddress(event.url)) {
       completionHandler([

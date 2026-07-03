@@ -1,14 +1,14 @@
 /**
- * BCH2/BC2 Transaction Builder
- * Builds and signs transactions for BCH2 and BC2
+ * VOID/VOID Transaction Builder
+ * Builds and signs transactions for VOID and VOID
  *
  * Supported input types:
  * - P2PKH (legacy 1xxx addresses)
  * - CashAddr (bitcoincashii: format)
- * - P2WPKH (bc1 SegWit addresses via BCH2's SegWit recovery)
+ * - P2WPKH (bc1 SegWit addresses via VOID's SegWit recovery)
  *
- * BCH2 SegWit Recovery:
- * After fork height, BCH2 nodes accept spending of P2WPKH outputs using
+ * VOID SegWit Recovery:
+ * After fork height, VOID nodes accept spending of P2WPKH outputs using
  * scriptSig instead of witness data. This enables claiming coins from
  * bc1 addresses using BIP84 derivation paths.
  */
@@ -18,12 +18,12 @@ import BIP32Factory from 'bip32';
 import ecc from '../blue_modules/noble_ecc';
 import {
   getUtxosByAddress,
-  getBC2Utxos,
+  getVOIDUtxos,
   getUtxosByScripthash,
   broadcastTransaction,
-  broadcastBC2Transaction,
+  broadcastVOIDTransaction,
   filterMatureUtxos,
-} from '../blue_modules/BCH2Electrum';
+} from '../blue_modules/VoidElectrum';
 
 const bip32 = BIP32Factory(ecc);
 const crypto = require('crypto');
@@ -49,14 +49,14 @@ interface TransactionResult {
 }
 
 /**
- * Build and broadcast a BCH2 or BC2 transaction
+ * Build and broadcast a VOID or VOID transaction
  */
 export async function sendTransaction(
   mnemonic: string,
   toAddress: string,
   amountSats: number,
   feePerByte: number,
-  isBC2: boolean,
+  isVOID: boolean,
   expectedAddress?: string // Optional: pass stored address to verify derivation
 ): Promise<TransactionResult> {
   feePerByte = Math.ceil(feePerByte); // Ensure integer sat/byte
@@ -72,8 +72,8 @@ export async function sendTransaction(
 
   try {
 
-  // Different derivation paths for BCH2 vs BC2
-  const derivationPath = isBC2 ? "m/44'/0'/0'/0/0" : "m/44'/145'/0'/0/0";
+  // Different derivation paths for VOID vs VOID
+  const derivationPath = isVOID ? "m/44'/0'/0'/0/0" : "m/44'/145'/0'/0/0";
   child = root.derivePath(derivationPath);
 
   if (!child.privateKey) {
@@ -81,11 +81,11 @@ export async function sendTransaction(
   }
 
   // Get from address
-  const fromAddress = isBC2
+  const fromAddress = isVOID
     ? getLegacyAddress(hash160(Buffer.from(child.publicKey)))
     : getCashAddr(hash160(Buffer.from(child.publicKey)));
 
-  DEBUG && console.log(`[TX] Derived ${isBC2 ? 'BC2' : 'BCH2'} address: ${fromAddress}`);
+  DEBUG && console.log(`[TX] Derived ${isVOID ? 'VOID' : 'VOID'} address: ${fromAddress}`);
   DEBUG && console.log(`[TX] Using derivation path: ${derivationPath}`);
 
   // Verify address matches if provided
@@ -94,9 +94,9 @@ export async function sendTransaction(
     const normalizedDerived = fromAddress.toLowerCase().replace(/^bitcoincash(ii)?:/, '');
     if (normalizedExpected !== normalizedDerived) {
       DEBUG && console.log(`[TX] WARNING: Address mismatch! Expected: ${expectedAddress}, Derived: ${fromAddress}`);
-      // Try alternate derivation paths for BC2
-      if (isBC2) {
-        DEBUG && console.log('[TX] Trying alternate BC2 derivation paths...');
+      // Try alternate derivation paths for VOID
+      if (isVOID) {
+        DEBUG && console.log('[TX] Trying alternate VOID derivation paths...');
         const altPaths = [
           "m/44'/145'/0'/0/0",  // BCH path (some wallets use this)
           "m/44'/0'/0'/0/1",    // Second address
@@ -123,7 +123,7 @@ export async function sendTransaction(
               toAddress,
               amountSats,
               feePerByte,
-              isBC2
+              isVOID
             );
           }
           // Zero non-matching altChild private key
@@ -135,8 +135,8 @@ export async function sendTransaction(
 
   // Fetch UTXOs and filter out immature coinbase rewards
   DEBUG && console.log(`[TX] Fetching UTXOs for address: ${fromAddress}`);
-  const rawUtxos: UTXO[] = isBC2
-    ? await getBC2Utxos(fromAddress)
+  const rawUtxos: UTXO[] = isVOID
+    ? await getVOIDUtxos(fromAddress)
     : await getUtxosByAddress(fromAddress);
 
   const utxos: UTXO[] = await filterMatureUtxos(rawUtxos);
@@ -146,7 +146,7 @@ export async function sendTransaction(
   }
 
   if (utxos.length === 0) {
-    const coinType = isBC2 ? 'BC2' : 'BCH2';
+    const coinType = isVOID ? 'VOID' : 'VOID';
     throw new Error(`No UTXOs available for ${coinType} address ${fromAddress}. The address may have no confirmed balance, or the coins may have already been spent.`);
   }
 
@@ -165,7 +165,7 @@ export async function sendTransaction(
   }
 
   if (utxos.length === 0) {
-    const coinType = isBC2 ? 'BC2' : 'BCH2';
+    const coinType = isVOID ? 'VOID' : 'VOID';
     throw new Error(`No valid UTXOs for ${coinType} address ${fromAddress} after validation`);
   }
 
@@ -232,15 +232,15 @@ export async function sendTransaction(
     changeAmount,
     privkeyCopy,
     Buffer.from(child.publicKey),
-    isBC2
+    isVOID
   );
 
   DEBUG && console.log(`[TX] Transaction hex (${txHex.length} chars): ${txHex}`);
 
   // Broadcast
-  DEBUG && console.log(`[TX] Broadcasting to ${isBC2 ? 'BC2' : 'BCH2'} network...`);
-  const txid = isBC2
-    ? await broadcastBC2Transaction(txHex)
+  DEBUG && console.log(`[TX] Broadcasting to ${isVOID ? 'VOID' : 'VOID'} network...`);
+  const txid = isVOID
+    ? await broadcastVOIDTransaction(txHex)
     : await broadcastTransaction(txHex);
 
   DEBUG && console.log(`[TX] Broadcast successful, txid: ${txid}`);
@@ -281,7 +281,7 @@ function buildTransaction(
   changeAmount: number,
   privateKey: Buffer,
   publicKey: Buffer,
-  isBC2: boolean
+  isVOID: boolean
 ): string {
   // Sanity checks to prevent malformed transactions
   if (amount < 0 || changeAmount < 0) throw new Error('Negative amount in transaction');
@@ -321,7 +321,7 @@ function buildTransaction(
   let outputCount = 1;
 
   // Output 1: recipient
-  const recipientScript = addressToScript(toAddress, isBC2);
+  const recipientScript = addressToScript(toAddress, isVOID);
   const amountBytes = Buffer.alloc(8);
   amountBytes.writeBigUInt64LE(BigInt(amount), 0);
   outputs = Buffer.concat([outputs, amountBytes, encodeVarInt(recipientScript.length), recipientScript]);
@@ -329,7 +329,7 @@ function buildTransaction(
   // Output 2: change (if any)
   if (changeAddress && changeAmount > 0) {
     outputCount++;
-    const changeScript = addressToScript(changeAddress, isBC2);
+    const changeScript = addressToScript(changeAddress, isVOID);
     const changeBytes = Buffer.alloc(8);
     changeBytes.writeBigUInt64LE(BigInt(changeAmount), 0);
     outputs = Buffer.concat([outputs, changeBytes, encodeVarInt(changeScript.length), changeScript]);
@@ -339,7 +339,7 @@ function buildTransaction(
   let bip143HashPrevouts: Buffer | null = null;
   let bip143HashSequence: Buffer | null = null;
   let bip143HashOutputs: Buffer | null = null;
-  if (!isBC2) {
+  if (!isVOID) {
     let prevoutsData = Buffer.alloc(0);
     let sequencesData = Buffer.alloc(0);
     for (const u of utxos) {
@@ -360,9 +360,9 @@ function buildTransaction(
     const utxo = utxos[i];
 
     // Create the signing preimage
-    // For BCH2, we use BIP143 (segwit-style) sighash for replay protection
-    // For BC2, we use legacy sighash
-    const sighash = isBC2
+    // For VOID, we use BIP143 (segwit-style) sighash for replay protection
+    // For VOID, we use legacy sighash
+    const sighash = isVOID
       ? createLegacySighash(utxos, i, publicKey, outputCount, outputs, utxo.value)
       : createBIP143Sighash(utxos, i, publicKey, outputCount, outputs, utxo.value, bip143HashPrevouts!, bip143HashSequence!, bip143HashOutputs!);
 
@@ -370,7 +370,7 @@ function buildTransaction(
     const signature = signWithPrivateKey(sighash, privateKey);
 
     // Build scriptSig: <sig> <pubkey>
-    const sigWithHashType = Buffer.concat([signature, Buffer.from([isBC2 ? 0x01 : 0x41])]); // SIGHASH_ALL (0x41 for BCH with FORKID)
+    const sigWithHashType = Buffer.concat([signature, Buffer.from([isVOID ? 0x01 : 0x41])]); // SIGHASH_ALL (0x41 for BCH with FORKID)
     const scriptSig = Buffer.concat([
       encodeVarInt(sigWithHashType.length),
       sigWithHashType,
@@ -411,7 +411,7 @@ function buildTransaction(
 }
 
 /**
- * Create BIP143 sighash for BCH2 (with FORKID)
+ * Create BIP143 sighash for VOID (with FORKID)
  * hashPrevouts, hashSequence, hashOutputs are precomputed and passed in to avoid
  * redundant per-input computation (they're the same for all inputs in SIGHASH_ALL mode).
  */
@@ -480,7 +480,7 @@ function createBIP143Sighash(
 }
 
 /**
- * Create legacy sighash for BC2
+ * Create legacy sighash for VOID
  */
 function createLegacySighash(
   utxos: UTXO[],
@@ -559,12 +559,12 @@ function signWithPrivateKey(hash: Buffer, privateKey: Buffer): Buffer {
 /**
  * Convert address to scriptPubKey
  */
-function addressToScript(address: string, isBC2: boolean): Buffer {
+function addressToScript(address: string, isVOID: boolean): Buffer {
   // Check for bech32/bech32m address (bc1)
   if (isBech32Address(address)) {
-    // BCH2 has no SegWit consensus — sending to bc1/bc1p creates anyone-can-spend outputs
-    if (!isBC2) {
-      throw new Error('Cannot send BCH2 to a SegWit (bc1) address — use a bitcoincashii: CashAddr address instead');
+    // VOID has no SegWit consensus — sending to bc1/bc1p creates anyone-can-spend outputs
+    if (!isVOID) {
+      throw new Error('Cannot send VOID to a SegWit (bc1) address — use a bitcoincashii: CashAddr address instead');
     }
     // Try Bech32m first (P2TR, witness version 1+)
     const decodedM = decodeBech32m(address);
@@ -598,8 +598,8 @@ function addressToScript(address: string, isBC2: boolean): Buffer {
     }
   }
 
-  if (isBC2) {
-    // BC2 uses legacy P2PKH addresses (starts with 1) or P2SH (starts with 3)
+  if (isVOID) {
+    // VOID uses legacy P2PKH addresses (starts with 1) or P2SH (starts with 3)
     if (address.startsWith('3')) {
       const scriptHash = decodeLegacyAddress(address);
       // P2SH script: OP_HASH160 <scripthash> OP_EQUAL
@@ -617,7 +617,7 @@ function addressToScript(address: string, isBC2: boolean): Buffer {
     ]);
   }
 
-  // BCH2 CashAddr format
+  // VOID CashAddr format
   const decoded = decodeCashAddr(address, true);
   if (decoded.type !== 0 && decoded.type !== 1) {
     throw new Error(`Unsupported CashAddr type ${decoded.type} — only P2PKH (0) and P2SH (1) are supported`);
@@ -688,8 +688,8 @@ export function decodeCashAddr(address: string, returnType?: boolean): Buffer | 
     prefix = 'bitcoincashii';
     addr = addr.slice(14);
   } else if (addr.startsWith('bitcoincash:')) {
-    // Reject BCH addresses — BCH2 uses bitcoincashii: prefix
-    throw new Error('Invalid address: use bitcoincashii: prefix for BCH2, not bitcoincash:');
+    // Reject BCH addresses — VOID uses bitcoincashii: prefix
+    throw new Error('Invalid address: use bitcoincashii: prefix for VOID, not bitcoincash:');
   } else {
     // No prefix — assume bitcoincashii
     prefix = 'bitcoincashii';
@@ -776,7 +776,7 @@ function getLegacyAddress(pubkeyHash: Buffer): string {
 }
 
 /**
- * Get BCH2 CashAddr from pubkey hash
+ * Get VOID CashAddr from pubkey hash
  */
 function getCashAddr(pubkeyHash: Buffer): string {
   const CHARSET = 'qpzry9x8gf2tvdw0s3jn54khce6mua7l';
@@ -1013,7 +1013,7 @@ async function sendTransactionWithKey(
   toAddress: string,
   amountSats: number,
   feePerByte: number,
-  isBC2: boolean
+  isVOID: boolean
 ): Promise<TransactionResult> {
   try {
   feePerByte = Math.ceil(feePerByte); // Ensure integer sat/byte
@@ -1022,15 +1022,15 @@ async function sendTransactionWithKey(
   if (!Number.isInteger(amountSats) || amountSats < 546) throw new Error('Invalid amount');
   // Fetch UTXOs and filter out immature coinbase rewards
   DEBUG && console.log(`[TX] Fetching UTXOs for address: ${fromAddress}`);
-  const rawUtxos: UTXO[] = isBC2
-    ? await getBC2Utxos(fromAddress)
+  const rawUtxos: UTXO[] = isVOID
+    ? await getVOIDUtxos(fromAddress)
     : await getUtxosByAddress(fromAddress);
 
   const utxos: UTXO[] = await filterMatureUtxos(rawUtxos);
   DEBUG && console.log(`[TX] Found ${rawUtxos.length} UTXOs, ${utxos.length} mature (${rawUtxos.length - utxos.length} immature coinbase excluded)`);
 
   if (utxos.length === 0) {
-    const coinType = isBC2 ? 'BC2' : 'BCH2';
+    const coinType = isVOID ? 'VOID' : 'VOID';
     const immatureMsg = rawUtxos.length > 0 ? ' All UTXOs may be immature coinbase rewards (need 100 confirmations).' : '';
     throw new Error(`No spendable UTXOs for ${coinType} address ${fromAddress}.${immatureMsg}`);
   }
@@ -1050,7 +1050,7 @@ async function sendTransactionWithKey(
   }
 
   if (utxos.length === 0) {
-    const coinType = isBC2 ? 'BC2' : 'BCH2';
+    const coinType = isVOID ? 'VOID' : 'VOID';
     throw new Error(`All UTXOs for ${coinType} address ${fromAddress} were invalid after validation`);
   }
 
@@ -1106,12 +1106,12 @@ async function sendTransactionWithKey(
     changeAmount,
     privateKey,
     publicKey,
-    isBC2
+    isVOID
   );
 
   // Broadcast
-  const txid = isBC2
-    ? await broadcastBC2Transaction(txHex)
+  const txid = isVOID
+    ? await broadcastVOIDTransaction(txHex)
     : await broadcastTransaction(txHex);
 
   return { txid, hex: txHex };
@@ -1126,7 +1126,7 @@ async function sendTransactionWithKey(
 
 /**
  * Send transaction from a bc1 (P2WPKH/SegWit) address
- * BCH2 supports SegWit recovery - spending P2WPKH outputs via scriptSig
+ * VOID supports SegWit recovery - spending P2WPKH outputs via scriptSig
  */
 export async function sendFromBech32(
   mnemonic: string,
@@ -1266,7 +1266,7 @@ export async function sendFromBech32(
   DEBUG && console.log(`[TX]   Change: ${changeAmount} sats`);
   DEBUG && console.log(`[TX]   Inputs: ${selectedUtxos.length}`);
 
-  // For BCH2 SegWit recovery, we use the same BIP143 sighash and scriptSig format
+  // For VOID SegWit recovery, we use the same BIP143 sighash and scriptSig format
   // as P2PKH. The node's SegWit recovery code detects the P2WPKH scriptPubKey
   // and validates using the scriptSig contents.
   // NOTE: Change goes to P2PKH (CashAddr) derived from the same pubkey, not back
@@ -1286,8 +1286,8 @@ export async function sendFromBech32(
 
   DEBUG && console.log(`[TX] Transaction hex (${txHex.length} chars): ${txHex}`);
 
-  // Broadcast to BCH2 network
-  DEBUG && console.log(`[TX] Broadcasting to BCH2 network...`);
+  // Broadcast to VOID network
+  DEBUG && console.log(`[TX] Broadcasting to VOID network...`);
   const txid = await broadcastTransaction(txHex);
 
   return { txid, hex: txHex };
@@ -1315,7 +1315,7 @@ export async function sendFromBech32(
 
 /**
  * Send transaction from a P2SH-P2WPKH (3xxx wrapped SegWit) address
- * BCH2 supports spending P2SH-P2WPKH via scriptSig with redeemScript appended
+ * VOID supports spending P2SH-P2WPKH via scriptSig with redeemScript appended
  */
 export async function sendFromP2SH(
   mnemonic: string,
@@ -1515,7 +1515,7 @@ function buildSegwitRecoveryTransaction(
   let outputs = Buffer.alloc(0);
   let outputCount = 1;
 
-  // Output 1: recipient (always BCH2 CashAddr for sending BCH2)
+  // Output 1: recipient (always VOID CashAddr for sending VOID)
   const recipientScript = addressToScript(toAddress, false);
   const amountBytes = Buffer.alloc(8);
   amountBytes.writeBigUInt64LE(BigInt(amount), 0);
@@ -1525,7 +1525,7 @@ function buildSegwitRecoveryTransaction(
   if (changeAddress && changeAmount > 0) {
     outputCount++;
     let changeScript: Buffer;
-    // BCH2: Always send change to P2PKH (CashAddr) — not back to SegWit/P2SH
+    // VOID: Always send change to P2PKH (CashAddr) — not back to SegWit/P2SH
     // which would require another recovery spend. P2PKH is natively spendable.
     // OP_DUP OP_HASH160 <pubkeyhash> OP_EQUALVERIFY OP_CHECKSIG
     changeScript = Buffer.concat([
@@ -1669,7 +1669,7 @@ function createBIP143SighashForSegwit(
 
 /**
  * Build and broadcast a P2WSH recovery transaction
- * P2WSH (witness v0, 32-byte script hash) spending via scriptSig on BCH2
+ * P2WSH (witness v0, 32-byte script hash) spending via scriptSig on VOID
  *
  * scriptPubKey: OP_0 PUSH_32 <32-byte-SHA256-of-redeemScript>
  * scriptSig: <sig+hashtype> <pubkey> <redeemScript>
@@ -1860,7 +1860,7 @@ export async function sendFromP2WSH(
 }
 
 /**
- * Build a raw transaction spending P2WSH outputs via scriptSig (BCH2 SegWit recovery)
+ * Build a raw transaction spending P2WSH outputs via scriptSig (VOID SegWit recovery)
  *
  * scriptSig: <sig+hashtype> <pubkey> <redeemScript>
  * Sighash: BIP143 with the redeemScript as scriptCode and hashtype 0x41
@@ -2024,7 +2024,7 @@ function createBIP143SighashWithScriptCode(
 
 /**
  * Build and broadcast a P2TR (Taproot) recovery transaction
- * P2TR key-path spending via scriptSig on BCH2
+ * P2TR key-path spending via scriptSig on VOID
  *
  * scriptSig: <64-byte-schnorr-sig> (single push, no pubkey, no hashtype byte for SIGHASH_DEFAULT)
  * Sighash: BIP341 Taproot sighash
@@ -2243,7 +2243,7 @@ export async function sendFromP2TR(
 }
 
 /**
- * Build a raw transaction spending P2TR outputs via scriptSig (BCH2 Taproot recovery)
+ * Build a raw transaction spending P2TR outputs via scriptSig (VOID Taproot recovery)
  *
  * Key-path spend:
  * - scriptSig: <64-byte-schnorr-sig> (single push)

@@ -453,7 +453,7 @@
     "sort_status": "Stanje"
   },
   "units": {
-    "BTC": "BCH2",
+    "BTC": "VOID",
     "MAX": "MAX",
     "sat_vbyte": "sat/vBajt",
     "sats": "sats"

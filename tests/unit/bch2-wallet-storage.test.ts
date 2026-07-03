@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import BCH2WalletStorage, {
+import VoidWalletStorage, {
   saveWallet,
   getWallets,
   getWallet,
@@ -8,11 +8,11 @@ import BCH2WalletStorage, {
   getWalletMnemonic,
   updateWalletBalance,
   StoredWallet,
-} from '../../class/bch2-wallet-storage';
+} from '../../class/void-wallet-storage';
 
 // A known test mnemonic (BIP39-valid)
 const TEST_MNEMONIC = 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about';
-const WALLETS_KEY = '@bch2_wallets';
+const WALLETS_KEY = '@void_wallets';
 
 beforeEach(async () => {
   await AsyncStorage.clear();
@@ -23,12 +23,12 @@ beforeEach(async () => {
 // ============================================================================
 describe('Wallet CRUD', () => {
   it('saveWallet() stores wallet data', async () => {
-    const wallet = await saveWallet('My Wallet', TEST_MNEMONIC, 'bch2');
+    const wallet = await saveWallet('My Wallet', TEST_MNEMONIC, 'void');
 
     expect(wallet).toBeDefined();
-    expect(wallet.id).toMatch(/^bch2_/);
+    expect(wallet.id).toMatch(/^void_/);
     expect(wallet.label).toBe('My Wallet');
-    expect(wallet.type).toBe('bch2');
+    expect(wallet.type).toBe('void');
     expect(wallet.balance).toBe(0);
     expect(wallet.unconfirmedBalance).toBe(0);
     expect(wallet.createdAt).toBeGreaterThan(0);
@@ -43,19 +43,19 @@ describe('Wallet CRUD', () => {
   });
 
   it('saveWallet() throws for invalid mnemonic', async () => {
-    await expect(saveWallet('W', 'not a valid mnemonic', 'bch2')).rejects.toThrow('Invalid mnemonic');
+    await expect(saveWallet('W', 'not a valid mnemonic', 'void')).rejects.toThrow('Invalid mnemonic');
   });
 
   it('saveWallet() trims label and mnemonic', async () => {
-    const wallet = await saveWallet('  My Label  ', `  ${TEST_MNEMONIC}  `, 'bch2');
+    const wallet = await saveWallet('  My Label  ', `  ${TEST_MNEMONIC}  `, 'void');
     expect(wallet.label).toBe('My Label');
     // The address should be derived from the trimmed mnemonic
     expect(wallet.address).toBeTruthy();
   });
 
   it('getWallets() retrieves stored wallets', async () => {
-    await saveWallet('W1', TEST_MNEMONIC, 'bch2');
-    await saveWallet('W2', TEST_MNEMONIC, 'bc2');
+    await saveWallet('W1', TEST_MNEMONIC, 'void');
+    await saveWallet('W2', TEST_MNEMONIC, 'void');
 
     const wallets = await getWallets();
     expect(wallets).toHaveLength(2);
@@ -69,7 +69,7 @@ describe('Wallet CRUD', () => {
   });
 
   it('getWallet() retrieves a single wallet by ID', async () => {
-    const saved = await saveWallet('Single', TEST_MNEMONIC, 'bch2');
+    const saved = await saveWallet('Single', TEST_MNEMONIC, 'void');
     const retrieved = await getWallet(saved.id);
     expect(retrieved).toBeDefined();
     expect(retrieved!.id).toBe(saved.id);
@@ -82,8 +82,8 @@ describe('Wallet CRUD', () => {
   });
 
   it('deleteWallet() removes wallet and verifies deletion', async () => {
-    const w1 = await saveWallet('To Delete', TEST_MNEMONIC, 'bch2');
-    const w2 = await saveWallet('To Keep', TEST_MNEMONIC, 'bc2');
+    const w1 = await saveWallet('To Delete', TEST_MNEMONIC, 'void');
+    const w2 = await saveWallet('To Keep', TEST_MNEMONIC, 'void');
 
     await deleteWallet(w1.id);
 
@@ -93,7 +93,7 @@ describe('Wallet CRUD', () => {
   });
 
   it('deleteWallet() on non-existent id does not corrupt storage', async () => {
-    const w = await saveWallet('Existing', TEST_MNEMONIC, 'bch2');
+    const w = await saveWallet('Existing', TEST_MNEMONIC, 'void');
     await deleteWallet('nonexistent_id');
 
     const wallets = await getWallets();
@@ -102,7 +102,7 @@ describe('Wallet CRUD', () => {
   });
 
   it('getWalletMnemonic() returns mnemonic for a wallet', async () => {
-    const wallet = await saveWallet('Mnemonic Test', TEST_MNEMONIC, 'bch2');
+    const wallet = await saveWallet('Mnemonic Test', TEST_MNEMONIC, 'void');
     const mnemonic = await getWalletMnemonic(wallet.id);
     expect(mnemonic).toBe(TEST_MNEMONIC);
   });
@@ -113,7 +113,7 @@ describe('Wallet CRUD', () => {
   });
 
   it('updateWalletBalance() updates balance and unconfirmed balance', async () => {
-    const wallet = await saveWallet('Balance', TEST_MNEMONIC, 'bch2');
+    const wallet = await saveWallet('Balance', TEST_MNEMONIC, 'void');
 
     await updateWalletBalance(wallet.id, 100000, 5000);
 
@@ -123,7 +123,7 @@ describe('Wallet CRUD', () => {
   });
 
   it('updateWalletBalance() rejects NaN and Infinity', async () => {
-    const wallet = await saveWallet('Balance', TEST_MNEMONIC, 'bch2');
+    const wallet = await saveWallet('Balance', TEST_MNEMONIC, 'void');
 
     await updateWalletBalance(wallet.id, NaN, 0);
     let w = await getWallet(wallet.id);
@@ -135,7 +135,7 @@ describe('Wallet CRUD', () => {
   });
 
   it('updateWalletBalance() clamps negative balance to zero', async () => {
-    const wallet = await saveWallet('Balance', TEST_MNEMONIC, 'bch2');
+    const wallet = await saveWallet('Balance', TEST_MNEMONIC, 'void');
 
     await updateWalletBalance(wallet.id, -500, 0);
 
@@ -148,8 +148,8 @@ describe('Wallet CRUD', () => {
 // Address Derivation
 // ============================================================================
 describe('Address derivation', () => {
-  it("BCH2 derivation path m/44'/145'/0'/0/0 produces CashAddr", async () => {
-    const wallet = await saveWallet('BCH2 Addr', TEST_MNEMONIC, 'bch2');
+  it("VOID derivation path m/44'/145'/0'/0/0 produces CashAddr", async () => {
+    const wallet = await saveWallet('VOID Addr', TEST_MNEMONIC, 'void');
     expect(wallet.address.startsWith('bitcoincashii:')).toBe(true);
     // CashAddr addresses have a prefix followed by the encoded data
     const addrParts = wallet.address.split(':');
@@ -159,8 +159,8 @@ describe('Address derivation', () => {
     expect(addrParts[1].length).toBeGreaterThan(0);
   });
 
-  it("BC2 derivation path m/44'/0'/0'/0/0 produces legacy address", async () => {
-    const wallet = await saveWallet('BC2 Addr', TEST_MNEMONIC, 'bc2');
+  it("VOID derivation path m/44'/0'/0'/0/0 produces legacy address", async () => {
+    const wallet = await saveWallet('VOID Addr', TEST_MNEMONIC, 'void');
     // Legacy addresses start with 1 or 3
     expect(wallet.address).toMatch(/^[13]/);
     // Should not contain CashAddr prefix
@@ -175,20 +175,20 @@ describe('Address derivation', () => {
   });
 
   it('same mnemonic produces deterministic addresses', async () => {
-    const w1 = await saveWallet('Det1', TEST_MNEMONIC, 'bch2');
-    const w2 = await saveWallet('Det2', TEST_MNEMONIC, 'bch2');
+    const w1 = await saveWallet('Det1', TEST_MNEMONIC, 'void');
+    const w2 = await saveWallet('Det2', TEST_MNEMONIC, 'void');
     expect(w1.address).toBe(w2.address);
   });
 
   it('different wallet types produce different addresses from same mnemonic', async () => {
-    const wBCH2 = await saveWallet('BCH2', TEST_MNEMONIC, 'bch2');
-    const wBC2 = await saveWallet('BC2', TEST_MNEMONIC, 'bc2');
+    const wVOID = await saveWallet('VOID', TEST_MNEMONIC, 'void');
+    const wVOID = await saveWallet('VOID', TEST_MNEMONIC, 'void');
     const wBC1 = await saveWallet('BC1', TEST_MNEMONIC, 'bc1');
 
     // All three should have different addresses (different derivation paths + encoding)
-    expect(wBCH2.address).not.toBe(wBC2.address);
-    expect(wBCH2.address).not.toBe(wBC1.address);
-    expect(wBC2.address).not.toBe(wBC1.address);
+    expect(wVOID.address).not.toBe(wVOID.address);
+    expect(wVOID.address).not.toBe(wBC1.address);
+    expect(wVOID.address).not.toBe(wBC1.address);
   });
 });
 
@@ -213,7 +213,7 @@ describe('Edge cases', () => {
   });
 
   it('secure deletion (mnemonic overwritten before removal)', async () => {
-    const wallet = await saveWallet('Secure Del', TEST_MNEMONIC, 'bch2');
+    const wallet = await saveWallet('Secure Del', TEST_MNEMONIC, 'void');
     const originalMnemonic = wallet.mnemonic;
 
     // Track all setItem calls by wrapping the real implementation
@@ -251,8 +251,8 @@ describe('Edge cases', () => {
   });
 
   it('multiple wallets can be saved and retrieved independently', async () => {
-    const w1 = await saveWallet('W1', TEST_MNEMONIC, 'bch2');
-    const w2 = await saveWallet('W2', TEST_MNEMONIC, 'bc2');
+    const w1 = await saveWallet('W1', TEST_MNEMONIC, 'void');
+    const w2 = await saveWallet('W2', TEST_MNEMONIC, 'void');
     const w3 = await saveWallet('W3', TEST_MNEMONIC, 'bc1');
 
     // Verify all wallets are stored
@@ -279,7 +279,7 @@ describe('Edge cases', () => {
   it('wallet IDs are unique', async () => {
     const wallets = [];
     for (let i = 0; i < 10; i++) {
-      wallets.push(await saveWallet(`W${i}`, TEST_MNEMONIC, 'bch2'));
+      wallets.push(await saveWallet(`W${i}`, TEST_MNEMONIC, 'void'));
     }
     const ids = wallets.map(w => w.id);
     const uniqueIds = new Set(ids);
@@ -290,7 +290,7 @@ describe('Edge cases', () => {
     // Fire multiple saveWallet calls concurrently
     const promises = [];
     for (let i = 0; i < 5; i++) {
-      promises.push(saveWallet(`Wallet ${i}`, TEST_MNEMONIC, 'bch2'));
+      promises.push(saveWallet(`Wallet ${i}`, TEST_MNEMONIC, 'void'));
     }
     await Promise.all(promises);
 
@@ -307,7 +307,7 @@ describe('Edge cases', () => {
 // ============================================================================
 describe('Mnemonic retrieval', () => {
   it('getWalletMnemonic returns mnemonic for stored wallet', async () => {
-    const wallet = await saveWallet('Test', TEST_MNEMONIC, 'bch2');
+    const wallet = await saveWallet('Test', TEST_MNEMONIC, 'void');
     const mnemonic = await getWalletMnemonic(wallet.id);
     expect(mnemonic).toBe(TEST_MNEMONIC);
   });
@@ -319,8 +319,8 @@ describe('Mnemonic retrieval', () => {
 
   it('legacy wallet with plaintext mnemonic returns mnemonic as-is', async () => {
     const wallet: StoredWallet = {
-      id: 'bch2_unenc_wallet',
-      type: 'bch2',
+      id: 'void_unenc_wallet',
+      type: 'void',
       label: 'Unencrypted',
       mnemonic: TEST_MNEMONIC,
       address: 'bitcoincashii:qtest',
@@ -330,7 +330,7 @@ describe('Mnemonic retrieval', () => {
     };
     await AsyncStorage.setItem(WALLETS_KEY, JSON.stringify([wallet]));
 
-    const mnemonic = await getWalletMnemonic('bch2_unenc_wallet');
+    const mnemonic = await getWalletMnemonic('void_unenc_wallet');
     expect(mnemonic).toBe(TEST_MNEMONIC);
   });
 });
@@ -341,7 +341,7 @@ describe('Mnemonic retrieval', () => {
 describe('Nonexistent wallet edge cases', () => {
   it('updateWalletBalance silently skips for nonexistent wallet ID', async () => {
     // Store one wallet, then update a different (nonexistent) ID
-    const wallet = await saveWallet('Existing', TEST_MNEMONIC, 'bch2');
+    const wallet = await saveWallet('Existing', TEST_MNEMONIC, 'void');
 
     // Should not throw
     await updateWalletBalance('nonexistent_id', 999999, 1000);
@@ -360,10 +360,10 @@ describe('withStorageLock error propagation', () => {
   it('releases lock on error so subsequent calls are not deadlocked', async () => {
     // saveWallet with invalid mnemonic should throw,
     // which exercises the lock's .finally() release path.
-    await expect(saveWallet('Fail', 'invalid mnemonic words', 'bch2')).rejects.toThrow();
+    await expect(saveWallet('Fail', 'invalid mnemonic words', 'void')).rejects.toThrow();
 
     // A subsequent saveWallet should succeed (lock was released)
-    const wallet = await saveWallet('After Error', TEST_MNEMONIC, 'bch2');
+    const wallet = await saveWallet('After Error', TEST_MNEMONIC, 'void');
     expect(wallet).toBeDefined();
     expect(wallet.label).toBe('After Error');
 
@@ -378,7 +378,7 @@ describe('withStorageLock error propagation', () => {
 // ============================================================================
 describe('Gap coverage: saveWallet edge cases', () => {
   it('empty string label is saved after trimming (empty label)', async () => {
-    const wallet = await saveWallet('', TEST_MNEMONIC, 'bch2');
+    const wallet = await saveWallet('', TEST_MNEMONIC, 'void');
     expect(wallet.label).toBe('');
     expect(wallet.address.startsWith('bitcoincashii:')).toBe(true);
 
@@ -389,7 +389,7 @@ describe('Gap coverage: saveWallet edge cases', () => {
   });
 
   it('whitespace-only label is trimmed to empty string', async () => {
-    const wallet = await saveWallet('   ', TEST_MNEMONIC, 'bch2');
+    const wallet = await saveWallet('   ', TEST_MNEMONIC, 'void');
     expect(wallet.label).toBe('');
   });
 });
@@ -398,10 +398,10 @@ describe('Gap coverage: saveWallet edge cases', () => {
 // Gap coverage: deriveAddress edge cases
 // ============================================================================
 describe('Gap coverage: deriveAddress edge cases', () => {
-  it('invalid walletType falls through to BCH2 derivation (default case)', async () => {
+  it('invalid walletType falls through to VOID derivation (default case)', async () => {
     const wallet = await saveWallet('Invalid Type', TEST_MNEMONIC, 'unknown' as any);
 
-    // Should still produce a valid BCH2 CashAddr address (the default path)
+    // Should still produce a valid VOID CashAddr address (the default path)
     expect(wallet.address.startsWith('bitcoincashii:')).toBe(true);
     expect(wallet.type).toBe('unknown');
   });
@@ -418,7 +418,7 @@ describe('Gap coverage: deriveAddress edge cases', () => {
       return seed;
     });
 
-    await saveWallet('Seed Zero Test', TEST_MNEMONIC, 'bch2');
+    await saveWallet('Seed Zero Test', TEST_MNEMONIC, 'void');
 
     // The captured seed should have been a non-zero buffer before zeroing
     expect(capturedSeed).not.toBeNull();
@@ -446,8 +446,8 @@ describe('Gap coverage: hash160 correct computation (SHA256 then RIPEMD160)', ()
   });
 
   it('hash160 of public key produces expected address', async () => {
-    const w1 = await saveWallet('Hash Test 1', TEST_MNEMONIC, 'bch2');
-    const w2 = await saveWallet('Hash Test 2', TEST_MNEMONIC, 'bch2');
+    const w1 = await saveWallet('Hash Test 1', TEST_MNEMONIC, 'void');
+    const w2 = await saveWallet('Hash Test 2', TEST_MNEMONIC, 'void');
 
     // Same mnemonic => same hash160 => same address
     expect(w1.address).toBe(w2.address);
@@ -465,7 +465,7 @@ describe('Gap coverage: hash160 correct computation (SHA256 then RIPEMD160)', ()
 // ============================================================================
 describe('Gap coverage: updateWalletBalance() negative unconfirmed balance', () => {
   it('negative unconfirmed balance is stored (not clamped), since pending spends can be negative', async () => {
-    const wallet = await saveWallet('Neg Unconf', TEST_MNEMONIC, 'bch2');
+    const wallet = await saveWallet('Neg Unconf', TEST_MNEMONIC, 'void');
 
     await updateWalletBalance(wallet.id, 100000, -5000);
 
@@ -475,7 +475,7 @@ describe('Gap coverage: updateWalletBalance() negative unconfirmed balance', () 
   });
 
   it('negative unconfirmed balance with fractional part is floored', async () => {
-    const wallet = await saveWallet('Neg Frac', TEST_MNEMONIC, 'bch2');
+    const wallet = await saveWallet('Neg Frac', TEST_MNEMONIC, 'void');
 
     await updateWalletBalance(wallet.id, 50000, -1234.7);
 
@@ -486,7 +486,7 @@ describe('Gap coverage: updateWalletBalance() negative unconfirmed balance', () 
   });
 
   it('large negative unconfirmed balance is accepted', async () => {
-    const wallet = await saveWallet('Large Neg', TEST_MNEMONIC, 'bch2');
+    const wallet = await saveWallet('Large Neg', TEST_MNEMONIC, 'void');
 
     await updateWalletBalance(wallet.id, 0, -999999999);
 
@@ -501,7 +501,7 @@ describe('Gap coverage: updateWalletBalance() negative unconfirmed balance', () 
 // ============================================================================
 describe('Gap coverage: deleteWallet() secure overwrite length', () => {
   it('random bytes overwrite has the same length as the original mnemonic', async () => {
-    const wallet = await saveWallet('Overwrite Len', TEST_MNEMONIC, 'bch2');
+    const wallet = await saveWallet('Overwrite Len', TEST_MNEMONIC, 'void');
     const originalMnemonicLength = wallet.mnemonic.length;
 
     // Track setItem calls to capture the overwrite
@@ -541,17 +541,17 @@ describe('Gap coverage: deleteWallet() secure overwrite length', () => {
 // Gap coverage: deriveAddress() with falsy walletType
 // ============================================================================
 describe('Gap coverage: deriveAddress() with falsy walletType', () => {
-  it('null walletType falls back to default BCH2 derivation', async () => {
+  it('null walletType falls back to default VOID derivation', async () => {
     const wallet = await saveWallet('Null Type', TEST_MNEMONIC, null as any);
     expect(wallet.address.startsWith('bitcoincashii:')).toBe(true);
   });
 
-  it('undefined walletType falls back to default BCH2 derivation', async () => {
+  it('undefined walletType falls back to default VOID derivation', async () => {
     const wallet = await saveWallet('Undef Type', TEST_MNEMONIC, undefined as any);
     expect(wallet.address.startsWith('bitcoincashii:')).toBe(true);
   });
 
-  it('empty string walletType falls back to default BCH2 derivation', async () => {
+  it('empty string walletType falls back to default VOID derivation', async () => {
     const wallet = await saveWallet('Empty Type', TEST_MNEMONIC, '' as any);
     expect(wallet.address.startsWith('bitcoincashii:')).toBe(true);
   });
@@ -563,8 +563,8 @@ describe('Gap coverage: deriveAddress() with falsy walletType', () => {
 describe('Gap coverage: withStorageLock() concurrent access', () => {
   it('two concurrent saveWallet calls are properly serialized by the mutex', async () => {
     const [w1, w2] = await Promise.all([
-      saveWallet('Concurrent A', TEST_MNEMONIC, 'bch2'),
-      saveWallet('Concurrent B', TEST_MNEMONIC, 'bch2'),
+      saveWallet('Concurrent A', TEST_MNEMONIC, 'void'),
+      saveWallet('Concurrent B', TEST_MNEMONIC, 'void'),
     ]);
 
     expect(w1).toBeDefined();
@@ -578,10 +578,10 @@ describe('Gap coverage: withStorageLock() concurrent access', () => {
   });
 
   it('concurrent save and delete are serialized without data loss', async () => {
-    const existing = await saveWallet('Existing', TEST_MNEMONIC, 'bch2');
+    const existing = await saveWallet('Existing', TEST_MNEMONIC, 'void');
 
     const [newWallet] = await Promise.all([
-      saveWallet('New One', TEST_MNEMONIC, 'bc2'),
+      saveWallet('New One', TEST_MNEMONIC, 'void'),
       deleteWallet(existing.id),
     ]);
 
@@ -591,7 +591,7 @@ describe('Gap coverage: withStorageLock() concurrent access', () => {
   });
 
   it('concurrent balance updates are serialized', async () => {
-    const wallet = await saveWallet('Balance Race', TEST_MNEMONIC, 'bch2');
+    const wallet = await saveWallet('Balance Race', TEST_MNEMONIC, 'void');
 
     await Promise.all([
       updateWalletBalance(wallet.id, 10000, 0),

@@ -1,67 +1,67 @@
 /**
- * BCH2 Units and Chain Types
+ * VOID Units and Chain Types
  */
 
-export const BCH2Unit = {
-  BCH2: 'BCH2',
+export const VOIDUnit = {
+  VOID: 'VOID',
   SATS: 'sats',
   LOCAL_CURRENCY: 'local_currency',
   MAX: 'MAX',
 } as const;
 
-export type BCH2Unit = (typeof BCH2Unit)[keyof typeof BCH2Unit];
+export type VOIDUnit = (typeof VOIDUnit)[keyof typeof VOIDUnit];
 
 export const CoinType = {
-  BC2: 'BC2',
-  BCH2: 'BCH2',
+  VOID: 'VOID',
+  VOID: 'VOID',
 } as const;
 
 export type CoinType = (typeof CoinType)[keyof typeof CoinType];
 
 /**
- * Format BCH2 amount for display
+ * Format VOID amount for display
  */
-export function formatBCH2Amount(satoshis: number, unit: BCH2Unit = BCH2Unit.BCH2): string {
+export function formatVOIDAmount(satoshis: number, unit: VOIDUnit = VOIDUnit.VOID): string {
   switch (unit) {
-    case BCH2Unit.BCH2:
-      return (satoshis / 100000000).toFixed(8) + ' BCH2';
-    case BCH2Unit.SATS:
+    case VOIDUnit.VOID:
+      return (satoshis / 100000000).toFixed(8) + ' VOID';
+    case VOIDUnit.SATS:
       return satoshis.toString() + ' sats';
     default:
-      return (satoshis / 100000000).toFixed(8) + ' BCH2';
+      return (satoshis / 100000000).toFixed(8) + ' VOID';
   }
 }
 
 /**
- * Parse BCH2 amount string to satoshis.
+ * Parse VOID amount string to satoshis.
  * Caller must specify the unit to avoid ambiguity.
- * Defaults to BCH2 (i.e. "1.5" = 150_000_000 sats).
+ * Defaults to VOID (i.e. "1.5" = 150_000_000 sats).
  */
-export function parseBCH2Amount(amount: string, unit: BCH2Unit = BCH2Unit.BCH2): number {
+export function parseVOIDAmount(amount: string, unit: VOIDUnit = VOIDUnit.VOID): number {
   const cleaned = amount.replace(/[^0-9.]/g, '');
   const value = parseFloat(cleaned);
   if (isNaN(value) || !isFinite(value)) return 0;
 
-  if (unit === BCH2Unit.SATS) {
+  if (unit === VOIDUnit.SATS) {
     const sats = Math.floor(value);
     if (!Number.isSafeInteger(sats) || sats < 0) return 0;
     return sats;
   }
 
-  // BCH2 unit: convert to satoshis
+  // VOID unit: convert to satoshis
   const sats = Math.round(value * 100000000);
   if (!Number.isSafeInteger(sats) || sats < 0) return 0;
   return sats;
 }
 
 /**
- * BCH2 fork information
+ * VOID fork information
  */
-export const BCH2_FORK_INFO = {
+export const VOID_FORK_INFO = {
   forkHeight: 53200,
   forkTimestamp: 0, // Will be set when fork happens
-  coinName: 'Bitcoin Cash II',
-  symbol: 'BCH2',
+  coinName: 'VoidCoin',
+  symbol: 'VOID',
   addressPrefix: 'bitcoincashii',
   defaultPort: 8339,
   rpcPort: 8342,
@@ -70,9 +70,9 @@ export const BCH2_FORK_INFO = {
 } as const;
 
 export default {
-  BCH2Unit,
+  VOIDUnit,
   CoinType,
-  formatBCH2Amount,
-  parseBCH2Amount,
-  BCH2_FORK_INFO,
+  formatVOIDAmount,
+  parseVOIDAmount,
+  VOID_FORK_INFO,
 };

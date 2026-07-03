@@ -4,11 +4,11 @@ import { isGroundControlUriValid } from '../../blue_modules/notifications';
 // Notifications.default = new Notifications();
 
 describe('notifications', () => {
-  // TODO: Re-enable when BCH2 push notification server is deployed
+  // TODO: Re-enable when VOID push notification server is deployed
   // eslint-disable-next-line jest/no-disabled-tests
   it.skip('can check groundcontrol server uri validity', async () => {
-    // TODO: Replace with BCH2 push notification server URL
-    assert.ok(await isGroundControlUriValid('https://groundcontrol.bch2.example.com'));
+    // TODO: Replace with VOID push notification server URL
+    assert.ok(await isGroundControlUriValid('https://groundcontrol.void.example.com'));
     assert.ok(!(await isGroundControlUriValid('https://www.google.com')));
     await new Promise(resolve => setTimeout(resolve, 2000));
   });

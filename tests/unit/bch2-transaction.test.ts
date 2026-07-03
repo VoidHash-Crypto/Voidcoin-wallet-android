@@ -1,10 +1,10 @@
 /**
- * Unit tests for BCH2 Transaction Builder
+ * Unit tests for VOID Transaction Builder
  *
  * Tests cover: coin selection, transaction serialization, fee estimation,
  * signing (SIGHASH_FORKID vs legacy), edge cases, and SegWit recovery.
  *
- * Strategy: We mock the network layer (BCH2Electrum) and use real crypto
+ * Strategy: We mock the network layer (VoidElectrum) and use real crypto
  * (noble_ecc, bip32, bip39) so that signatures and hashes are deterministic
  * and verifiable against the actual transaction builder logic.
  */
@@ -22,21 +22,21 @@ const bs58check = require('bs58check');
 // network. The mocks return controlled UTXO sets and accept any broadcast.
 
 const mockGetUtxosByAddress = jest.fn();
-const mockGetBC2Utxos = jest.fn();
+const mockGetVOIDUtxos = jest.fn();
 const mockGetUtxosByScripthash = jest.fn();
 const mockBroadcastTransaction = jest.fn();
-const mockBroadcastBC2Transaction = jest.fn();
+const mockBroadcastVOIDTransaction = jest.fn();
 
-jest.mock('../../blue_modules/BCH2Electrum', () => ({
+jest.mock('../../blue_modules/VoidElectrum', () => ({
   getUtxosByAddress: (...args: any[]) => mockGetUtxosByAddress(...args),
-  getBC2Utxos: (...args: any[]) => mockGetBC2Utxos(...args),
+  getVOIDUtxos: (...args: any[]) => mockGetVOIDUtxos(...args),
   getUtxosByScripthash: (...args: any[]) => mockGetUtxosByScripthash(...args),
   broadcastTransaction: (...args: any[]) => mockBroadcastTransaction(...args),
-  broadcastBC2Transaction: (...args: any[]) => mockBroadcastBC2Transaction(...args),
+  broadcastVOIDTransaction: (...args: any[]) => mockBroadcastVOIDTransaction(...args),
 }));
 
 // Import after mocking
-import { sendTransaction, sendFromBech32, sendFromP2SH, sendFromP2WSH, sendFromP2TR, decodeCashAddr } from '../../class/bch2-transaction';
+import { sendTransaction, sendFromBech32, sendFromP2SH, sendFromP2WSH, sendFromP2TR, decodeCashAddr } from '../../class/void-transaction';
 
 // ---- Test Helpers ----------------------------------------------------------
 
@@ -143,7 +143,7 @@ function encodeBech32(hrp: string, version: number, program: Buffer): string {
 // We derive valid addresses from the test mnemonic so that CashAddr checksums pass.
 
 let DEST_CASHADDR: string;  // Valid destination CashAddr (different derivation from sender)
-let BC2_LEGACY_ADDR: string; // Valid BC2 legacy address (same mnemonic, BC2 path)
+let VOID_LEGACY_ADDR: string; // Valid VOID legacy address (same mnemonic, VOID path)
 let BC1_ADDRESS: string;    // Valid bc1 P2WPKH address (BIP84 m/84'/0'/0'/0/0)
 
 beforeAll(async () => {
@@ -155,10 +155,10 @@ beforeAll(async () => {
   const destPkh = hash160(Buffer.from(destChild.publicKey));
   DEST_CASHADDR = encodeCashAddr(destPkh, 0);
 
-  // BC2 legacy address at m/44'/0'/0'/0/0
-  const bc2Child = root.derivePath("m/44'/0'/0'/0/0");
-  const bc2Pkh = hash160(Buffer.from(bc2Child.publicKey));
-  BC2_LEGACY_ADDR = bs58check.encode(Buffer.concat([Buffer.from([0x00]), bc2Pkh]));
+  // VOID legacy address at m/44'/0'/0'/0/0
+  const voidChild = root.derivePath("m/44'/0'/0'/0/0");
+  const voidPkh = hash160(Buffer.from(voidChild.publicKey));
+  VOID_LEGACY_ADDR = bs58check.encode(Buffer.concat([Buffer.from([0x00]), voidPkh]));
 
   // bc1 P2WPKH address at m/84'/0'/0'/0/0
   const bech32Child = root.derivePath("m/84'/0'/0'/0/0");
@@ -171,7 +171,7 @@ beforeEach(() => {
   jest.clearAllMocks();
   // Default broadcast mock returns a fake txid
   mockBroadcastTransaction.mockResolvedValue('abcd'.repeat(16));
-  mockBroadcastBC2Transaction.mockResolvedValue('ef01'.repeat(16));
+  mockBroadcastVOIDTransaction.mockResolvedValue('ef01'.repeat(16));
 });
 
 // ============================================================================
@@ -271,7 +271,7 @@ describe('Coin selection', () => {
 // Transaction Serialization
 // ============================================================================
 describe('Transaction serialization', () => {
-  it('uses SIGHASH_FORKID (0x41) for BCH2 transactions', async () => {
+  it('uses SIGHASH_FORKID (0x41) for VOID transactions', async () => {
     const utxo = { txid: fakeTxid(10), vout: 0, value: 100_000 };
     mockGetUtxosByAddress.mockResolvedValue([utxo]);
 
@@ -290,11 +290,11 @@ describe('Transaction serialization', () => {
     expect(hashTypeByte).toBe(0x41);
   });
 
-  it('uses SIGHASH_ALL (0x01) for BC2 transactions', async () => {
+  it('uses SIGHASH_ALL (0x01) for VOID transactions', async () => {
     const utxo = { txid: fakeTxid(11), vout: 0, value: 100_000 };
-    mockGetBC2Utxos.mockResolvedValue([utxo]);
+    mockGetVOIDUtxos.mockResolvedValue([utxo]);
 
-    // Send BC2 transaction to a legacy address
+    // Send VOID transaction to a legacy address
     const result = await sendTransaction(TEST_MNEMONIC, '1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2', 50_000, 1, true);
     const txBuf = Buffer.from(result.hex, 'hex');
 
@@ -438,7 +438,7 @@ describe('Fee estimation', () => {
 // Signing
 // ============================================================================
 describe('Signing', () => {
-  it('produces a valid DER-encoded ECDSA signature for BCH2', async () => {
+  it('produces a valid DER-encoded ECDSA signature for VOID', async () => {
     const utxo = { txid: fakeTxid(30), vout: 0, value: 100_000 };
     mockGetUtxosByAddress.mockResolvedValue([utxo]);
 
@@ -460,9 +460,9 @@ describe('Signing', () => {
     expect(sigWithHashType[sigWithHashType.length - 1]).toBe(0x41);
   });
 
-  it('produces a valid DER-encoded ECDSA signature for BC2', async () => {
+  it('produces a valid DER-encoded ECDSA signature for VOID', async () => {
     const utxo = { txid: fakeTxid(31), vout: 0, value: 100_000 };
-    mockGetBC2Utxos.mockResolvedValue([utxo]);
+    mockGetVOIDUtxos.mockResolvedValue([utxo]);
 
     const result = await sendTransaction(TEST_MNEMONIC, '1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2', 50_000, 1, true);
     const txBuf = Buffer.from(result.hex, 'hex');
@@ -476,7 +476,7 @@ describe('Signing', () => {
 
     // DER: starts with 0x30
     expect(sigWithHashType[0]).toBe(0x30);
-    // BC2 uses SIGHASH_ALL = 0x01
+    // VOID uses SIGHASH_ALL = 0x01
     expect(sigWithHashType[sigWithHashType.length - 1]).toBe(0x01);
   });
 
@@ -617,7 +617,7 @@ describe('decodeCashAddr', () => {
     expect(result.hash.length).toBe(20);
   });
 
-  it('rejects bitcoincash: prefix (BCH, not BCH2)', () => {
+  it('rejects bitcoincash: prefix (BCH, not VOID)', () => {
     expect(() => {
       decodeCashAddr('bitcoincash:qr95sy3j9xwd2ap32xkykttr4cvcu7as5yc93ky292');
     }).toThrow(/bitcoincashii/);
@@ -786,26 +786,26 @@ describe('P2WSH recovery (sendFromP2WSH)', () => {
 });
 
 // ============================================================================
-// BC2 vs BCH2 derivation paths
+// VOID vs VOID derivation paths
 // ============================================================================
 describe('Derivation path selection', () => {
-  it('uses BCH2 network calls for isBC2=false', async () => {
+  it('uses VOID network calls for isVOID=false', async () => {
     const utxo = { txid: fakeTxid(60), vout: 0, value: 100_000 };
     mockGetUtxosByAddress.mockResolvedValue([utxo]);
 
-    // BCH2 mode (isBC2=false) calls getUtxosByAddress
+    // VOID mode (isVOID=false) calls getUtxosByAddress
     await sendTransaction(TEST_MNEMONIC, DEST_CASHADDR, 50_000, 1, false);
     expect(mockGetUtxosByAddress).toHaveBeenCalledTimes(1);
-    expect(mockGetBC2Utxos).not.toHaveBeenCalled();
+    expect(mockGetVOIDUtxos).not.toHaveBeenCalled();
   });
 
-  it('uses BC2 network calls for isBC2=true', async () => {
+  it('uses VOID network calls for isVOID=true', async () => {
     const utxo = { txid: fakeTxid(61), vout: 0, value: 100_000 };
-    mockGetBC2Utxos.mockResolvedValue([utxo]);
+    mockGetVOIDUtxos.mockResolvedValue([utxo]);
 
-    // BC2 mode (isBC2=true) calls getBC2Utxos
+    // VOID mode (isVOID=true) calls getVOIDUtxos
     await sendTransaction(TEST_MNEMONIC, '1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2', 50_000, 1, true);
-    expect(mockGetBC2Utxos).toHaveBeenCalledTimes(1);
+    expect(mockGetVOIDUtxos).toHaveBeenCalledTimes(1);
     expect(mockGetUtxosByAddress).not.toHaveBeenCalled();
   });
 });
@@ -980,8 +980,8 @@ describe('P2TR recovery (sendFromP2TR)', () => {
 // addressToScript (internal, tested via sendTransaction output scripts)
 // ============================================================================
 describe('addressToScript output scripts', () => {
-  it('produces correct witness v0 P2WPKH script for bc1q destination (via BC2 sendTransaction)', async () => {
-    // BCH2 now blocks sending to bc1 addresses — use BC2 mode (isBC2=true) to test bc1 output scripts
+  it('produces correct witness v0 P2WPKH script for bc1q destination (via VOID sendTransaction)', async () => {
+    // VOID now blocks sending to bc1 addresses — use VOID mode (isVOID=true) to test bc1 output scripts
     const seed = await bip39.mnemonicToSeed(TEST_MNEMONIC);
     const root = bip32.fromSeed(seed);
     const destChild = root.derivePath("m/84'/0'/0'/0/1");
@@ -989,7 +989,7 @@ describe('addressToScript output scripts', () => {
     const destBc1 = encodeBech32('bc', 0, destPkh);
 
     const utxo = { txid: fakeTxid(90), vout: 0, value: 100_000 };
-    mockGetBC2Utxos.mockResolvedValue([utxo]);
+    mockGetVOIDUtxos.mockResolvedValue([utxo]);
 
     const result = await sendTransaction(TEST_MNEMONIC, destBc1, 50_000, 1, true);
     const txHex = result.hex;
@@ -999,13 +999,13 @@ describe('addressToScript output scripts', () => {
     expect(txHex).toContain(expectedScript);
   });
 
-  it('produces correct witness v1 P2TR script for bc1p destination (via BC2 sendTransaction)', async () => {
-    // BCH2 now blocks sending to bc1 addresses — use BC2 mode to test bc1p output scripts
+  it('produces correct witness v1 P2TR script for bc1p destination (via VOID sendTransaction)', async () => {
+    // VOID now blocks sending to bc1 addresses — use VOID mode to test bc1p output scripts
     const fakeXonly = crypto.createHash('sha256').update('p2tr-test-dest').digest();
     const bc1pDest = encodeBech32m('bc', 1, fakeXonly);
 
     const utxo = { txid: fakeTxid(91), vout: 0, value: 100_000 };
-    mockGetBC2Utxos.mockResolvedValue([utxo]);
+    mockGetVOIDUtxos.mockResolvedValue([utxo]);
 
     const result = await sendTransaction(TEST_MNEMONIC, bc1pDest, 50_000, 1, true);
     const txHex = result.hex;
@@ -1017,7 +1017,7 @@ describe('addressToScript output scripts', () => {
 
   it('produces correct P2SH script for 3xxx destination', async () => {
     // When sending to a 3xxx (P2SH) address, output script: OP_HASH160 PUSH_20 <hash> OP_EQUAL (a914...87)
-    // Use sendTransaction with isBC2=true to send to a P2SH address
+    // Use sendTransaction with isVOID=true to send to a P2SH address
     const seed = await bip39.mnemonicToSeed(TEST_MNEMONIC);
     const root = bip32.fromSeed(seed);
     const child = root.derivePath("m/49'/0'/0'/0/0");
@@ -1028,7 +1028,7 @@ describe('addressToScript output scripts', () => {
     const p2shAddress = bs58check.encode(versionedHash);
 
     const utxo = { txid: fakeTxid(92), vout: 0, value: 100_000 };
-    mockGetBC2Utxos.mockResolvedValue([utxo]);
+    mockGetVOIDUtxos.mockResolvedValue([utxo]);
 
     const result = await sendTransaction(TEST_MNEMONIC, p2shAddress, 50_000, 1, true);
     const txHex = result.hex;
@@ -1040,7 +1040,7 @@ describe('addressToScript output scripts', () => {
 
   it('throws for invalid legacy address', async () => {
     const utxo = { txid: fakeTxid(93), vout: 0, value: 100_000 };
-    mockGetBC2Utxos.mockResolvedValue([utxo]);
+    mockGetVOIDUtxos.mockResolvedValue([utxo]);
 
     // "1InvalidAddress" is not a valid base58check address
     await expect(
@@ -1212,13 +1212,13 @@ describe('P2SH recovery - UTXO/fee error paths', () => {
 // addressToScript P2WSH output script (via sendFromBech32 to P2WSH destination)
 // ============================================================================
 describe('addressToScript P2WSH output', () => {
-  it('produces OP_0 PUSH_32 <32-byte-hash> for P2WSH bc1q destination (via BC2 sendTransaction)', async () => {
-    // BCH2 now blocks sending to bc1 addresses — use BC2 mode to test P2WSH output scripts
+  it('produces OP_0 PUSH_32 <32-byte-hash> for P2WSH bc1q destination (via VOID sendTransaction)', async () => {
+    // VOID now blocks sending to bc1 addresses — use VOID mode to test P2WSH output scripts
     const programHash = crypto.createHash('sha256').update('p2wsh-output-test').digest();
     const p2wshDest = encodeBech32('bc', 0, programHash);
 
     const utxo = { txid: fakeTxid(100), vout: 0, value: 100_000 };
-    mockGetBC2Utxos.mockResolvedValue([utxo]);
+    mockGetVOIDUtxos.mockResolvedValue([utxo]);
 
     const result = await sendTransaction(TEST_MNEMONIC, p2wshDest, 50_000, 1, true);
     const txHex = result.hex;
@@ -1234,7 +1234,7 @@ describe('addressToScript P2WSH output', () => {
 // ============================================================================
 describe('addressToScript unsupported witness', () => {
   it('throws for bech32 address with witness version 1 but using bech32 (not bech32m) encoding', async () => {
-    // BCH2 now blocks all bc1 destinations — the error fires before reaching version checks
+    // VOID now blocks all bc1 destinations — the error fires before reaching version checks
     const randomProgram = crypto.randomBytes(20);
     const unsupportedAddr = encodeBech32('bc', 1, randomProgram);
 
@@ -1243,7 +1243,7 @@ describe('addressToScript unsupported witness', () => {
 
     await expect(
       sendTransaction(TEST_MNEMONIC, unsupportedAddr, 50_000, 1, false),
-    ).rejects.toThrow(/Cannot send BCH2 to a SegWit/);
+    ).rejects.toThrow(/Cannot send VOID to a SegWit/);
   });
 });
 
@@ -1294,9 +1294,9 @@ describe('decodeCashAddr insufficient hash data', () => {
 });
 
 // ============================================================================
-// sendTransaction alternate derivation path for BC2
+// sendTransaction alternate derivation path for VOID
 // ============================================================================
-describe('sendTransaction alternate derivation path for BC2', () => {
+describe('sendTransaction alternate derivation path for VOID', () => {
   it('falls back to m/44\'/0\'/0\'/0/1 when expectedAddress matches that path', async () => {
     // Derive the address at the alternate path m/44'/0'/0'/0/1
     const seed = await bip39.mnemonicToSeed(TEST_MNEMONIC);
@@ -1305,11 +1305,11 @@ describe('sendTransaction alternate derivation path for BC2', () => {
     const altPkh = hash160(Buffer.from(altChild.publicKey));
     const altAddress = bs58check.encode(Buffer.concat([Buffer.from([0x00]), altPkh]));
 
-    // Mock the BC2 UTXO lookup for the alternate address
+    // Mock the VOID UTXO lookup for the alternate address
     const utxo = { txid: fakeTxid(102), vout: 0, value: 100_000 };
-    mockGetBC2Utxos.mockResolvedValue([utxo]);
+    mockGetVOIDUtxos.mockResolvedValue([utxo]);
 
-    // Send with isBC2=true and expectedAddress matching the alternate path
+    // Send with isVOID=true and expectedAddress matching the alternate path
     const result = await sendTransaction(
       TEST_MNEMONIC,
       '1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2', // destination
@@ -1321,10 +1321,10 @@ describe('sendTransaction alternate derivation path for BC2', () => {
 
     expect(result.txid).toBeTruthy();
     expect(result.hex).toBeTruthy();
-    // The BC2 UTXO lookup should have been called (sendTransactionWithKey is invoked)
-    expect(mockGetBC2Utxos).toHaveBeenCalled();
+    // The VOID UTXO lookup should have been called (sendTransactionWithKey is invoked)
+    expect(mockGetVOIDUtxos).toHaveBeenCalled();
     // Broadcast should have been called
-    expect(mockBroadcastBC2Transaction).toHaveBeenCalledTimes(1);
+    expect(mockBroadcastVOIDTransaction).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -1332,7 +1332,7 @@ describe('sendTransaction alternate derivation path for BC2', () => {
 // encodeVarInt 8-byte branch (n > 0xFFFFFFFF)
 // ============================================================================
 describe('encodeVarInt 8-byte branch', () => {
-  // encodeVarInt is a private (non-exported) function in bch2-transaction.ts.
+  // encodeVarInt is a private (non-exported) function in void-transaction.ts.
   // It cannot be imported or called directly from tests.
   // We verify the 8-byte branch indirectly by validating the encoding logic:
   // For n > 0xFFFFFFFF, the function writes: [0xff] + BigUInt64LE(n).
@@ -1589,7 +1589,7 @@ describe('sendFromP2TR odd-Y key negation', () => {
 // Gap 1: sendTransaction feePerByte validation - NaN, Infinity, 0, negative
 // ============================================================================
 describe('sendTransaction feePerByte validation', () => {
-  /** Helper to extract change amount from a 1-input, 2-output BCH2 tx */
+  /** Helper to extract change amount from a 1-input, 2-output VOID tx */
   function extractChangeAmount(txHex: string): number {
     const txBuf = Buffer.from(txHex, 'hex');
     let offset = 5; // version(4) + varint_inputcount(1)
@@ -1782,8 +1782,8 @@ describe('buildTransaction change=0 edge case', () => {
 // ============================================================================
 // Gap 7: buildTransaction P2SH output handling (destination starts with '3')
 // ============================================================================
-describe('buildTransaction P2SH output for BC2', () => {
-  it('produces P2SH script (a914...87) when BC2 destination starts with 3', async () => {
+describe('buildTransaction P2SH output for VOID', () => {
+  it('produces P2SH script (a914...87) when VOID destination starts with 3', async () => {
     // Use an actual valid P2SH address
     const seed = await bip39.mnemonicToSeed(TEST_MNEMONIC);
     const root = bip32.fromSeed(seed);
@@ -1797,7 +1797,7 @@ describe('buildTransaction P2SH output for BC2', () => {
     expect(p2shAddress.startsWith('3')).toBe(true);
 
     const utxo = { txid: fakeTxid(175), vout: 0, value: 100_000 };
-    mockGetBC2Utxos.mockResolvedValue([utxo]);
+    mockGetVOIDUtxos.mockResolvedValue([utxo]);
 
     const result = await sendTransaction(TEST_MNEMONIC, p2shAddress, 50_000, 1, true);
     const txBuf = Buffer.from(result.hex, 'hex');
@@ -1832,8 +1832,8 @@ describe('buildTransaction P2SH output for BC2', () => {
 // Gap 8: createLegacySighash multi-input scenario with proper empty scriptSig
 // ============================================================================
 describe('createLegacySighash multi-input', () => {
-  it('produces a valid BC2 tx with 3 inputs (legacy sighash with empty scriptSig for non-signing inputs)', async () => {
-    // BC2 uses legacy sighash. With multiple inputs, each input's sighash
+  it('produces a valid VOID tx with 3 inputs (legacy sighash with empty scriptSig for non-signing inputs)', async () => {
+    // VOID uses legacy sighash. With multiple inputs, each input's sighash
     // should have the signing input's scriptPubKey and empty scriptSig for others.
     // We verify the transaction is valid (all 3 inputs signed correctly).
     // Each UTXO is 25_000 so first two (50_000) can't cover amount(50_000) + fee(374 for 2-in 2-out)
@@ -1843,7 +1843,7 @@ describe('createLegacySighash multi-input', () => {
       { txid: fakeTxid(181), vout: 0, value: 25_000 },
       { txid: fakeTxid(182), vout: 0, value: 25_000 },
     ];
-    mockGetBC2Utxos.mockResolvedValue(utxos);
+    mockGetVOIDUtxos.mockResolvedValue(utxos);
 
     // amount = 50_000. 3-in 2-out: size = 10 + 3*148 + 68 = 522, fee = 522
     // total = 75_000. change = 75000 - 50000 - 522 = 24478
@@ -1870,7 +1870,7 @@ describe('createLegacySighash multi-input', () => {
 
       // DER starts with 0x30
       expect(sigWithHashType[0]).toBe(0x30);
-      // BC2 SIGHASH_ALL = 0x01
+      // VOID SIGHASH_ALL = 0x01
       expect(sigWithHashType[sigWithHashType.length - 1]).toBe(0x01);
 
       offset += scriptSigLen + 4; // past scriptSig + sequence
@@ -1880,7 +1880,7 @@ describe('createLegacySighash multi-input', () => {
     expect(txBuf[offset]).toBe(2);
   });
 
-  it('produces different sighashes for each input in a multi-input BC2 tx', async () => {
+  it('produces different sighashes for each input in a multi-input VOID tx', async () => {
     // If createLegacySighash incorrectly handles the empty scriptSig for non-signing
     // inputs, signatures would be wrong. We verify that a 2-input tx works correctly
     // and produces a different signature for each input (since sighashes differ).
@@ -1890,7 +1890,7 @@ describe('createLegacySighash multi-input', () => {
       { txid: fakeTxid(183), vout: 0, value: 40_000 },
       { txid: fakeTxid(184), vout: 0, value: 40_000 },
     ];
-    mockGetBC2Utxos.mockResolvedValue(utxos);
+    mockGetVOIDUtxos.mockResolvedValue(utxos);
 
     // 2-in 2-out: size = 10 + 296 + 68 = 374, fee = 374
     // change = 80000 - 50000 - 374 = 29626
@@ -1925,7 +1925,7 @@ describe('decodeCashAddr prefix validation', () => {
   it('rejects bitcoincash: prefix with explicit error about bitcoincashii:', () => {
     expect(() => {
       decodeCashAddr('bitcoincash:qr95sy3j9xwd2ap32xkykttr4cvcu7as5yc93ky292');
-    }).toThrow('Invalid address: use bitcoincashii: prefix for BCH2, not bitcoincash:');
+    }).toThrow('Invalid address: use bitcoincashii: prefix for VOID, not bitcoincash:');
   });
 
   it('rejects bitcoincash: prefix when called with returnType=true', () => {
@@ -1984,10 +1984,10 @@ describe('decodeBech32 invalid checksum', () => {
     const utxo = { txid: fakeTxid(190), vout: 0, value: 100_000 };
     mockGetUtxosByAddress.mockResolvedValue([utxo]);
 
-    // BCH2 now blocks all bc1 destinations before reaching checksum validation
+    // VOID now blocks all bc1 destinations before reaching checksum validation
     await expect(
       sendTransaction(TEST_MNEMONIC, corrupt, 50_000, 1, false),
-    ).rejects.toThrow(/Cannot send BCH2 to a SegWit/);
+    ).rejects.toThrow(/Cannot send VOID to a SegWit/);
   });
 
   it('throws when bc1 address passed to sendFromBech32 has corrupted checksum', async () => {
@@ -2007,7 +2007,7 @@ describe('decodeBech32 invalid checksum', () => {
 // ============================================================================
 describe('decodeBech32 version > 16 rejection', () => {
   it('rejects bech32 address with witness version 17 as destination', async () => {
-    // BCH2 now blocks all bc1 destinations before reaching version validation
+    // VOID now blocks all bc1 destinations before reaching version validation
     const program = crypto.randomBytes(20);
     const invalidAddr = encodeBech32('bc', 17, program);
 
@@ -2016,7 +2016,7 @@ describe('decodeBech32 version > 16 rejection', () => {
 
     await expect(
       sendTransaction(TEST_MNEMONIC, invalidAddr, 50_000, 1, false),
-    ).rejects.toThrow(/Cannot send BCH2 to a SegWit/);
+    ).rejects.toThrow(/Cannot send VOID to a SegWit/);
   });
 });
 
@@ -2025,7 +2025,7 @@ describe('decodeBech32 version > 16 rejection', () => {
 // ============================================================================
 describe('decodeBech32 v0 program length validation', () => {
   it('rejects v0 bech32 address with 16-byte program', async () => {
-    // BCH2 now blocks all bc1 destinations before reaching program length validation
+    // VOID now blocks all bc1 destinations before reaching program length validation
     const shortProgram = crypto.randomBytes(16);
     const invalidAddr = encodeBech32('bc', 0, shortProgram);
 
@@ -2034,11 +2034,11 @@ describe('decodeBech32 v0 program length validation', () => {
 
     await expect(
       sendTransaction(TEST_MNEMONIC, invalidAddr, 50_000, 1, false),
-    ).rejects.toThrow(/Cannot send BCH2 to a SegWit/);
+    ).rejects.toThrow(/Cannot send VOID to a SegWit/);
   });
 
   it('rejects v0 bech32 address with 24-byte program (not 20 or 32)', async () => {
-    // BCH2 now blocks all bc1 destinations
+    // VOID now blocks all bc1 destinations
     const oddProgram = crypto.randomBytes(24);
     const invalidAddr = encodeBech32('bc', 0, oddProgram);
 
@@ -2047,25 +2047,25 @@ describe('decodeBech32 v0 program length validation', () => {
 
     await expect(
       sendTransaction(TEST_MNEMONIC, invalidAddr, 50_000, 1, false),
-    ).rejects.toThrow(/Cannot send BCH2 to a SegWit/);
+    ).rejects.toThrow(/Cannot send VOID to a SegWit/);
   });
 
-  it('accepts v0 bech32 address with 20-byte program (P2WPKH) via BC2 mode', async () => {
-    // BCH2 blocks bc1 — use BC2 mode to test P2WPKH acceptance
+  it('accepts v0 bech32 address with 20-byte program (P2WPKH) via VOID mode', async () => {
+    // VOID blocks bc1 — use VOID mode to test P2WPKH acceptance
     const utxo = { txid: fakeTxid(194), vout: 0, value: 100_000 };
-    mockGetBC2Utxos.mockResolvedValue([utxo]);
+    mockGetVOIDUtxos.mockResolvedValue([utxo]);
 
     const result = await sendTransaction(TEST_MNEMONIC, BC1_ADDRESS, 50_000, 1, true);
     expect(result.hex).toBeTruthy();
   });
 
-  it('accepts v0 bech32 address with 32-byte program (P2WSH) as destination via BC2 mode', async () => {
-    // BCH2 blocks bc1 — use BC2 mode to test P2WSH acceptance
+  it('accepts v0 bech32 address with 32-byte program (P2WSH) as destination via VOID mode', async () => {
+    // VOID blocks bc1 — use VOID mode to test P2WSH acceptance
     const programHash = crypto.createHash('sha256').update('v0-32byte-test').digest();
     const p2wshDest = encodeBech32('bc', 0, programHash);
 
     const utxo = { txid: fakeTxid(195), vout: 0, value: 100_000 };
-    mockGetBC2Utxos.mockResolvedValue([utxo]);
+    mockGetVOIDUtxos.mockResolvedValue([utxo]);
 
     const result = await sendTransaction(TEST_MNEMONIC, p2wshDest, 50_000, 1, true);
     expect(result.hex).toBeTruthy();
@@ -2175,10 +2175,10 @@ describe('decodeBech32 padding bits rejection', () => {
     const utxo = { txid: fakeTxid(197), vout: 0, value: 100_000 };
     mockGetUtxosByAddress.mockResolvedValue([utxo]);
 
-    // BCH2 now blocks all bc1 destinations before reaching padding validation
+    // VOID now blocks all bc1 destinations before reaching padding validation
     await expect(
       sendTransaction(TEST_MNEMONIC, addrStr, 50_000, 1, false),
-    ).rejects.toThrow(/Cannot send BCH2 to a SegWit/);
+    ).rejects.toThrow(/Cannot send VOID to a SegWit/);
   });
 });
 
@@ -2301,16 +2301,16 @@ describe('encodeVarInt boundary values', () => {
 // Gap 16: addressToScript() P2TR destination (bc1p bech32m)
 // ============================================================================
 describe('addressToScript P2TR destination', () => {
-  it('produces correct OP_1 PUSH_32 <x-only-pubkey> script for bc1p address (via BC2 mode)', async () => {
-    // BCH2 now blocks bc1 destinations — use BC2 mode to test P2TR output scripts
+  it('produces correct OP_1 PUSH_32 <x-only-pubkey> script for bc1p address (via VOID mode)', async () => {
+    // VOID now blocks bc1 destinations — use VOID mode to test P2TR output scripts
     const xonlyPubkey = crypto.createHash('sha256').update('p2tr-destination-test-gap16').digest();
     const bc1pDest = encodeBech32m('bc', 1, xonlyPubkey);
 
     expect(bc1pDest.startsWith('bc1p')).toBe(true);
 
-    // Send a BC2 transaction to this bc1p destination
+    // Send a VOID transaction to this bc1p destination
     const utxo = { txid: fakeTxid(210), vout: 0, value: 100_000 };
-    mockGetBC2Utxos.mockResolvedValue([utxo]);
+    mockGetVOIDUtxos.mockResolvedValue([utxo]);
 
     const result = await sendTransaction(TEST_MNEMONIC, bc1pDest, 50_000, 1, true);
     const txHex = result.hex;
@@ -2345,7 +2345,7 @@ describe('addressToScript P2TR destination', () => {
 // ============================================================================
 describe('addressToScript unsupported witness v2-v16', () => {
   it('throws for witness version 2 bech32m address (20-byte program)', async () => {
-    // BCH2 now blocks all bc1 destinations before reaching version checks
+    // VOID now blocks all bc1 destinations before reaching version checks
     const program = crypto.randomBytes(20);
     const v2Addr = encodeBech32m('bc', 2, program);
 
@@ -2354,11 +2354,11 @@ describe('addressToScript unsupported witness v2-v16', () => {
 
     await expect(
       sendTransaction(TEST_MNEMONIC, v2Addr, 50_000, 1, false),
-    ).rejects.toThrow(/Cannot send BCH2 to a SegWit/);
+    ).rejects.toThrow(/Cannot send VOID to a SegWit/);
   });
 
   it('throws for witness version 16 bech32m address', async () => {
-    // BCH2 now blocks all bc1 destinations
+    // VOID now blocks all bc1 destinations
     const program = crypto.randomBytes(20);
     const v16Addr = encodeBech32m('bc', 16, program);
 
@@ -2367,11 +2367,11 @@ describe('addressToScript unsupported witness v2-v16', () => {
 
     await expect(
       sendTransaction(TEST_MNEMONIC, v16Addr, 50_000, 1, false),
-    ).rejects.toThrow(/Cannot send BCH2 to a SegWit/);
+    ).rejects.toThrow(/Cannot send VOID to a SegWit/);
   });
 
   it('throws for witness version 3 bech32m address with 32-byte program', async () => {
-    // BCH2 now blocks all bc1 destinations
+    // VOID now blocks all bc1 destinations
     const program = crypto.randomBytes(32);
     const v3Addr = encodeBech32m('bc', 3, program);
 
@@ -2380,7 +2380,7 @@ describe('addressToScript unsupported witness v2-v16', () => {
 
     await expect(
       sendTransaction(TEST_MNEMONIC, v3Addr, 50_000, 1, false),
-    ).rejects.toThrow(/Cannot send BCH2 to a SegWit/);
+    ).rejects.toThrow(/Cannot send VOID to a SegWit/);
   });
 });
 
@@ -2388,8 +2388,8 @@ describe('addressToScript unsupported witness v2-v16', () => {
 // Gap 18: sendTransaction() address mismatch alternate derivation
 // ============================================================================
 describe('sendTransaction address mismatch alternate derivation', () => {
-  it('tries alternate BC2 derivation paths when expectedAddress does not match primary', async () => {
-    // Primary BC2 path is m/44'/0'/0'/0/0.
+  it('tries alternate VOID derivation paths when expectedAddress does not match primary', async () => {
+    // Primary VOID path is m/44'/0'/0'/0/0.
     // altPaths includes m/44'/145'/0'/0/0. Derive address from that path.
     const seed = await bip39.mnemonicToSeed(TEST_MNEMONIC);
     const root = bip32.fromSeed(seed);
@@ -2398,9 +2398,9 @@ describe('sendTransaction address mismatch alternate derivation', () => {
     const altAddress = bs58check.encode(Buffer.concat([Buffer.from([0x00]), altPkh]));
 
     const utxo = { txid: fakeTxid(214), vout: 0, value: 100_000 };
-    mockGetBC2Utxos.mockResolvedValue([utxo]);
+    mockGetVOIDUtxos.mockResolvedValue([utxo]);
 
-    // Send as BC2 with expectedAddress matching the alternate m/44'/145'/0'/0/0 path
+    // Send as VOID with expectedAddress matching the alternate m/44'/145'/0'/0/0 path
     const result = await sendTransaction(
       TEST_MNEMONIC,
       '1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2',
@@ -2413,14 +2413,14 @@ describe('sendTransaction address mismatch alternate derivation', () => {
     expect(result.txid).toBeTruthy();
     expect(result.hex).toBeTruthy();
     // Broadcast should have been called via sendTransactionWithKey
-    expect(mockBroadcastBC2Transaction).toHaveBeenCalledTimes(1);
+    expect(mockBroadcastVOIDTransaction).toHaveBeenCalledTimes(1);
   });
 
   it('falls through to primary derivation when expectedAddress matches no alternate path', async () => {
     // Provide an expectedAddress that doesn't match any derivation path.
     // The code should just continue with the primary path (no throw from the mismatch).
     const utxo = { txid: fakeTxid(215), vout: 0, value: 100_000 };
-    mockGetBC2Utxos.mockResolvedValue([utxo]);
+    mockGetVOIDUtxos.mockResolvedValue([utxo]);
 
     // expectedAddress is something random - won't match any path, so code falls through
     const result = await sendTransaction(
@@ -2436,12 +2436,12 @@ describe('sendTransaction address mismatch alternate derivation', () => {
     expect(result.hex).toBeTruthy();
   });
 
-  it('alternate derivation logic is skipped for BCH2 (isBC2=false)', async () => {
-    // When isBC2=false, the alternate path search is not attempted
+  it('alternate derivation logic is skipped for VOID (isVOID=false)', async () => {
+    // When isVOID=false, the alternate path search is not attempted
     const utxo = { txid: fakeTxid(216), vout: 0, value: 100_000 };
     mockGetUtxosByAddress.mockResolvedValue([utxo]);
 
-    // Provide a mismatched expectedAddress but isBC2=false, so no alternate search
+    // Provide a mismatched expectedAddress but isVOID=false, so no alternate search
     const result = await sendTransaction(
       TEST_MNEMONIC,
       DEST_CASHADDR,
@@ -2453,9 +2453,9 @@ describe('sendTransaction address mismatch alternate derivation', () => {
 
     expect(result.txid).toBeTruthy();
     expect(result.hex).toBeTruthy();
-    // Should use broadcastTransaction (BCH2), not BC2
+    // Should use broadcastTransaction (VOID), not VOID
     expect(mockBroadcastTransaction).toHaveBeenCalledTimes(1);
-    expect(mockBroadcastBC2Transaction).not.toHaveBeenCalled();
+    expect(mockBroadcastVOIDTransaction).not.toHaveBeenCalled();
   });
 });
 
@@ -2463,8 +2463,8 @@ describe('sendTransaction address mismatch alternate derivation', () => {
 // Gap 19: isBech32Address() case sensitivity (uppercase BC1Q)
 // ============================================================================
 describe('isBech32Address case sensitivity', () => {
-  it('recognizes uppercase BC1Q address (bech32 spec allows uppercase) via BC2 mode', async () => {
-    // BCH2 now blocks bc1 destinations — use BC2 mode to test case handling
+  it('recognizes uppercase BC1Q address (bech32 spec allows uppercase) via VOID mode', async () => {
+    // VOID now blocks bc1 destinations — use VOID mode to test case handling
     const seed = await bip39.mnemonicToSeed(TEST_MNEMONIC);
     const root = bip32.fromSeed(seed);
     const destChild = root.derivePath("m/84'/0'/0'/0/1");
@@ -2473,7 +2473,7 @@ describe('isBech32Address case sensitivity', () => {
     expect(destBc1Upper.startsWith('BC1Q')).toBe(true);
 
     const utxo = { txid: fakeTxid(220), vout: 0, value: 100_000 };
-    mockGetBC2Utxos.mockResolvedValue([utxo]);
+    mockGetVOIDUtxos.mockResolvedValue([utxo]);
 
     const result = await sendTransaction(TEST_MNEMONIC, destBc1Upper, 50_000, 1, true);
     expect(result.hex).toBeTruthy();
@@ -2483,8 +2483,8 @@ describe('isBech32Address case sensitivity', () => {
     expect(result.hex).toContain(expectedScript);
   });
 
-  it('recognizes mixed-prefix BC1q address via toLowerCase normalization (BC2 mode)', async () => {
-    // BCH2 now blocks bc1 destinations — use BC2 mode to test case normalization
+  it('recognizes mixed-prefix BC1q address via toLowerCase normalization (VOID mode)', async () => {
+    // VOID now blocks bc1 destinations — use VOID mode to test case normalization
     const seed = await bip39.mnemonicToSeed(TEST_MNEMONIC);
     const root = bip32.fromSeed(seed);
     const destChild = root.derivePath("m/84'/0'/0'/0/1");
@@ -2493,7 +2493,7 @@ describe('isBech32Address case sensitivity', () => {
     const mixedCase = 'BC1' + destBc1.slice(3);
 
     const utxo = { txid: fakeTxid(221), vout: 0, value: 100_000 };
-    mockGetBC2Utxos.mockResolvedValue([utxo]);
+    mockGetVOIDUtxos.mockResolvedValue([utxo]);
 
     const result = await sendTransaction(TEST_MNEMONIC, mixedCase, 50_000, 1, true);
     expect(result.hex).toBeTruthy();
@@ -2546,15 +2546,15 @@ describe('decodeCashAddr no-prefix input', () => {
 // Gap 21: createLegacySighash multi-input empty scriptSig
 // ============================================================================
 describe('createLegacySighash multi-input empty scriptSig', () => {
-  it('multi-input BC2 transaction: non-signing inputs have empty scriptSig in sighash preimage', async () => {
+  it('multi-input VOID transaction: non-signing inputs have empty scriptSig in sighash preimage', async () => {
     // We verify this indirectly: if non-signing inputs did NOT have empty scriptSig,
     // the sighash would be wrong and the signatures would be different from expected.
-    // A 2-input BC2 tx should produce valid distinct signatures for each input.
+    // A 2-input VOID tx should produce valid distinct signatures for each input.
     const utxos = [
       { txid: fakeTxid(230), vout: 0, value: 40_000 },
       { txid: fakeTxid(231), vout: 1, value: 40_000 },
     ];
-    mockGetBC2Utxos.mockResolvedValue(utxos);
+    mockGetVOIDUtxos.mockResolvedValue(utxos);
 
     // 2-in 2-out: size = 10 + 296 + 68 = 374, fee = 374
     const result = await sendTransaction(TEST_MNEMONIC, '1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2', 50_000, 1, true);
@@ -2575,7 +2575,7 @@ describe('createLegacySighash multi-input empty scriptSig', () => {
       expect(sigPushLen).toBeGreaterThan(60); // DER sig is typically ~71-73 bytes + hashtype
       const sigWithHashType = scriptSig.subarray(1, 1 + sigPushLen);
       expect(sigWithHashType[0]).toBe(0x30); // DER SEQUENCE tag
-      expect(sigWithHashType[sigWithHashType.length - 1]).toBe(0x01); // SIGHASH_ALL for BC2
+      expect(sigWithHashType[sigWithHashType.length - 1]).toBe(0x01); // SIGHASH_ALL for VOID
 
       // Public key follows
       const pubkeyPushOffset = 1 + sigPushLen;
@@ -2586,11 +2586,11 @@ describe('createLegacySighash multi-input empty scriptSig', () => {
     }
   });
 
-  it('single-input BC2 tx sighash uses scriptPubKey (not empty) for the signing input', async () => {
+  it('single-input VOID tx sighash uses scriptPubKey (not empty) for the signing input', async () => {
     // With 1 input, the signing input should have scriptPubKey in the sighash preimage.
     // We verify by confirming the transaction builds and signs successfully.
     const utxo = { txid: fakeTxid(232), vout: 0, value: 100_000 };
-    mockGetBC2Utxos.mockResolvedValue([utxo]);
+    mockGetVOIDUtxos.mockResolvedValue([utxo]);
 
     const result = await sendTransaction(TEST_MNEMONIC, '1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2', 50_000, 1, true);
     const txBuf = Buffer.from(result.hex, 'hex');
@@ -2663,13 +2663,13 @@ describe('UTXO vout boundary values', () => {
 // Gap 23: buildTransaction with P2TR bc1p destination
 // ============================================================================
 describe('buildTransaction with P2TR bc1p destination', () => {
-  it('builds BCH2 transaction sending to bc1p address and verifies output script', async () => {
-    // BCH2 now blocks bc1 destinations — use BC2 mode to test P2TR output scripts
+  it('builds VOID transaction sending to bc1p address and verifies output script', async () => {
+    // VOID now blocks bc1 destinations — use VOID mode to test P2TR output scripts
     const xonly = crypto.createHash('sha256').update('gap23-p2tr-dest-build').digest();
     const bc1pDest = encodeBech32m('bc', 1, xonly);
 
     const utxo = { txid: fakeTxid(250), vout: 0, value: 100_000 };
-    mockGetBC2Utxos.mockResolvedValue([utxo]);
+    mockGetVOIDUtxos.mockResolvedValue([utxo]);
 
     const result = await sendTransaction(TEST_MNEMONIC, bc1pDest, 50_000, 1, true);
     const txBuf = Buffer.from(result.hex, 'hex');
@@ -2700,14 +2700,14 @@ describe('buildTransaction with P2TR bc1p destination', () => {
     expect(destScript.subarray(2).equals(xonly)).toBe(true);
   });
 
-  it('builds BC2 transaction sending to bc1p address', async () => {
-    // bc1p destination should work even for BC2 (isBC2=true) since addressToScript
-    // checks isBech32Address before checking isBC2
-    const xonly = crypto.createHash('sha256').update('gap23-bc2-p2tr-dest').digest();
+  it('builds VOID transaction sending to bc1p address', async () => {
+    // bc1p destination should work even for VOID (isVOID=true) since addressToScript
+    // checks isBech32Address before checking isVOID
+    const xonly = crypto.createHash('sha256').update('gap23-void-p2tr-dest').digest();
     const bc1pDest = encodeBech32m('bc', 1, xonly);
 
     const utxo = { txid: fakeTxid(251), vout: 0, value: 100_000 };
-    mockGetBC2Utxos.mockResolvedValue([utxo]);
+    mockGetVOIDUtxos.mockResolvedValue([utxo]);
 
     const result = await sendTransaction(TEST_MNEMONIC, bc1pDest, 50_000, 1, true);
     const txHex = result.hex;
@@ -2727,17 +2727,17 @@ describe('decodeBech32m decoding', () => {
     expect(BECH32M_CONST).toBe(0x2bc830a3);
   });
 
-  it('bech32m-encoded bc1p address decodes successfully (via BC2 sendTransaction)', async () => {
-    // BCH2 now blocks bc1 destinations — use BC2 mode to test bech32m decoding
+  it('bech32m-encoded bc1p address decodes successfully (via VOID sendTransaction)', async () => {
+    // VOID now blocks bc1 destinations — use VOID mode to test bech32m decoding
     const knownXonly = Buffer.alloc(32);
     for (let i = 0; i < 32; i++) knownXonly[i] = i;
     const bc1pAddr = encodeBech32m('bc', 1, knownXonly);
 
     expect(bc1pAddr.startsWith('bc1p')).toBe(true);
 
-    // Use as destination in BC2 mode to verify addressToScript decodes it correctly
+    // Use as destination in VOID mode to verify addressToScript decodes it correctly
     const utxo = { txid: fakeTxid(126), vout: 0, value: 100_000 };
-    mockGetBC2Utxos.mockResolvedValue([utxo]);
+    mockGetVOIDUtxos.mockResolvedValue([utxo]);
 
     const result = await sendTransaction(TEST_MNEMONIC, bc1pAddr, 50_000, 1, true);
     const txHex = result.hex;
@@ -2748,7 +2748,7 @@ describe('decodeBech32m decoding', () => {
   });
 
   it('bech32 (not bech32m) encoded v1 address fails P2TR detection', async () => {
-    // BCH2 now blocks all bc1 destinations
+    // VOID now blocks all bc1 destinations
     const program = crypto.randomBytes(32);
     const bech32v1Addr = encodeBech32('bc', 1, program); // bech32, not bech32m!
 
@@ -2757,11 +2757,11 @@ describe('decodeBech32m decoding', () => {
 
     await expect(
       sendTransaction(TEST_MNEMONIC, bech32v1Addr, 50_000, 1, false),
-    ).rejects.toThrow(/Cannot send BCH2 to a SegWit/);
+    ).rejects.toThrow(/Cannot send VOID to a SegWit/);
   });
 
   it('bech32m address with corrupted payload returns null from decodeBech32m', async () => {
-    // BCH2 now blocks all bc1 destinations
+    // VOID now blocks all bc1 destinations
     const xonly = crypto.createHash('sha256').update('corrupt-bech32m').digest();
     const validAddr = encodeBech32m('bc', 1, xonly);
 
@@ -2776,7 +2776,7 @@ describe('decodeBech32m decoding', () => {
 
     await expect(
       sendTransaction(TEST_MNEMONIC, corruptAddr, 50_000, 1, false),
-    ).rejects.toThrow(/Cannot send BCH2 to a SegWit/);
+    ).rejects.toThrow(/Cannot send VOID to a SegWit/);
   });
 });
 
@@ -2944,7 +2944,7 @@ describe('Transaction with OP_RETURN destination', () => {
   // We test that an OP_RETURN-like address is properly rejected since it doesn't
   // match any address format (not base58, not cashaddr, not bech32).
 
-  it('rejects non-address string as destination for BCH2', async () => {
+  it('rejects non-address string as destination for VOID', async () => {
     const utxo = { txid: fakeTxid(140), vout: 0, value: 100_000 };
     mockGetUtxosByAddress.mockResolvedValue([utxo]);
 
@@ -2953,9 +2953,9 @@ describe('Transaction with OP_RETURN destination', () => {
     ).rejects.toThrow(); // Will fail at addressToScript (not cashaddr, not bech32)
   });
 
-  it('rejects non-address string as destination for BC2', async () => {
+  it('rejects non-address string as destination for VOID', async () => {
     const utxo = { txid: fakeTxid(141), vout: 0, value: 100_000 };
-    mockGetBC2Utxos.mockResolvedValue([utxo]);
+    mockGetVOIDUtxos.mockResolvedValue([utxo]);
 
     await expect(
       sendTransaction(TEST_MNEMONIC, 'OP_RETURN_data', 50_000, 1, true),

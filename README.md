@@ -1,14 +1,14 @@
-# Bitcoin Cash II Wallet
+# VoidCoin Wallet
 
-The official mobile wallet for Bitcoin Cash II (BCH2) and BitcoinII (BC2).
+The official mobile wallet for VoidCoin (VOID) and BitcoinII (BC2).
 
 ## Features
 
-- **BCH2 & BC2 Support** - Full wallet support for both chains
+- **VOID & BC2 Support** - Full wallet support for both chains
 - **Create & Import Wallets** - Generate new wallets or restore from seed phrase
-- **BCH2 Airdrop Claiming** - Claim BCH2 from BC2 holdings at fork height 53,200
+- **VOID Airdrop Claiming** - Claim VOID from BC2 holdings at fork height 53,200
 - **Non-Custodial** - Your keys, your coins
-- **CashAddr Format** - BCH2 uses `bitcoincashii:` address prefix
+- **CashAddr Format** - VOID uses `bitcoincashii:` address prefix
 - **Legacy Format** - BC2 uses standard legacy addresses
 - **Electrum Connection** - Fast sync via Electrum servers
 - **QR Code Support** - Scan and generate QR codes
@@ -19,21 +19,21 @@ Download the latest APK from [Releases](https://github.com/BitcoincashII/Bitcoin
 
 ## Electrum Servers
 
-**BCH2:**
-- electrum.bch2.org:50002 (SSL)
-- electrum2.bch2.org:50002 (SSL)
+**VOID:**
+- electrum.void.org:50002 (SSL)
+- electrum2.void.org:50002 (SSL)
 
 **BC2:**
-- bc2electrum.bch2.org:50010 (TCP) / :50011 (SSL)
+- bc2electrum.void.org:50010 (TCP) / :50011 (SSL)
 
 ## Block Explorers
 
-- **BCH2:** https://explorer.bch2.org
+- **VOID:** https://explorer.void.org
 - **BC2:** https://explorer.bitcoin-ii.org
 
 ## Network Information
 
-| Parameter | BCH2 | BC2 |
+| Parameter | VOID | BC2 |
 |-----------|------|-----|
 | Address Format | CashAddr (`bitcoincashii:`) | Legacy (`1...`) |
 | Fork Height | Block 53,200 | - |
@@ -61,12 +61,12 @@ APK output: `android/app/build/outputs/apk/release/app-release-unsigned.apk`
 ## Support
 
 - **Report Bugs:** dev@bitcoincashii.org
-- **Website:** https://bch2.org
+- **Website:** https://void.org
 - **BC2 Website:** https://bitcoin-ii.org
 
 ## Credits
 
-This wallet is a fork of [BlueWallet](https://github.com/BlueWallet/BlueWallet), adapted for Bitcoin Cash II.
+This wallet is a fork of [BlueWallet](https://github.com/BlueWallet/BlueWallet), adapted for VoidCoin.
 
 ## License
 

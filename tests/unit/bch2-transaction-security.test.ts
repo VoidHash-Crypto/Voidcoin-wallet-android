@@ -1,5 +1,5 @@
 /**
- * Security tests for BCH2 Transaction Builder
+ * Security tests for VOID Transaction Builder
  *
  * Tests cover the security hardening applied to CashAddr decoding,
  * address validation, and transaction input validation. Each test
@@ -11,17 +11,17 @@ import assert from 'assert';
 
 // ---- Mocks ----------------------------------------------------------------
 const mockGetUtxosByAddress = jest.fn();
-const mockGetBC2Utxos = jest.fn();
+const mockGetVOIDUtxos = jest.fn();
 const mockGetUtxosByScripthash = jest.fn();
 const mockBroadcastTransaction = jest.fn();
-const mockBroadcastBC2Transaction = jest.fn();
+const mockBroadcastVOIDTransaction = jest.fn();
 
-jest.mock('../../blue_modules/BCH2Electrum', () => ({
+jest.mock('../../blue_modules/VoidElectrum', () => ({
   getUtxosByAddress: (...args: any[]) => mockGetUtxosByAddress(...args),
-  getBC2Utxos: (...args: any[]) => mockGetBC2Utxos(...args),
+  getVOIDUtxos: (...args: any[]) => mockGetVOIDUtxos(...args),
   getUtxosByScripthash: (...args: any[]) => mockGetUtxosByScripthash(...args),
   broadcastTransaction: (...args: any[]) => mockBroadcastTransaction(...args),
-  broadcastBC2Transaction: (...args: any[]) => mockBroadcastBC2Transaction(...args),
+  broadcastVOIDTransaction: (...args: any[]) => mockBroadcastVOIDTransaction(...args),
 }));
 
 // Mock the rng module to return deterministic bytes
@@ -30,8 +30,8 @@ jest.mock('../../class/rng', () => ({
 }));
 
 // Import after mocking
-import { decodeCashAddr } from '../../class/bch2-transaction';
-import { BCH2Wallet } from '../../class/wallets/bch2-wallet';
+import { decodeCashAddr } from '../../class/void-transaction';
+import { VoidWallet } from '../../class/wallets/void-wallet';
 
 // ---- Test Helpers ----------------------------------------------------------
 
@@ -109,7 +109,7 @@ const VALID_ADDR = encodeCashAddr(KNOWN_HASH, 0);
 // Tests
 // ---------------------------------------------------------------------------
 
-describe('BCH2 Transaction Security', () => {
+describe('VOID Transaction Security', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -277,14 +277,14 @@ describe('BCH2 Transaction Security', () => {
   });
 
   // -------------------------------------------------------------------------
-  // Address Validation (BCH2Wallet.isValidAddress)
+  // Address Validation (VoidWallet.isValidAddress)
   // -------------------------------------------------------------------------
-  describe('Address validation (BCH2Wallet.isValidAddress)', () => {
+  describe('Address validation (VoidWallet.isValidAddress)', () => {
 
     it('10. rejects bitcoincash: addresses', () => {
       const bchAddr = 'bitcoincash:qpm2qsznhks23z7629mms6s4cwef74vcwvy22gdx6a';
       assert.strictEqual(
-        BCH2Wallet.isValidAddress(bchAddr),
+        VoidWallet.isValidAddress(bchAddr),
         false,
         'Should reject BCH addresses (wrong chain)'
       );
@@ -293,7 +293,7 @@ describe('BCH2 Transaction Security', () => {
     it('11. rejects bchtest: addresses', () => {
       const testAddr = 'bchtest:qpm2qsznhks23z7629mms6s4cwef74vcwvhanqgjxu';
       assert.strictEqual(
-        BCH2Wallet.isValidAddress(testAddr),
+        VoidWallet.isValidAddress(testAddr),
         false,
         'Should reject bchtest: addresses (wrong chain)'
       );
@@ -301,14 +301,14 @@ describe('BCH2 Transaction Security', () => {
 
     it('12. accepts valid bitcoincashii: addresses', () => {
       assert.strictEqual(
-        BCH2Wallet.isValidAddress(VALID_ADDR),
+        VoidWallet.isValidAddress(VALID_ADDR),
         true,
         'Should accept valid bitcoincashii: P2PKH address'
       );
 
       const p2shAddr = encodeCashAddr(KNOWN_HASH, 1);
       assert.strictEqual(
-        BCH2Wallet.isValidAddress(p2shAddr),
+        VoidWallet.isValidAddress(p2shAddr),
         true,
         'Should accept valid bitcoincashii: P2SH address'
       );
@@ -325,7 +325,7 @@ describe('BCH2 Transaction Security', () => {
       const invalidFullAddr = VALID_ADDR.slice(0, colonIdx + 1) + invalidPayload;
 
       assert.strictEqual(
-        BCH2Wallet.isValidAddress(invalidFullAddr),
+        VoidWallet.isValidAddress(invalidFullAddr),
         false,
         'Should reject addresses containing characters outside the CashAddr charset'
       );

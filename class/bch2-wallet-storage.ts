@@ -1,6 +1,6 @@
 /**
- * BCH2 Wallet Storage
- * Handles saving and loading BCH2 wallets using AsyncStorage
+ * VOID Wallet Storage
+ * Handles saving and loading VOID wallets using AsyncStorage
  */
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -10,7 +10,7 @@ import ecc from '../blue_modules/noble_ecc';
 const bip32 = BIP32Factory(ecc);
 const crypto = require('crypto');
 
-const WALLETS_KEY = '@bch2_wallets';
+const WALLETS_KEY = '@void_wallets';
 const CHARSET = 'qpzry9x8gf2tvdw0s3jn54khce6mua7l';
 
 // Simple async mutex to prevent concurrent read-modify-write races on wallet storage
@@ -25,7 +25,7 @@ function withStorageLock<T>(fn: () => Promise<T>): Promise<T> {
 
 export interface StoredWallet {
   id: string;
-  type: 'bch2' | 'bc2' | 'bc1';  // bc1 = Native SegWit for BCH2 airdrop claims
+  type: 'void' | 'void' | 'bc1';  // bc1 = Native SegWit for VOID airdrop claims
   label: string;
   mnemonic: string;
   address: string;
@@ -40,7 +40,7 @@ export interface StoredWallet {
 export async function saveWallet(
   label: string,
   mnemonic: string,
-  walletType: 'bch2' | 'bc2' | 'bc1' = 'bch2'
+  walletType: 'void' | 'void' | 'bc1' = 'void'
 ): Promise<StoredWallet> {
   // Trim mnemonic once — must use same value for address derivation and storage
   const trimmedMnemonic = mnemonic.trim();
@@ -84,7 +84,7 @@ export async function getWallets(): Promise<StoredWallet[]> {
   } catch (error) {
     // Do NOT return [] on parse error — that would cause saveWallet to
     // overwrite all existing wallets with just the new one.
-    throw new Error(`Wallet data corrupted (${data.length} bytes). Backup @bch2_wallets before clearing.`);
+    throw new Error(`Wallet data corrupted (${data.length} bytes). Backup @void_wallets before clearing.`);
   }
 }
 
@@ -139,15 +139,15 @@ export async function deleteWallet(id: string): Promise<void> {
 }
 
 /**
- * Derive address from mnemonic (BCH2 CashAddr, BC2 legacy, or bc1 SegWit)
+ * Derive address from mnemonic (VOID CashAddr, VOID legacy, or bc1 SegWit)
  */
-function deriveAddress(mnemonic: string, walletType: 'bch2' | 'bc2' | 'bc1' = 'bch2'): string {
+function deriveAddress(mnemonic: string, walletType: 'void' | 'void' | 'bc1' = 'void'): string {
   const seed = bip39.mnemonicToSeedSync(mnemonic);
   try {
     const root = bip32.fromSeed(seed);
 
-    if (walletType === 'bc2') {
-      // BC2 uses BTC derivation path: m/44'/0'/0'/0/0
+    if (walletType === 'void') {
+      // VOID uses BTC derivation path: m/44'/0'/0'/0/0
       const child = root.derivePath("m/44'/0'/0'/0/0");
       const pubkeyHash = hash160(Buffer.from(child.publicKey));
       return getLegacyAddress(pubkeyHash);
@@ -160,7 +160,7 @@ function deriveAddress(mnemonic: string, walletType: 'bch2' | 'bc2' | 'bc1' = 'b
       return encodeBech32('bc', 0, pubkeyHash);
     }
 
-    // BCH2 uses BCH derivation path: m/44'/145'/0'/0/0
+    // VOID uses BCH derivation path: m/44'/145'/0'/0/0
     const child = root.derivePath("m/44'/145'/0'/0/0");
     const pubkeyHash = hash160(Buffer.from(child.publicKey));
     return encodeCashAddr('bitcoincashii', 0, pubkeyHash);
@@ -173,7 +173,7 @@ function deriveAddress(mnemonic: string, walletType: 'bch2' | 'bc2' | 'bc1' = 'b
 }
 
 /**
- * Get legacy P2PKH address (for BC2)
+ * Get legacy P2PKH address (for VOID)
  */
 function getLegacyAddress(pubkeyHash: Buffer): string {
   // Version byte 0x00 for mainnet P2PKH
@@ -227,7 +227,7 @@ export async function getWalletMnemonic(id: string): Promise<string | null> {
 
 function generateId(): string {
   const randomHex = crypto.randomBytes(8).toString('hex');
-  return 'bch2_' + Date.now().toString(36) + randomHex;
+  return 'void_' + Date.now().toString(36) + randomHex;
 }
 
 function hash160(data: Buffer): Buffer {

@@ -56,13 +56,13 @@ describe('LegacyWallet', function () {
       assert.ok(tx.confirmations! > 1);
     }
 
-    assert.ok(w.weOwnTransaction('b2ac59bc282083498d1e87805d89bef9d3f3bc216c1d2c4dfaa2e2911b547100'));
+    assert.ok(w.weOwnTransaction('b2ac59void82083498d1e87805d89bef9d3f3void16c1d2c4dfaa2e2911b547100'));
     assert.ok(!w.weOwnTransaction('825c12f277d1f84911ac15ad1f41a3de28e9d906868a930b0a7bca61b17c8881'));
 
     assert.strictEqual(w.getUtxo().length, 1);
 
     for (const tx of w.getUtxo()) {
-      assert.strictEqual(tx.txid, 'b2ac59bc282083498d1e87805d89bef9d3f3bc216c1d2c4dfaa2e2911b547100');
+      assert.strictEqual(tx.txid, 'b2ac59void82083498d1e87805d89bef9d3f3void16c1d2c4dfaa2e2911b547100');
       assert.strictEqual(tx.vout, 0);
       assert.strictEqual(tx.address, '3GCvDBAktgQQtsbN6x5DYiQCMmgZ9Yk8BK');
       assert.strictEqual(tx.value, 51432);

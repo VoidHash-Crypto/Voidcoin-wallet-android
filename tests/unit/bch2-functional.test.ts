@@ -1,5 +1,5 @@
 /**
- * BCH2 Functional Tests — End-to-End Wallet Operations
+ * VOID Functional Tests — End-to-End Wallet Operations
  *
  * Tests the full wallet lifecycle by mocking the Electrum layer:
  * 1. Wallet lifecycle: create → address derivation → balance → send → verify
@@ -22,36 +22,36 @@ const bs58check = require('bs58check');
 const TEST_MNEMONIC = 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about';
 const TEST_MNEMONIC_ALT = 'zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong';
 const TEST_PASSWORD = 'testpassword123';
-const WALLETS_KEY = '@bch2_wallets';
+const WALLETS_KEY = '@void_wallets';
 
 // ---- Electrum Mocks ----------------------------------------------------------
 const mockGetUtxosByAddress = jest.fn();
-const mockGetBC2Utxos = jest.fn();
+const mockGetVOIDUtxos = jest.fn();
 const mockGetUtxosByScripthash = jest.fn();
 const mockBroadcastTransaction = jest.fn();
-const mockBroadcastBC2Transaction = jest.fn();
+const mockBroadcastVOIDTransaction = jest.fn();
 const mockGetBalanceByAddress = jest.fn();
 const mockGetBalanceByScripthash = jest.fn();
-const mockGetBC2Balance = jest.fn();
-const mockGetBC2BalanceByScripthash = jest.fn();
+const mockGetVOIDBalance = jest.fn();
+const mockGetVOIDBalanceByScripthash = jest.fn();
 
-jest.mock('../../blue_modules/BCH2Electrum', () => ({
+jest.mock('../../blue_modules/VoidElectrum', () => ({
   getUtxosByAddress: (...args: any[]) => mockGetUtxosByAddress(...args),
-  getBC2Utxos: (...args: any[]) => mockGetBC2Utxos(...args),
+  getVOIDUtxos: (...args: any[]) => mockGetVOIDUtxos(...args),
   getUtxosByScripthash: (...args: any[]) => mockGetUtxosByScripthash(...args),
   broadcastTransaction: (...args: any[]) => mockBroadcastTransaction(...args),
-  broadcastBC2Transaction: (...args: any[]) => mockBroadcastBC2Transaction(...args),
+  broadcastVOIDTransaction: (...args: any[]) => mockBroadcastVOIDTransaction(...args),
   getBalanceByAddress: (...args: any[]) => mockGetBalanceByAddress(...args),
   getBalanceByScripthash: (...args: any[]) => mockGetBalanceByScripthash(...args),
-  getBC2Balance: (...args: any[]) => mockGetBC2Balance(...args),
-  getBC2BalanceByScripthash: (...args: any[]) => mockGetBC2BalanceByScripthash(...args),
+  getVoidBalance: (...args: any[]) => mockGetVOIDBalance(...args),
+  getVoidBalanceByScripthash: (...args: any[]) => mockGetVOIDBalanceByScripthash(...args),
   connectMain: jest.fn(),
 }));
 
-// Mock BCH2Wallet class for airdrop tests
-jest.mock('../../class/wallets/bch2-wallet', () => {
+// Mock VoidWallet class for airdrop tests
+jest.mock('../../class/wallets/void-wallet', () => {
   return {
-    BCH2Wallet: jest.fn().mockImplementation(() => ({
+    VoidWallet: jest.fn().mockImplementation(() => ({
       setSecret: jest.fn().mockReturnThis(),
       getAddress: jest.fn().mockReturnValue('bitcoincashii:qmockaddress'),
       fetchBalance: jest.fn().mockResolvedValue(undefined),
@@ -63,7 +63,7 @@ jest.mock('../../class/wallets/bch2-wallet', () => {
 });
 
 // Import modules under test AFTER mocks
-import { sendTransaction, decodeCashAddr } from '../../class/bch2-transaction';
+import { sendTransaction, decodeCashAddr } from '../../class/void-transaction';
 import {
   saveWallet,
   getWallets,
@@ -72,16 +72,16 @@ import {
   getWalletMnemonic,
   updateWalletBalance,
   StoredWallet,
-} from '../../class/bch2-wallet-storage';
+} from '../../class/void-wallet-storage';
 import {
   claimFromMnemonic,
   buildScanResult,
   getAntiGamingStatus,
   AirdropClaimResult,
   AirdropScanResult,
-} from '../../class/bch2-airdrop';
+} from '../../class/void-airdrop';
 
-// ---- CashAddr helpers (from bch2-transaction.test.ts pattern) ----------------
+// ---- CashAddr helpers (from void-transaction.test.ts pattern) ----------------
 const CASHADDR_CHARSET = 'qpzry9x8gf2tvdw0s3jn54khce6mua7l';
 const CASHADDR_GENERATORS = [0x98f2bc8e61n, 0x79b76d99e2n, 0xf33e5fb3c4n, 0xae2eabe2a8n, 0x1e4f43e470n];
 
@@ -156,11 +156,11 @@ beforeEach(async () => {
   jest.clearAllMocks();
   await AsyncStorage.clear();
   mockBroadcastTransaction.mockResolvedValue('abcd'.repeat(16));
-  mockBroadcastBC2Transaction.mockResolvedValue('ef01'.repeat(16));
+  mockBroadcastVOIDTransaction.mockResolvedValue('ef01'.repeat(16));
   mockGetBalanceByAddress.mockResolvedValue({ confirmed: 0, unconfirmed: 0 });
   mockGetBalanceByScripthash.mockResolvedValue({ confirmed: 0, unconfirmed: 0 });
-  mockGetBC2Balance.mockResolvedValue({ confirmed: 0, unconfirmed: 0 });
-  mockGetBC2BalanceByScripthash.mockResolvedValue({ confirmed: 0, unconfirmed: 0 });
+  mockGetVOIDBalance.mockResolvedValue({ confirmed: 0, unconfirmed: 0 });
+  mockGetVOIDBalanceByScripthash.mockResolvedValue({ confirmed: 0, unconfirmed: 0 });
 });
 
 // ============================================================================
@@ -169,10 +169,10 @@ beforeEach(async () => {
 describe('Wallet lifecycle (create -> address -> balance -> send -> verify)', () => {
   it('full lifecycle: create wallet, derive address, fetch balance, send tx, update balance', async () => {
     // Step 1: Create wallet
-    const wallet = await saveWallet('Main Wallet', TEST_MNEMONIC, 'bch2');
-    expect(wallet.id).toMatch(/^bch2_/);
+    const wallet = await saveWallet('Main Wallet', TEST_MNEMONIC, 'void');
+    expect(wallet.id).toMatch(/^void_/);
     expect(wallet.label).toBe('Main Wallet');
-    expect(wallet.type).toBe('bch2');
+    expect(wallet.type).toBe('void');
     expect(wallet.balance).toBe(0);
 
     // Step 2: Verify address derivation — CashAddr with correct prefix
@@ -204,7 +204,7 @@ describe('Wallet lifecycle (create -> address -> balance -> send -> verify)', ()
   });
 
   it('lifecycle with unconfirmed balance: create, add confirmed + unconfirmed, verify', async () => {
-    const wallet = await saveWallet('Unconf Wallet', TEST_MNEMONIC, 'bch2');
+    const wallet = await saveWallet('Unconf Wallet', TEST_MNEMONIC, 'void');
 
     // Simulate receiving coins — confirmed + unconfirmed
     await updateWalletBalance(wallet.id, 500_000, 100_000);
@@ -214,7 +214,7 @@ describe('Wallet lifecycle (create -> address -> balance -> send -> verify)', ()
   });
 
   it('multiple sequential sends from the same wallet', async () => {
-    const wallet = await saveWallet('Multi-Send', TEST_MNEMONIC, 'bch2');
+    const wallet = await saveWallet('Multi-Send', TEST_MNEMONIC, 'void');
     await updateWalletBalance(wallet.id, 5_000_000, 0);
 
     // First send
@@ -242,8 +242,8 @@ describe('Wallet lifecycle (create -> address -> balance -> send -> verify)', ()
 // ============================================================================
 describe('Import/restore from mnemonic', () => {
   it('importing same mnemonic produces same address', async () => {
-    const w1 = await saveWallet('Original', TEST_MNEMONIC, 'bch2');
-    const w2 = await saveWallet('Restored', TEST_MNEMONIC, 'bch2');
+    const w1 = await saveWallet('Original', TEST_MNEMONIC, 'void');
+    const w2 = await saveWallet('Restored', TEST_MNEMONIC, 'void');
 
     expect(w1.address).toBe(w2.address);
     expect(w1.address.startsWith('bitcoincashii:')).toBe(true);
@@ -251,11 +251,11 @@ describe('Import/restore from mnemonic', () => {
 
   it('restored wallet can retrieve balance', async () => {
     // Create original wallet
-    const original = await saveWallet('Original', TEST_MNEMONIC, 'bch2');
+    const original = await saveWallet('Original', TEST_MNEMONIC, 'void');
     await updateWalletBalance(original.id, 750_000, 10_000);
 
     // "Restore" wallet from same mnemonic
-    const restored = await saveWallet('Restored', TEST_MNEMONIC, 'bch2');
+    const restored = await saveWallet('Restored', TEST_MNEMONIC, 'void');
     expect(restored.address).toBe(original.address);
 
     // Simulate fetching balance for restored wallet (same address, same balance)
@@ -266,20 +266,20 @@ describe('Import/restore from mnemonic', () => {
   });
 
   it('restored wallet can decrypt mnemonic correctly', async () => {
-    const wallet = await saveWallet('Decrypt Test', TEST_MNEMONIC, 'bch2');
+    const wallet = await saveWallet('Decrypt Test', TEST_MNEMONIC, 'void');
     const decrypted = await getWalletMnemonic(wallet.id);
     expect(decrypted).toBe(TEST_MNEMONIC);
   });
 
   it('different mnemonic produces different address', async () => {
-    const w1 = await saveWallet('Mnemonic 1', TEST_MNEMONIC, 'bch2');
-    const w2 = await saveWallet('Mnemonic 2', TEST_MNEMONIC_ALT, 'bch2');
+    const w1 = await saveWallet('Mnemonic 1', TEST_MNEMONIC, 'void');
+    const w2 = await saveWallet('Mnemonic 2', TEST_MNEMONIC_ALT, 'void');
     expect(w1.address).not.toBe(w2.address);
   });
 
   it('imported wallet can send transactions after restore', async () => {
     // Restore wallet
-    const wallet = await saveWallet('Restored Sender', TEST_MNEMONIC, 'bch2');
+    const wallet = await saveWallet('Restored Sender', TEST_MNEMONIC, 'void');
     await updateWalletBalance(wallet.id, 2_000_000, 0);
 
     // Verify mnemonic can be decrypted
@@ -292,14 +292,14 @@ describe('Import/restore from mnemonic', () => {
     expect(result.txid).toBeTruthy();
   });
 
-  it('BC2 wallet type uses different derivation path than BCH2', async () => {
-    const bch2Wallet = await saveWallet('BCH2', TEST_MNEMONIC, 'bch2');
-    const bc2Wallet = await saveWallet('BC2', TEST_MNEMONIC, 'bc2');
+  it('VOID wallet type uses different derivation path than VOID', async () => {
+    const voidWallet = await saveWallet('VOID', TEST_MNEMONIC, 'void');
+    const voidWallet = await saveWallet('VOID', TEST_MNEMONIC, 'void');
 
-    // BCH2 uses CashAddr, BC2 uses legacy
-    expect(bch2Wallet.address.startsWith('bitcoincashii:')).toBe(true);
-    expect(bc2Wallet.address).toMatch(/^[13]/);
-    expect(bch2Wallet.address).not.toBe(bc2Wallet.address);
+    // VOID uses CashAddr, VOID uses legacy
+    expect(voidWallet.address.startsWith('bitcoincashii:')).toBe(true);
+    expect(voidWallet.address).toMatch(/^[13]/);
+    expect(voidWallet.address).not.toBe(voidWallet.address);
   });
 });
 
@@ -393,11 +393,11 @@ describe('Edge cases: maximum balance send (sweep)', () => {
 });
 
 describe('Edge cases: invalid address rejection', () => {
-  it('rejects sending BCH2 to a SegWit (bc1) address', async () => {
+  it('rejects sending VOID to a SegWit (bc1) address', async () => {
     mockGetUtxosByAddress.mockResolvedValue([{ txid: fakeTxid(40), vout: 0, value: 100_000 }]);
     await expect(
       sendTransaction(TEST_MNEMONIC, 'bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4', 50_000, 1, false),
-    ).rejects.toThrow(/Cannot send BCH2 to a SegWit/);
+    ).rejects.toThrow(/Cannot send VOID to a SegWit/);
   });
 
   it('rejects sending to a bitcoincash: (BCH) prefixed address', async () => {
@@ -475,9 +475,9 @@ describe('Edge cases: European locale decimal input (comma as separator)', () =>
 // ============================================================================
 describe('Storage operations: save multiple, list, update, delete, verify', () => {
   it('saves 3 wallets and lists all correctly', async () => {
-    const w1 = await saveWallet('Wallet Alpha', TEST_MNEMONIC, 'bch2');
-    const w2 = await saveWallet('Wallet Beta', TEST_MNEMONIC, 'bc2');
-    const w3 = await saveWallet('Wallet Gamma', TEST_MNEMONIC_ALT, 'bch2');
+    const w1 = await saveWallet('Wallet Alpha', TEST_MNEMONIC, 'void');
+    const w2 = await saveWallet('Wallet Beta', TEST_MNEMONIC, 'void');
+    const w3 = await saveWallet('Wallet Gamma', TEST_MNEMONIC_ALT, 'void');
 
     const wallets = await getWallets();
     expect(wallets).toHaveLength(3);
@@ -485,8 +485,8 @@ describe('Storage operations: save multiple, list, update, delete, verify', () =
   });
 
   it('update balance on specific wallet does not affect others', async () => {
-    const w1 = await saveWallet('W1', TEST_MNEMONIC, 'bch2');
-    const w2 = await saveWallet('W2', TEST_MNEMONIC_ALT, 'bch2');
+    const w1 = await saveWallet('W1', TEST_MNEMONIC, 'void');
+    const w2 = await saveWallet('W2', TEST_MNEMONIC_ALT, 'void');
 
     await updateWalletBalance(w1.id, 1_000_000, 50_000);
 
@@ -499,9 +499,9 @@ describe('Storage operations: save multiple, list, update, delete, verify', () =
   });
 
   it('delete one wallet preserves others with correct balances', async () => {
-    const w1 = await saveWallet('Keep Me', TEST_MNEMONIC, 'bch2');
-    const w2 = await saveWallet('Delete Me', TEST_MNEMONIC_ALT, 'bch2');
-    const w3 = await saveWallet('Also Keep', TEST_MNEMONIC, 'bc2');
+    const w1 = await saveWallet('Keep Me', TEST_MNEMONIC, 'void');
+    const w2 = await saveWallet('Delete Me', TEST_MNEMONIC_ALT, 'void');
+    const w3 = await saveWallet('Also Keep', TEST_MNEMONIC, 'void');
 
     await updateWalletBalance(w1.id, 100_000, 0);
     await updateWalletBalance(w3.id, 200_000, 5_000);
@@ -527,7 +527,7 @@ describe('Storage operations: save multiple, list, update, delete, verify', () =
   });
 
   it('deleted wallet mnemonic is securely overwritten before removal', async () => {
-    const wallet = await saveWallet('Secure Del', TEST_MNEMONIC, 'bch2');
+    const wallet = await saveWallet('Secure Del', TEST_MNEMONIC, 'void');
     const originalMnemonic = wallet.mnemonic;
 
     const capturedWrites: string[] = [];
@@ -559,35 +559,35 @@ describe('Storage operations: save multiple, list, update, delete, verify', () =
   it('wallet IDs are unique across creation calls', async () => {
     const wallets = [];
     for (let i = 0; i < 5; i++) {
-      wallets.push(await saveWallet(`W${i}`, TEST_MNEMONIC, 'bch2'));
+      wallets.push(await saveWallet(`W${i}`, TEST_MNEMONIC, 'void'));
     }
     const ids = new Set(wallets.map(w => w.id));
     expect(ids.size).toBe(5);
   });
 
   it('balance update with NaN is rejected (balance unchanged)', async () => {
-    const w = await saveWallet('NaN Test', TEST_MNEMONIC, 'bch2');
+    const w = await saveWallet('NaN Test', TEST_MNEMONIC, 'void');
     await updateWalletBalance(w.id, NaN, 0);
     const updated = await getWallet(w.id);
     expect(updated!.balance).toBe(0);
   });
 
   it('balance update with Infinity is rejected (balance unchanged)', async () => {
-    const w = await saveWallet('Inf Test', TEST_MNEMONIC, 'bch2');
+    const w = await saveWallet('Inf Test', TEST_MNEMONIC, 'void');
     await updateWalletBalance(w.id, Infinity, 0);
     const updated = await getWallet(w.id);
     expect(updated!.balance).toBe(0);
   });
 
   it('negative confirmed balance is clamped to zero', async () => {
-    const w = await saveWallet('Neg Test', TEST_MNEMONIC, 'bch2');
+    const w = await saveWallet('Neg Test', TEST_MNEMONIC, 'void');
     await updateWalletBalance(w.id, -500, 0);
     const updated = await getWallet(w.id);
     expect(updated!.balance).toBe(0);
   });
 
   it('negative unconfirmed balance is stored (pending spend)', async () => {
-    const w = await saveWallet('Neg Unconf', TEST_MNEMONIC, 'bch2');
+    const w = await saveWallet('Neg Unconf', TEST_MNEMONIC, 'void');
     await updateWalletBalance(w.id, 100_000, -5_000);
     const updated = await getWallet(w.id);
     expect(updated!.unconfirmedBalance).toBe(-5_000);
@@ -596,7 +596,7 @@ describe('Storage operations: save multiple, list, update, delete, verify', () =
   it('concurrent saves via Promise.all do not lose data', async () => {
     const promises = [];
     for (let i = 0; i < 5; i++) {
-      promises.push(saveWallet(`Concurrent ${i}`, TEST_MNEMONIC, 'bch2'));
+      promises.push(saveWallet(`Concurrent ${i}`, TEST_MNEMONIC, 'void'));
     }
     await Promise.all(promises);
 
@@ -634,8 +634,8 @@ describe('Airdrop claim: mock successful scan', () => {
     const claim = results[0];
     expect(claim.success).toBe(true);
     expect(claim.balance).toBe(100_000);
-    expect(claim.bch2Address.startsWith('bitcoincashii:')).toBe(true);
-    expect(claim.address).toBeTruthy(); // BC2 legacy address
+    expect(claim.voidAddress.startsWith('bitcoincashii:')).toBe(true);
+    expect(claim.address).toBeTruthy(); // VOID legacy address
   });
 
   it('claimFromMnemonic returns failure for invalid mnemonic', async () => {
@@ -653,7 +653,7 @@ describe('Airdrop claim: mock successful scan', () => {
     expect(results).toHaveLength(1);
     expect(results[0].success).toBe(false);
     expect(results[0].balance).toBe(0);
-    expect(results[0].error).toContain('No BCH2 balance found');
+    expect(results[0].error).toContain('No VOID balance found');
   });
 
   it('buildScanResult produces correct AirdropScanResult structure', () => {
@@ -661,18 +661,18 @@ describe('Airdrop claim: mock successful scan', () => {
       {
         success: true,
         address: '1TestAddr',
-        bch2Address: 'bitcoincashii:qtest1',
+        voidAddress: 'bitcoincashii:qtest1',
         balance: 50_000,
-        bc2Balance: 50_000,
+        voidBalance: 50_000,
         addressType: 'legacy',
         derivationPath: "m/44'/145'/0'/0/0",
       },
       {
         success: true,
         address: '1TestAddr2',
-        bch2Address: 'bitcoincashii:qtest2',
+        voidAddress: 'bitcoincashii:qtest2',
         balance: 30_000,
-        bc2Balance: 20_000,
+        voidBalance: 20_000,
         addressType: 'legacy',
         derivationPath: "m/44'/0'/0'/0/0",
       },
@@ -693,21 +693,21 @@ describe('Airdrop claim: mock successful scan', () => {
       {
         success: true,
         address: '1Good',
-        bch2Address: 'bitcoincashii:qgood',
+        voidAddress: 'bitcoincashii:qgood',
         balance: 100_000,
-        bc2Balance: 100_000,
+        voidBalance: 100_000,
       },
       {
         success: false,
         address: '1Bad',
-        bch2Address: 'bitcoincashii:qbad',
+        voidAddress: 'bitcoincashii:qbad',
         balance: 0,
         error: 'No balance',
       },
       {
         success: true,
         address: '1Zero',
-        bch2Address: 'bitcoincashii:qzero',
+        voidAddress: 'bitcoincashii:qzero',
         balance: 0,
       },
     ];
@@ -731,7 +731,7 @@ describe('Airdrop claim: mock successful scan', () => {
     expect(result.blocked).toBe(false);
   });
 
-  it('getAntiGamingStatus returns warning when excess BCH2 detected', () => {
+  it('getAntiGamingStatus returns warning when excess VOID detected', () => {
     const scan: AirdropScanResult = {
       totalBalance: 150_000,
       airdropBalance: 100_000,
@@ -740,11 +740,11 @@ describe('Airdrop claim: mock successful scan', () => {
     };
 
     const result = getAntiGamingStatus(scan);
-    expect(result.warning).toContain('exceeds the current BC2 balance');
+    expect(result.warning).toContain('exceeds the current VOID balance');
     expect(result.blocked).toBe(false);
   });
 
-  it('getAntiGamingStatus warns but does not block when no BC2 match', () => {
+  it('getAntiGamingStatus warns but does not block when no VOID match', () => {
     const scan: AirdropScanResult = {
       totalBalance: 50_000,
       airdropBalance: 0,
@@ -753,7 +753,7 @@ describe('Airdrop claim: mock successful scan', () => {
     };
 
     const result = getAntiGamingStatus(scan);
-    expect(result.warning).toContain('No matching BC2 balance');
+    expect(result.warning).toContain('No matching VOID balance');
     expect(result.blocked).toBe(false);
   });
 });
@@ -764,12 +764,12 @@ describe('Airdrop claim: mock successful scan', () => {
 describe('Cross-component integration', () => {
   it('wallet storage address matches transaction builder derivation', async () => {
     // The address saved by saveWallet should match what sendTransaction derives
-    const wallet = await saveWallet('Derivation Match', TEST_MNEMONIC, 'bch2');
+    const wallet = await saveWallet('Derivation Match', TEST_MNEMONIC, 'void');
     expect(wallet.address).toBe(SENDER_CASHADDR);
   });
 
   it('decodeCashAddr correctly round-trips addresses derived from walletStorage', async () => {
-    const wallet = await saveWallet('Roundtrip', TEST_MNEMONIC, 'bch2');
+    const wallet = await saveWallet('Roundtrip', TEST_MNEMONIC, 'void');
 
     // decodeCashAddr should extract the 20-byte pubkey hash
     const decoded = decodeCashAddr(wallet.address, true);
@@ -783,7 +783,7 @@ describe('Cross-component integration', () => {
 
   it('send+store lifecycle', async () => {
     // Create wallet
-    const wallet = await saveWallet('Auth Wallet', TEST_MNEMONIC, 'bch2');
+    const wallet = await saveWallet('Auth Wallet', TEST_MNEMONIC, 'void');
 
     // Retrieve mnemonic
     const mnemonic = await getWalletMnemonic(wallet.id);

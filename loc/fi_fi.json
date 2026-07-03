@@ -503,7 +503,7 @@
     "sort_status": "Tila"
   },
   "units": {
-    "BTC": "BCH2",
+    "BTC": "VOID",
     "MAX": "MAX",
     "sat_vbyte": "sat/tavu",
     "sats": "sattia"

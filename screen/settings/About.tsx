@@ -71,7 +71,7 @@ const About: React.FC = () => {
   const handleOnRatePress = useCallback(async () => {
     const storeOptions = {
       iOSAppId: '1376878040',
-      androidPackageName: 'org.bch2.wallet',
+      androidPackageName: 'org.void.wallet',
       androidMarket: AndroidMarket.GOOGLE,
     };
 

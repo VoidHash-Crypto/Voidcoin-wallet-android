@@ -474,7 +474,7 @@
     "sort_status": "Állapot"
   },
   "units": {
-    "BTC": "BCH2",
+    "BTC": "VOID",
     "MAX": "Maximum",
     "sat_vbyte": "sat/byte",
     "sats": "sats"

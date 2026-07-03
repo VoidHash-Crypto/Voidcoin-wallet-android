@@ -614,7 +614,7 @@
     "sort_by": "Trier par"
   },
   "units": {
-    "BTC": "BCH2",
+    "BTC": "VOID",
     "MAX": "Max",
     "sat_vbyte": "sat/byte",
     "sats": "sats"

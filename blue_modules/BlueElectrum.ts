@@ -8,7 +8,7 @@ import { sha256 as _sha256 } from '@noble/hashes/sha256';
 import { LegacyWallet, SegwitBech32Wallet, SegwitP2SHWallet, TaprootWallet } from '../class';
 import presentAlert from '../components/Alert';
 import loc from '../loc';
-import { GROUP_IO_BCH2 } from './currency';
+import { GROUP_IO_VOID } from './currency';
 import { ElectrumServerItem } from '../screen/settings/ElectrumSettings';
 import { triggerWarningHapticFeedback } from './hapticFeedback';
 import { AlertButton } from 'react-native';
@@ -83,9 +83,9 @@ export const ELECTRUM_SSL_PORT = 'electrum_ssl_port';
 export const ELECTRUM_SERVER_HISTORY = 'electrum_server_history';
 const ELECTRUM_CONNECTION_DISABLED = 'electrum_disabled';
 const storageKey = 'ELECTRUM_PEERS';
-const defaultPeer = { host: 'electrum.bch2.org', tcp: 50001 };
+const defaultPeer = { host: 'electrum.void.org', tcp: 50001 };
 export const hardcodedPeers: Peer[] = [
-  { host: 'electrum.bch2.org', tcp: 50001 },
+  { host: 'electrum.void.org', tcp: 50001 },
   { host: '144.202.73.66', tcp: 50001 },  // IP fallback if DNS fails
 ];
 
@@ -141,7 +141,7 @@ async function _getRealm() {
 
 export const getPreferredServer = async (): Promise<ElectrumServerItem | undefined> => {
   try {
-    await DefaultPreference.setName(GROUP_IO_BCH2);
+    await DefaultPreference.setName(GROUP_IO_VOID);
     const host = (await DefaultPreference.get(ELECTRUM_HOST)) as string;
     const tcpPort = await DefaultPreference.get(ELECTRUM_TCP_PORT);
     const sslPort = await DefaultPreference.get(ELECTRUM_SSL_PORT);
@@ -166,7 +166,7 @@ export const getPreferredServer = async (): Promise<ElectrumServerItem | undefin
 
 export const removePreferredServer = async () => {
   try {
-    await DefaultPreference.setName(GROUP_IO_BCH2);
+    await DefaultPreference.setName(GROUP_IO_VOID);
     console.log('Removing preferred server');
     await DefaultPreference.clear(ELECTRUM_HOST);
     await DefaultPreference.clear(ELECTRUM_TCP_PORT);
@@ -179,7 +179,7 @@ export const removePreferredServer = async () => {
 export async function isDisabled(): Promise<boolean> {
   let result;
   try {
-    await DefaultPreference.setName(GROUP_IO_BCH2);
+    await DefaultPreference.setName(GROUP_IO_VOID);
     const savedValue = await DefaultPreference.get(ELECTRUM_CONNECTION_DISABLED);
     console.log('Getting Electrum connection disabled state:', savedValue);
     if (savedValue === null) {
@@ -195,7 +195,7 @@ export async function isDisabled(): Promise<boolean> {
 }
 
 export async function setDisabled(disabled = true) {
-  await DefaultPreference.setName(GROUP_IO_BCH2);
+  await DefaultPreference.setName(GROUP_IO_VOID);
   console.log('Setting Electrum connection disabled state to:', disabled);
   return DefaultPreference.set(ELECTRUM_CONNECTION_DISABLED, disabled ? '1' : '');
 }
@@ -216,7 +216,7 @@ function getNextPeer() {
 
 async function getSavedPeer(): Promise<Peer | null> {
   try {
-    await DefaultPreference.setName(GROUP_IO_BCH2);
+    await DefaultPreference.setName(GROUP_IO_VOID);
     const host = (await DefaultPreference.get(ELECTRUM_HOST)) as string;
     const tcpPort = await DefaultPreference.get(ELECTRUM_TCP_PORT);
     const sslPort = await DefaultPreference.get(ELECTRUM_SSL_PORT);
@@ -257,8 +257,8 @@ export async function connectMain(): Promise<void> {
 
   try {
     console.log('begin connection:', JSON.stringify(usingPeer));
-    // BCH2 Electrum servers use self-signed certs — disable TLS verification for known hosts
-    const isSelfSigned = usingPeer.host === 'electrum.bch2.org' || usingPeer.host === 'electrum2.bch2.org';
+    // VOID Electrum servers use self-signed certs — disable TLS verification for known hosts
+    const isSelfSigned = usingPeer.host === 'electrum.void.org' || usingPeer.host === 'electrum2.void.org';
     const tlsOptions = usingPeer.ssl && isSelfSigned ? { rejectUnauthorized: false } : undefined;
     mainClient = new ElectrumClient(net, tls, usingPeer.ssl || usingPeer.tcp, usingPeer.host, usingPeer.ssl ? 'tls' : 'tcp', tlsOptions);
 
@@ -277,7 +277,7 @@ export async function connectMain(): Promise<void> {
         setTimeout(connectMain, usingPeer.host.endsWith('.onion') ? 4000 : 500);
       }
     };
-    const ver = await mainClient.initElectrum({ client: 'bch2-wallet', version: '1.4' });
+    const ver = await mainClient.initElectrum({ client: 'void-wallet', version: '1.4' });
     if (ver && ver[0]) {
       console.log('connected to ', ver);
       serverName = ver[0];
@@ -350,7 +350,7 @@ export async function presentResetToDefaultsAlert(): Promise<boolean> {
         text: loc.settings.electrum_reset,
         onPress: async () => {
           try {
-            await DefaultPreference.setName(GROUP_IO_BCH2);
+            await DefaultPreference.setName(GROUP_IO_VOID);
             await DefaultPreference.clear(ELECTRUM_HOST);
             await DefaultPreference.clear(ELECTRUM_SSL_PORT);
             await DefaultPreference.clear(ELECTRUM_TCP_PORT);
@@ -368,7 +368,7 @@ export async function presentResetToDefaultsAlert(): Promise<boolean> {
         text: loc.settings.electrum_reset_to_default_and_clear_history,
         onPress: async () => {
           try {
-            await DefaultPreference.setName(GROUP_IO_BCH2);
+            await DefaultPreference.setName(GROUP_IO_VOID);
             await DefaultPreference.clear(ELECTRUM_SERVER_HISTORY);
             await DefaultPreference.clear(ELECTRUM_HOST);
             await DefaultPreference.clear(ELECTRUM_SSL_PORT);

@@ -1,8 +1,8 @@
 /**
- * BCH2 Electrum Module - Security Hardening Tests
+ * VOID Electrum Module - Security Hardening Tests
  *
  * Tests UTXO validation, input sanitization, address validation,
- * coinbase maturity checks, and header validation in BCH2Electrum.ts.
+ * coinbase maturity checks, and header validation in VoidElectrum.ts.
  */
 
 // --- Mock Setup ---
@@ -43,7 +43,7 @@ const VALID_SCRIPTHASH = 'a'.repeat(64);
 const VALID_TXID = 'b'.repeat(64);
 
 /**
- * Helper: import the BCH2Electrum module within jest.isolateModules so each
+ * Helper: import the VoidElectrum module within jest.isolateModules so each
  * test group gets a fresh module state (fresh connection flags, client refs, etc.).
  * Before returning the module, it drives connectMain() by making the mocks
  * resolve successfully so functions that need a connection can proceed.
@@ -63,7 +63,7 @@ async function getConnectedModule() {
         mockBlockchainTransaction_broadcast.mockReset();
         mockClose.mockReset();
 
-        mod = require('../../blue_modules/BCH2Electrum');
+        mod = require('../../blue_modules/VoidElectrum');
         resolve();
       } catch (e) {
         reject(e);
@@ -76,7 +76,7 @@ async function getConnectedModule() {
 // =====================================================================
 // UTXO Validation
 // =====================================================================
-describe('BCH2Electrum Security - UTXO Validation', () => {
+describe('VoidElectrum Security - UTXO Validation', () => {
   // Helper: call getUtxosByScripthash with mocked listunspent response
   async function callGetUtxos(utxoResponse: any): Promise<any[]> {
     const mod = await getConnectedModule();
@@ -197,7 +197,7 @@ describe('BCH2Electrum Security - UTXO Validation', () => {
 // =====================================================================
 // Input Validation
 // =====================================================================
-describe('BCH2Electrum Security - Input Validation', () => {
+describe('VoidElectrum Security - Input Validation', () => {
   it('9. getUtxosByScripthash rejects non-64-char-hex scripthash', async () => {
     const mod = await getConnectedModule();
 
@@ -406,14 +406,14 @@ describe('BCH2Electrum Security - Input Validation', () => {
 // =====================================================================
 // Address Validation (tested indirectly through getBalanceByAddress)
 // =====================================================================
-describe('BCH2Electrum Security - Address Validation', () => {
+describe('VoidElectrum Security - Address Validation', () => {
   it('19. addressToScriptHash (via getBalanceByAddress) rejects empty string', async () => {
     const mod = await getConnectedModule();
 
     await expect(mod.getBalanceByAddress('')).rejects.toThrow(/[Ii]nvalid/);
   });
 
-  it('20. addressToScriptHash (via getBalanceByAddress) rejects bitcoincash: prefix (BCH not BCH2)', async () => {
+  it('20. addressToScriptHash (via getBalanceByAddress) rejects bitcoincash: prefix (BCH not VOID)', async () => {
     const mod = await getConnectedModule();
 
     // BCH CashAddr prefix should be rejected (cross-chain confusion attack)
@@ -439,7 +439,7 @@ describe('BCH2Electrum Security - Address Validation', () => {
 // =====================================================================
 // Coinbase Maturity
 // =====================================================================
-describe('BCH2Electrum Security - Coinbase Maturity', () => {
+describe('VoidElectrum Security - Coinbase Maturity', () => {
   it('21. isCoinbaseTx rejects raw hex shorter than 74 chars', async () => {
     const mod = await getConnectedModule();
 
@@ -535,7 +535,7 @@ describe('BCH2Electrum Security - Coinbase Maturity', () => {
 // =====================================================================
 // Header Validation
 // =====================================================================
-describe('BCH2Electrum Security - Header Validation', () => {
+describe('VoidElectrum Security - Header Validation', () => {
   it('24. connectMain only accepts integer height >= 0 from header subscription', async () => {
     // Test with a valid integer height
     mockInitElectrum.mockReset().mockResolvedValue(undefined);
@@ -545,7 +545,7 @@ describe('BCH2Electrum Security - Header Validation', () => {
     await new Promise<void>((resolve, reject) => {
       jest.isolateModules(() => {
         try {
-          mod = require('../../blue_modules/BCH2Electrum');
+          mod = require('../../blue_modules/VoidElectrum');
           resolve();
         } catch (e) {
           reject(e);
@@ -571,7 +571,7 @@ describe('BCH2Electrum Security - Header Validation', () => {
     await new Promise<void>((resolve, reject) => {
       jest.isolateModules(() => {
         try {
-          mod = require('../../blue_modules/BCH2Electrum');
+          mod = require('../../blue_modules/VoidElectrum');
           resolve();
         } catch (e) {
           reject(e);
@@ -595,7 +595,7 @@ describe('BCH2Electrum Security - Header Validation', () => {
     await new Promise<void>((resolve, reject) => {
       jest.isolateModules(() => {
         try {
-          mod = require('../../blue_modules/BCH2Electrum');
+          mod = require('../../blue_modules/VoidElectrum');
           resolve();
         } catch (e) {
           reject(e);
@@ -618,7 +618,7 @@ describe('BCH2Electrum Security - Header Validation', () => {
     await new Promise<void>((resolve, reject) => {
       jest.isolateModules(() => {
         try {
-          mod = require('../../blue_modules/BCH2Electrum');
+          mod = require('../../blue_modules/VoidElectrum');
           resolve();
         } catch (e) {
           reject(e);
@@ -641,7 +641,7 @@ describe('BCH2Electrum Security - Header Validation', () => {
     await new Promise<void>((resolve, reject) => {
       jest.isolateModules(() => {
         try {
-          mod = require('../../blue_modules/BCH2Electrum');
+          mod = require('../../blue_modules/VoidElectrum');
           resolve();
         } catch (e) {
           reject(e);
@@ -665,7 +665,7 @@ describe('BCH2Electrum Security - Header Validation', () => {
     await new Promise<void>((resolve, reject) => {
       jest.isolateModules(() => {
         try {
-          mod = require('../../blue_modules/BCH2Electrum');
+          mod = require('../../blue_modules/VoidElectrum');
           resolve();
         } catch (e) {
           reject(e);
@@ -684,7 +684,7 @@ describe('BCH2Electrum Security - Header Validation', () => {
 // =====================================================================
 // Additional Security Edge Cases
 // =====================================================================
-describe('BCH2Electrum Security - Additional Edge Cases', () => {
+describe('VoidElectrum Security - Additional Edge Cases', () => {
   it('broadcastTransaction validates server response is a valid txid', async () => {
     const mod = await getConnectedModule();
     const validHex = 'a'.repeat(100); // 50 bytes, valid hex
@@ -744,7 +744,7 @@ describe('BCH2Electrum Security - Additional Edge Cases', () => {
         try {
           mockInitElectrum.mockReset().mockResolvedValue(undefined);
           mockBlockchainHeaders_subscribe.mockReset().mockResolvedValue({ height: 1000 });
-          mod2 = require('../../blue_modules/BCH2Electrum');
+          mod2 = require('../../blue_modules/VoidElectrum');
           resolve();
         } catch (e) {
           reject(e);

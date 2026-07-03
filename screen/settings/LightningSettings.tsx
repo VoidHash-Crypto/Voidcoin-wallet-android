@@ -9,7 +9,7 @@ import presentAlert, { AlertType } from '../../components/Alert';
 import { Button } from '../../components/Button';
 import loc from '../../loc';
 import triggerHapticFeedback, { HapticFeedbackTypes } from '../../blue_modules/hapticFeedback';
-import { GROUP_IO_BCH2 } from '../../blue_modules/currency';
+import { GROUP_IO_VOID } from '../../blue_modules/currency';
 import { clearLNDHub, getLNDHub, setLNDHub } from '../../helpers/lndHub';
 import { DetailViewStackParamList } from '../../navigation/DetailViewStackParamList';
 import { useExtendedNavigation } from '../../hooks/useExtendedNavigation';
@@ -70,7 +70,7 @@ const LightningSettings: React.FC = () => {
     setIsLoading(true);
     let normalizedURI;
     try {
-      await DefaultPreference.setName(GROUP_IO_BCH2);
+      await DefaultPreference.setName(GROUP_IO_VOID);
       if (URI) {
         normalizedURI = new URL(URI.replace(/([^:]\/)\/+/g, '$1')).toString();
         await LightningCustodianWallet.isValidNodeAddress(normalizedURI);

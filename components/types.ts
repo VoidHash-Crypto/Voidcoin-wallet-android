@@ -43,9 +43,9 @@ export interface ToolTipMenuProps {
 }
 
 export enum HandOffActivityType {
-  ReceiveOnchain = 'org.bch2.wallet.receiveonchain',
-  Xpub = 'org.bch2.wallet.xpub',
-  ViewInBlockExplorer = 'org.bch2.wallet.blockexplorer',
+  ReceiveOnchain = 'org.void.wallet.receiveonchain',
+  Xpub = 'org.void.wallet.xpub',
+  ViewInBlockExplorer = 'org.void.wallet.blockexplorer',
 }
 
 export interface HandOffComponentProps {

@@ -1,58 +1,58 @@
 /**
- * BCH2 Stack Navigator
- * Main navigation for BCH2 wallet screens
+ * VOID Stack Navigator
+ * Main navigation for VOID wallet screens
  */
 
 import React from 'react';
 import { View, Text } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { BCH2Colors, BCH2Typography } from '../components/BCH2Theme';
-import { BCH2RootStackParamList } from './BCH2NavigationTypes';
+import { VoidColors, VOIDTypography } from '../components/VoidTheme';
+import { VOIDRootStackParamList } from './VOIDNavigationTypes';
 
 // Import screens
-import BCH2WalletList from '../screen/bch2/BCH2WalletList';
-import ClaimAirdrop from '../screen/bch2/ClaimAirdrop';
-import BCH2Receive from '../screen/bch2/BCH2Receive';
-import BCH2Send from '../screen/bch2/BCH2Send';
-import BCH2Settings from '../screen/bch2/BCH2Settings';
-import BCH2WalletDetail from '../screen/bch2/BCH2WalletDetail';
-import AddWallet from '../screen/bch2/AddWallet';
-import BCH2AppPassword from '../screen/bch2/BCH2AppPassword';
-import { getWallet, getWalletMnemonic, updateWalletBalance, StoredWallet } from '../class/bch2-wallet-storage';
-import { getTransactionsByAddress, getBC2Transactions, getBalanceByAddress, getBC2Balance, getBalanceByScripthash, getTransactionsByScripthash } from '../blue_modules/BCH2Electrum';
-import { sendTransaction, sendFromBech32, sendFromP2SH } from '../class/bch2-transaction';
-import { bc1AddressToScripthash } from '../class/bch2-airdrop';
+import VoidWalletList from '../screen/void/VoidWalletList';
+import ClaimAirdrop from '../screen/void/ClaimAirdrop';
+import VoidReceive from '../screen/void/VoidReceive';
+import VoidSend from '../screen/void/VoidSend';
+import VoidSettings from '../screen/void/VoidSettings';
+import VoidWalletDetail from '../screen/void/VoidWalletDetail';
+import AddWallet from '../screen/void/AddWallet';
+import VoidAppPassword from '../screen/void/VoidAppPassword';
+import { getWallet, getWalletMnemonic, updateWalletBalance, StoredWallet } from '../class/void-wallet-storage';
+import { getTransactionsByAddress, getVOIDTransactions, getBalanceByAddress, getVoidBalance, getBalanceByScripthash, getTransactionsByScripthash } from '../blue_modules/VoidElectrum';
+import { sendTransaction, sendFromBech32, sendFromP2SH } from '../class/void-transaction';
+import { bc1AddressToScripthash } from '../class/void-airdrop';
 
-const Stack = createNativeStackNavigator<BCH2RootStackParamList>();
+const Stack = createNativeStackNavigator<VOIDRootStackParamList>();
 
 const defaultScreenOptions = {
   headerStyle: {
-    backgroundColor: BCH2Colors.backgroundSecondary,
+    backgroundColor: VoidColors.backgroundSecondary,
   },
-  headerTintColor: BCH2Colors.textPrimary,
+  headerTintColor: VoidColors.textPrimary,
   headerTitleStyle: {
-    fontWeight: BCH2Typography.fontWeight.semibold,
-    fontSize: BCH2Typography.fontSize.lg,
+    fontWeight: VOIDTypography.fontWeight.semibold,
+    fontSize: VOIDTypography.fontSize.lg,
   },
   headerShadowVisible: false,
   contentStyle: {
-    backgroundColor: BCH2Colors.background,
+    backgroundColor: VoidColors.background,
   },
   animation: 'slide_from_right' as const,
 };
 
-export const BCH2Navigator: React.FC = () => {
+export const VoidNavigator: React.FC = () => {
   return (
     <Stack.Navigator
-      initialRouteName="BCH2WalletList"
+      initialRouteName="VoidWalletList"
       screenOptions={defaultScreenOptions}
     >
       <Stack.Screen
-        name="BCH2WalletList"
-        component={BCH2WalletList}
+        name="VoidWalletList"
+        component={VoidWalletList}
         options={{
           headerShown: false,
-          title: 'BCH2 Wallet',
+          title: 'VOID Wallet',
         }}
       />
 
@@ -60,14 +60,14 @@ export const BCH2Navigator: React.FC = () => {
         name="ClaimAirdrop"
         component={ClaimAirdrop}
         options={{
-          title: 'Claim BCH2',
+          title: 'Claim VOID',
           headerBackTitle: 'Back',
         }}
       />
 
       <Stack.Screen
-        name="BCH2Receive"
-        component={BCH2ReceiveWrapper}
+        name="VoidReceive"
+        component={VoidReceiveWrapper}
         options={{
           title: 'Receive',
           headerBackTitle: 'Back',
@@ -75,8 +75,8 @@ export const BCH2Navigator: React.FC = () => {
       />
 
       <Stack.Screen
-        name="BCH2Send"
-        component={BCH2SendWrapper}
+        name="VoidSend"
+        component={VoidSendWrapper}
         options={{
           title: 'Send',
           headerBackTitle: 'Back',
@@ -84,8 +84,8 @@ export const BCH2Navigator: React.FC = () => {
       />
 
       <Stack.Screen
-        name="BCH2Settings"
-        component={BCH2Settings}
+        name="VoidSettings"
+        component={VoidSettings}
         options={{
           title: 'Settings',
           headerBackTitle: 'Back',
@@ -94,7 +94,7 @@ export const BCH2Navigator: React.FC = () => {
 
       <Stack.Screen
         name="WalletDetail"
-        component={BCH2WalletDetailWrapper}
+        component={VoidWalletDetailWrapper}
         options={{
           title: 'Wallet',
           headerBackTitle: 'Back',
@@ -111,8 +111,8 @@ export const BCH2Navigator: React.FC = () => {
       />
 
       <Stack.Screen
-        name="BCH2AppPassword"
-        component={BCH2AppPassword}
+        name="VoidAppPassword"
+        component={VoidAppPassword}
         options={{
           title: 'App Password',
           headerBackTitle: 'Back',
@@ -124,25 +124,25 @@ export const BCH2Navigator: React.FC = () => {
 
 // Wrapper components to handle route params
 import { useRoute, useNavigation } from '@react-navigation/native';
-import { BCH2ReceiveRouteProp, BCH2SendRouteProp, WalletDetailRouteProp } from './BCH2NavigationTypes';
+import { VoidReceiveRouteProp, VoidSendRouteProp, WalletDetailRouteProp } from './VOIDNavigationTypes';
 
-const BCH2ReceiveWrapper: React.FC = () => {
-  const route = useRoute<BCH2ReceiveRouteProp>();
-  const { address, walletLabel, isBC2 } = route.params;
+const VoidReceiveWrapper: React.FC = () => {
+  const route = useRoute<VoidReceiveRouteProp>();
+  const { address, walletLabel, isVOID } = route.params;
 
   return (
-    <BCH2Receive
+    <VoidReceive
       address={address}
       walletLabel={walletLabel}
-      isBC2={isBC2}
+      isVOID={isVOID}
     />
   );
 };
 
-const BCH2SendWrapper: React.FC = () => {
-  const route = useRoute<BCH2SendRouteProp>();
+const VoidSendWrapper: React.FC = () => {
+  const route = useRoute<VoidSendRouteProp>();
   const navigation = useNavigation();
-  const { walletId, walletBalance, walletAddress, isBC2 } = route.params;
+  const { walletId, walletBalance, walletAddress, isVOID } = route.params;
 
   const handleSend = async (toAddress: string, amount: number, feePerByte: number): Promise<{ txid: string }> => {
     const mnemonic = await getWalletMnemonic(walletId);
@@ -154,22 +154,22 @@ const BCH2SendWrapper: React.FC = () => {
     const isP2SHSource = walletAddress.startsWith('3');
 
     let result;
-    if (isBech32Source && !isBC2) {
+    if (isBech32Source && !isVOID) {
       result = await sendFromBech32(mnemonic, walletAddress, toAddress, amount, feePerByte);
-    } else if (isP2SHSource && !isBC2) {
+    } else if (isP2SHSource && !isVOID) {
       result = await sendFromP2SH(mnemonic, walletAddress, toAddress, amount, feePerByte);
     } else {
-      result = await sendTransaction(mnemonic, toAddress, amount, feePerByte, isBC2 || false, walletAddress);
+      result = await sendTransaction(mnemonic, toAddress, amount, feePerByte, isVOID || false, walletAddress);
     }
 
     return { txid: result.txid };
   };
 
   return (
-    <BCH2Send
+    <VoidSend
       walletBalance={walletBalance}
       walletAddress={walletAddress}
-      isBC2={isBC2}
+      isVOID={isVOID}
       onSend={handleSend}
       navigation={navigation}
     />
@@ -184,7 +184,7 @@ interface Transaction {
   height?: number;
 }
 
-const BCH2WalletDetailWrapper: React.FC = () => {
+const VoidWalletDetailWrapper: React.FC = () => {
   const route = useRoute<WalletDetailRouteProp>();
   const navigation = useNavigation();
   const { walletId } = route.params;
@@ -195,15 +195,15 @@ const BCH2WalletDetailWrapper: React.FC = () => {
 
   const fetchWalletData = React.useCallback(async (w: StoredWallet) => {
     try {
-      const isBC2 = w.type === 'bc2';
+      const isVOID = w.type === 'void';
       const isBC1 = w.type === 'bc1' || w.address.toLowerCase().startsWith('bc1');
 
       let balance: { confirmed: number; unconfirmed: number };
       let txHistory: any[];
 
-      if (isBC2) {
-        balance = await getBC2Balance(w.address);
-        txHistory = await getBC2Transactions(w.address);
+      if (isVOID) {
+        balance = await getVoidBalance(w.address);
+        txHistory = await getVOIDTransactions(w.address);
       } else if (isBC1) {
         // bc1 addresses need scripthash-based queries
         const scripthash = bc1AddressToScripthash(w.address);
@@ -213,7 +213,7 @@ const BCH2WalletDetailWrapper: React.FC = () => {
         balance = await getBalanceByScripthash(scripthash);
         txHistory = await getTransactionsByScripthash(scripthash);
       } else {
-        // Standard BCH2 CashAddr
+        // Standard VOID CashAddr
         balance = await getBalanceByAddress(w.address);
         txHistory = await getTransactionsByAddress(w.address);
       }
@@ -269,13 +269,13 @@ const BCH2WalletDetailWrapper: React.FC = () => {
   }
 
   return (
-    <BCH2WalletDetail
+    <VoidWalletDetail
       walletId={walletId}
       label={wallet.label}
       balance={wallet.balance}
       unconfirmedBalance={wallet.unconfirmedBalance}
       address={wallet.address}
-      isBC2={wallet.type === 'bc2'}
+      isVOID={wallet.type === 'void'}
       transactions={transactions}
       navigation={navigation}
       onRefresh={handleRefresh}
@@ -284,4 +284,4 @@ const BCH2WalletDetailWrapper: React.FC = () => {
   );
 };
 
-export default BCH2Navigator;
+export default VoidNavigator;

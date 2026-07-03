@@ -628,7 +628,7 @@ describe('multisig-wallet (native segwit)', () => {
     assert.strictEqual(sorted[3].toString('hex'), '030000000000000000000000000000000000004141414141414141414141414141');
 
     sorted = MultisigHDWallet.sortBuffers([
-      Buffer.from('02ff12471208c14bd580709cb2358d98975247d8765f92bc25eab3b2763ed605f8', 'hex'),
+      Buffer.from('02ff12471208c14bd580709cb2358d98975247d8765f92void5eab3b2763ed605f8', 'hex'),
       Buffer.from('02fe6f0a5a297eb38c391581c4413e084773ea23954d93f7753db7dc0adc188b2f', 'hex'),
     ]);
     assert.strictEqual(
@@ -636,7 +636,7 @@ describe('multisig-wallet (native segwit)', () => {
       '02fe6f0a5a297eb38c391581c4413e084773ea23954d93f7753db7dc0adc188b2f',
       JSON.stringify(sorted),
     );
-    assert.strictEqual(sorted[1].toString('hex'), '02ff12471208c14bd580709cb2358d98975247d8765f92bc25eab3b2763ed605f8');
+    assert.strictEqual(sorted[1].toString('hex'), '02ff12471208c14bd580709cb2358d98975247d8765f92void5eab3b2763ed605f8');
   });
 
   it('some validations work', () => {

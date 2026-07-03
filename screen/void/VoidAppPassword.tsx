@@ -1,5 +1,5 @@
 /**
- * BCH2 App Password Screen
+ * VOID App Password Screen
  * Set/remove an app-level password stored via AsyncStorage
  */
 
@@ -17,11 +17,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { sha256 } from '@noble/hashes/sha256';
 import { bytesToHex } from '@noble/hashes/utils';
 import ReactNativeBiometrics from 'react-native-biometrics';
-import { BCH2Colors, BCH2Spacing, BCH2Typography, BCH2BorderRadius } from '../../components/BCH2Theme';
+import { VoidColors, VOIDSpacing, VOIDTypography, VOIDBorderRadius } from '../../components/VoidTheme';
 
-const APP_PASSWORD_KEY = '@bch2_app_password';
-const BIOMETRIC_ENABLED_KEY = '@bch2_biometric_enabled';
-const AUTO_LOCK_TIMEOUT_KEY = '@bch2_auto_lock_timeout';
+const APP_PASSWORD_KEY = '@void_app_password';
+const BIOMETRIC_ENABLED_KEY = '@void_biometric_enabled';
+const AUTO_LOCK_TIMEOUT_KEY = '@void_auto_lock_timeout';
 
 const rnBiometrics = new ReactNativeBiometrics({ allowDeviceCredentials: true });
 
@@ -83,7 +83,7 @@ interface Props {
   navigation?: any;
 }
 
-const BCH2AppPassword: React.FC<Props> = ({ navigation }) => {
+const VoidAppPassword: React.FC<Props> = ({ navigation }) => {
   const [hasPassword, setHasPassword] = useState(false);
   const [loading, setLoading] = useState(true);
   const [currentPassword, setCurrentPassword] = useState('');
@@ -133,7 +133,7 @@ const BCH2AppPassword: React.FC<Props> = ({ navigation }) => {
   if (loading) {
     return (
       <View style={styles.container}>
-        <ActivityIndicator size="large" color={BCH2Colors.primary} />
+        <ActivityIndicator size="large" color={VoidColors.primary} />
       </View>
     );
   }
@@ -149,7 +149,7 @@ const BCH2AppPassword: React.FC<Props> = ({ navigation }) => {
           <TextInput
             style={styles.input}
             placeholder="Current password"
-            placeholderTextColor={BCH2Colors.textMuted}
+            placeholderTextColor={VoidColors.textMuted}
             secureTextEntry
             value={currentPassword}
             onChangeText={setCurrentPassword}
@@ -171,7 +171,7 @@ const BCH2AppPassword: React.FC<Props> = ({ navigation }) => {
           <TextInput
             style={styles.input}
             placeholder="New password"
-            placeholderTextColor={BCH2Colors.textMuted}
+            placeholderTextColor={VoidColors.textMuted}
             secureTextEntry
             value={newPassword}
             onChangeText={setNewPassword}
@@ -180,7 +180,7 @@ const BCH2AppPassword: React.FC<Props> = ({ navigation }) => {
           <TextInput
             style={styles.input}
             placeholder="Confirm password"
-            placeholderTextColor={BCH2Colors.textMuted}
+            placeholderTextColor={VoidColors.textMuted}
             secureTextEntry
             value={confirmPassword}
             onChangeText={setConfirmPassword}
@@ -200,49 +200,49 @@ const BCH2AppPassword: React.FC<Props> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: BCH2Colors.background,
-    padding: BCH2Spacing.lg,
+    backgroundColor: VoidColors.background,
+    padding: VOIDSpacing.lg,
   },
   section: {
-    marginTop: BCH2Spacing.xl,
+    marginTop: VOIDSpacing.xl,
   },
   title: {
-    fontSize: BCH2Typography.fontSize.xl,
-    fontWeight: BCH2Typography.fontWeight.bold as any,
-    color: BCH2Colors.textPrimary,
-    marginBottom: BCH2Spacing.sm,
+    fontSize: VOIDTypography.fontSize.xl,
+    fontWeight: VOIDTypography.fontWeight.bold as any,
+    color: VoidColors.textPrimary,
+    marginBottom: VOIDSpacing.sm,
   },
   description: {
-    fontSize: BCH2Typography.fontSize.sm,
-    color: BCH2Colors.textSecondary,
-    marginBottom: BCH2Spacing.lg,
+    fontSize: VOIDTypography.fontSize.sm,
+    color: VoidColors.textSecondary,
+    marginBottom: VOIDSpacing.lg,
     lineHeight: 20,
   },
   input: {
-    backgroundColor: BCH2Colors.backgroundSecondary,
-    borderRadius: BCH2BorderRadius.md,
-    padding: BCH2Spacing.md,
-    fontSize: BCH2Typography.fontSize.md,
-    color: BCH2Colors.textPrimary,
-    marginBottom: BCH2Spacing.md,
+    backgroundColor: VoidColors.backgroundSecondary,
+    borderRadius: VOIDBorderRadius.md,
+    padding: VOIDSpacing.md,
+    fontSize: VOIDTypography.fontSize.md,
+    color: VoidColors.textPrimary,
+    marginBottom: VOIDSpacing.md,
     borderWidth: 1,
-    borderColor: BCH2Colors.border,
+    borderColor: VoidColors.border,
   },
   button: {
-    backgroundColor: BCH2Colors.primary,
-    borderRadius: BCH2BorderRadius.md,
-    padding: BCH2Spacing.md,
+    backgroundColor: VoidColors.primary,
+    borderRadius: VOIDBorderRadius.md,
+    padding: VOIDSpacing.md,
     alignItems: 'center',
-    marginTop: BCH2Spacing.sm,
+    marginTop: VOIDSpacing.sm,
   },
   dangerButton: {
-    backgroundColor: BCH2Colors.error,
+    backgroundColor: VoidColors.error,
   },
   buttonText: {
     color: '#FFFFFF',
-    fontSize: BCH2Typography.fontSize.md,
-    fontWeight: BCH2Typography.fontWeight.semibold as any,
+    fontSize: VOIDTypography.fontSize.md,
+    fontWeight: VOIDTypography.fontWeight.semibold as any,
   },
 });
 
-export default BCH2AppPassword;
+export default VoidAppPassword;

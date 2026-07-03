@@ -1,11 +1,11 @@
 /**
- * BCH2 Wallet (P2PKH Legacy)
- * Bitcoin Cash II wallet using CashAddr format
+ * VOID Wallet (P2PKH Legacy)
+ * VoidCoin wallet using CashAddr format
  */
 
 import { ECPairAPI, ECPairFactory } from 'ecpair';
 import ecc from '../../blue_modules/noble_ecc';
-import * as BCH2Electrum from '../../blue_modules/BCH2Electrum';
+import * as VoidElectrum from '../../blue_modules/VoidElectrum';
 import { AbstractWallet } from './abstract-wallet';
 import { Transaction, Utxo } from './types';
 import { randomBytes } from '../rng';
@@ -17,15 +17,15 @@ const crypto = require('crypto');
 const CHARSET = 'qpzry9x8gf2tvdw0s3jn54khce6mua7l';
 
 /**
- * BCH2 Legacy Wallet (P2PKH with CashAddr)
+ * VOID Legacy Wallet (P2PKH with CashAddr)
  */
-export class BCH2Wallet extends AbstractWallet {
-  static readonly type = 'bch2Legacy';
-  static readonly typeReadable = 'BCH2 (CashAddr)';
+export class VoidWallet extends AbstractWallet {
+  static readonly type = 'voidLegacy';
+  static readonly typeReadable = 'VOID (CashAddr)';
   // @ts-ignore: override
-  public readonly type = BCH2Wallet.type;
+  public readonly type = VoidWallet.type;
   // @ts-ignore: override
-  public readonly typeReadable = BCH2Wallet.typeReadable;
+  public readonly typeReadable = VoidWallet.typeReadable;
 
   _transactions: Transaction[] = [];
 
@@ -43,7 +43,7 @@ export class BCH2Wallet extends AbstractWallet {
   }
 
   /**
-   * Get BCH2 CashAddr format address
+   * Get VOID CashAddr format address
    */
   getAddress(): string | false {
     if (this._address) return this._address;
@@ -67,37 +67,37 @@ export class BCH2Wallet extends AbstractWallet {
   }
 
   /**
-   * Fetch balance from BCH2 Electrum server
+   * Fetch balance from VOID Electrum server
    */
   async fetchBalance(): Promise<void> {
     const address = this.getAddress();
     if (!address) return;
 
     try {
-      const balance = await BCH2Electrum.getBalanceByAddress(address);
+      const balance = await VoidElectrum.getBalanceByAddress(address);
       this.balance = balance.confirmed;
       this.unconfirmed_balance = balance.unconfirmed;
       this._lastBalanceFetch = Date.now();
     } catch (err) {
-      console.log('BCH2 fetchBalance error:', err);
+      console.log('VOID fetchBalance error:', err);
     }
   }
 
   /**
-   * Fetch transactions from BCH2 Electrum server
+   * Fetch transactions from VOID Electrum server
    */
   async fetchTransactions(): Promise<void> {
     const address = this.getAddress();
     if (!address) return;
 
     try {
-      const history = await BCH2Electrum.getTransactionsByAddress(address);
+      const history = await VoidElectrum.getTransactionsByAddress(address);
       const transactions: Transaction[] = [];
 
       for (const tx of history) {
-        const fullTx = await BCH2Electrum.getTransaction(tx.tx_hash);
+        const fullTx = await VoidElectrum.getTransaction(tx.tx_hash);
         if (fullTx) {
-          const blockHeight = BCH2Electrum.getLatestBlock().height || 0;
+          const blockHeight = VoidElectrum.getLatestBlock().height || 0;
           transactions.push({
             txid: tx.tx_hash,
             hash: tx.tx_hash,
@@ -121,7 +121,7 @@ export class BCH2Wallet extends AbstractWallet {
       this._transactions = transactions;
       this._lastTxFetch = Date.now();
     } catch (err) {
-      console.log('BCH2 fetchTransactions error:', err);
+      console.log('VOID fetchTransactions error:', err);
     }
   }
 
@@ -137,7 +137,7 @@ export class BCH2Wallet extends AbstractWallet {
     if (!address) return [];
 
     try {
-      const utxos = await BCH2Electrum.getUtxosByAddress(address);
+      const utxos = await VoidElectrum.getUtxosByAddress(address);
       this._utxo = utxos.map(u => ({
         ...u,
         address,
@@ -145,7 +145,7 @@ export class BCH2Wallet extends AbstractWallet {
       }));
       return this._utxo;
     } catch (err) {
-      console.log('BCH2 fetchUtxos error:', err);
+      console.log('VOID fetchUtxos error:', err);
       return [];
     }
   }
@@ -167,7 +167,7 @@ export class BCH2Wallet extends AbstractWallet {
       return false;
     }
 
-    // Normalize: only strip the BCH2 prefix for comparison
+    // Normalize: only strip the VOID prefix for comparison
     const normalize = (addr: string) => {
       const lower = addr.toLowerCase();
       return lower.startsWith('bitcoincashii:') ? lower.slice('bitcoincashii:'.length) : lower;
@@ -177,7 +177,7 @@ export class BCH2Wallet extends AbstractWallet {
   }
 
   /**
-   * Validate BCH2 address
+   * Validate VOID address
    */
   static isValidAddress(address: string): boolean {
     try {
@@ -227,11 +227,11 @@ export class BCH2Wallet extends AbstractWallet {
   }
 
   isSegwit(): boolean {
-    return false; // BCH2 doesn't support SegWit
+    return false; // VOID doesn't support SegWit
   }
 
   allowRBF(): boolean {
-    return false; // BCH2 doesn't support RBF
+    return false; // VOID doesn't support RBF
   }
 }
 
@@ -325,4 +325,4 @@ function cashAddrPolymod(values: number[]): bigint {
   return chk;
 }
 
-export default BCH2Wallet;
+export default VoidWallet;

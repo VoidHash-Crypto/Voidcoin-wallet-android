@@ -1,6 +1,6 @@
 /**
- * BCH2 Receive Screen
- * Displays QR code and address for receiving BCH2
+ * VOID Receive Screen
+ * Displays QR code and address for receiving VOID
  */
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
@@ -14,24 +14,24 @@ import {
   Alert,
 } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
-import { BCH2Colors, BCH2Spacing, BCH2Typography, BCH2Shadows, BCH2BorderRadius } from '../../components/BCH2Theme';
+import { VoidColors, VOIDSpacing, VOIDTypography, VOIDShadows, VOIDBorderRadius } from '../../components/VoidTheme';
 
-interface BCH2ReceiveProps {
+interface VoidReceiveProps {
   address: string;
   walletLabel?: string;
-  isBC2?: boolean;
+  isVOID?: boolean;
   navigation?: any;
 }
 
-export const BCH2ReceiveScreen: React.FC<BCH2ReceiveProps> = ({
+export const VoidReceiveScreen: React.FC<VoidReceiveProps> = ({
   address,
-  walletLabel = 'BCH2 Wallet',
-  isBC2 = false,
+  walletLabel = 'VOID Wallet',
+  isVOID = false,
   navigation,
 }) => {
   const [copied, setCopied] = useState(false);
-  const primaryColor = isBC2 ? BCH2Colors.bc2Primary : BCH2Colors.primary;
-  const coinSymbol = isBC2 ? 'BC2' : 'BCH2';
+  const primaryColor = isVOID ? VoidColors.voidPrimary : VoidColors.primary;
+  const coinSymbol = isVOID ? 'VOID' : 'VOID';
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   useEffect(() => {
@@ -87,8 +87,8 @@ export const BCH2ReceiveScreen: React.FC<BCH2ReceiveProps> = ({
           <QRCode
             value={address}
             size={200}
-            color={BCH2Colors.textPrimary}
-            backgroundColor={BCH2Colors.backgroundCard}
+            color={VoidColors.textPrimary}
+            backgroundColor={VoidColors.backgroundCard}
             logo={undefined}
           />
         </View>
@@ -137,11 +137,11 @@ export const BCH2ReceiveScreen: React.FC<BCH2ReceiveProps> = ({
       </View>
 
       {/* Address Format Info */}
-      {!isBC2 && (
+      {!isVOID && (
         <View style={styles.formatInfo}>
           <Text style={styles.formatTitle}>CashAddr Format</Text>
           <Text style={styles.formatText}>
-            BCH2 uses the CashAddr format with the{'\n'}
+            VOID uses the CashAddr format with the{'\n'}
             <Text style={styles.formatHighlight}>bitcoincashii:</Text> prefix
           </Text>
         </View>
@@ -153,67 +153,67 @@ export const BCH2ReceiveScreen: React.FC<BCH2ReceiveProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: BCH2Colors.background,
-    padding: BCH2Spacing.lg,
+    backgroundColor: VoidColors.background,
+    padding: VOIDSpacing.lg,
   },
   header: {
     alignItems: 'center',
-    marginBottom: BCH2Spacing.xl,
-    paddingTop: BCH2Spacing.lg,
+    marginBottom: VOIDSpacing.xl,
+    paddingTop: VOIDSpacing.lg,
   },
   title: {
-    fontSize: BCH2Typography.fontSize.xxl,
-    fontWeight: BCH2Typography.fontWeight.bold,
-    color: BCH2Colors.textPrimary,
-    marginBottom: BCH2Spacing.xs,
+    fontSize: VOIDTypography.fontSize.xxl,
+    fontWeight: VOIDTypography.fontWeight.bold,
+    color: VoidColors.textPrimary,
+    marginBottom: VOIDSpacing.xs,
   },
   subtitle: {
-    fontSize: BCH2Typography.fontSize.base,
-    color: BCH2Colors.textSecondary,
+    fontSize: VOIDTypography.fontSize.base,
+    color: VoidColors.textSecondary,
   },
   qrCard: {
-    backgroundColor: BCH2Colors.backgroundCard,
-    borderRadius: BCH2BorderRadius.lg,
+    backgroundColor: VoidColors.backgroundCard,
+    borderRadius: VOIDBorderRadius.lg,
     borderWidth: 1,
-    padding: BCH2Spacing.xl,
+    padding: VOIDSpacing.xl,
     alignItems: 'center',
-    ...BCH2Shadows.md,
+    ...VOIDShadows.md,
   },
   qrContainer: {
-    padding: BCH2Spacing.md,
-    backgroundColor: BCH2Colors.backgroundCard,
-    borderRadius: BCH2BorderRadius.md,
-    marginBottom: BCH2Spacing.lg,
+    padding: VOIDSpacing.md,
+    backgroundColor: VoidColors.backgroundCard,
+    borderRadius: VOIDBorderRadius.md,
+    marginBottom: VOIDSpacing.lg,
   },
   addressContainer: {
     alignItems: 'center',
-    marginBottom: BCH2Spacing.lg,
+    marginBottom: VOIDSpacing.lg,
     width: '100%',
   },
   addressLabel: {
-    fontSize: BCH2Typography.fontSize.sm,
-    fontWeight: BCH2Typography.fontWeight.semibold,
-    marginBottom: BCH2Spacing.sm,
+    fontSize: VOIDTypography.fontSize.sm,
+    fontWeight: VOIDTypography.fontWeight.semibold,
+    marginBottom: VOIDSpacing.sm,
     textTransform: 'uppercase',
     letterSpacing: 1,
   },
   address: {
-    fontSize: BCH2Typography.fontSize.sm,
-    color: BCH2Colors.textPrimary,
+    fontSize: VOIDTypography.fontSize.sm,
+    color: VoidColors.textPrimary,
     fontFamily: 'monospace',
     textAlign: 'center',
     lineHeight: 22,
   },
   actions: {
     flexDirection: 'row',
-    gap: BCH2Spacing.md,
+    gap: VOIDSpacing.md,
     width: '100%',
   },
   actionButton: {
     flex: 1,
-    paddingVertical: BCH2Spacing.md,
-    paddingHorizontal: BCH2Spacing.md,
-    borderRadius: BCH2BorderRadius.md,
+    paddingVertical: VOIDSpacing.md,
+    paddingHorizontal: VOIDSpacing.md,
+    borderRadius: VOIDBorderRadius.md,
     borderWidth: 1,
     alignItems: 'center',
   },
@@ -221,50 +221,50 @@ const styles = StyleSheet.create({
     borderWidth: 0,
   },
   actionButtonText: {
-    fontSize: BCH2Typography.fontSize.base,
-    fontWeight: BCH2Typography.fontWeight.semibold,
+    fontSize: VOIDTypography.fontSize.base,
+    fontWeight: VOIDTypography.fontWeight.semibold,
   },
   actionButtonTextFilled: {
-    fontSize: BCH2Typography.fontSize.base,
-    fontWeight: BCH2Typography.fontWeight.semibold,
-    color: BCH2Colors.textPrimary,
+    fontSize: VOIDTypography.fontSize.base,
+    fontWeight: VOIDTypography.fontWeight.semibold,
+    color: VoidColors.textPrimary,
   },
   infoCard: {
-    backgroundColor: BCH2Colors.backgroundCard,
-    borderRadius: BCH2BorderRadius.md,
-    padding: BCH2Spacing.md,
-    marginTop: BCH2Spacing.lg,
+    backgroundColor: VoidColors.backgroundCard,
+    borderRadius: VOIDBorderRadius.md,
+    padding: VOIDSpacing.md,
+    marginTop: VOIDSpacing.lg,
     borderLeftWidth: 3,
-    borderLeftColor: BCH2Colors.warning,
+    borderLeftColor: VoidColors.warning,
   },
   infoText: {
-    fontSize: BCH2Typography.fontSize.sm,
-    color: BCH2Colors.textSecondary,
+    fontSize: VOIDTypography.fontSize.sm,
+    color: VoidColors.textSecondary,
     lineHeight: 20,
   },
   formatInfo: {
     alignItems: 'center',
-    marginTop: BCH2Spacing.xl,
-    paddingTop: BCH2Spacing.lg,
+    marginTop: VOIDSpacing.xl,
+    paddingTop: VOIDSpacing.lg,
     borderTopWidth: 1,
-    borderTopColor: BCH2Colors.border,
+    borderTopColor: VoidColors.border,
   },
   formatTitle: {
-    fontSize: BCH2Typography.fontSize.sm,
-    fontWeight: BCH2Typography.fontWeight.semibold,
-    color: BCH2Colors.textMuted,
-    marginBottom: BCH2Spacing.xs,
+    fontSize: VOIDTypography.fontSize.sm,
+    fontWeight: VOIDTypography.fontWeight.semibold,
+    color: VoidColors.textMuted,
+    marginBottom: VOIDSpacing.xs,
   },
   formatText: {
-    fontSize: BCH2Typography.fontSize.sm,
-    color: BCH2Colors.textMuted,
+    fontSize: VOIDTypography.fontSize.sm,
+    color: VoidColors.textMuted,
     textAlign: 'center',
     lineHeight: 20,
   },
   formatHighlight: {
-    color: BCH2Colors.primary,
+    color: VoidColors.primary,
     fontFamily: 'monospace',
   },
 });
 
-export default BCH2ReceiveScreen;
+export default VoidReceiveScreen;

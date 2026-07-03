@@ -1,17 +1,17 @@
 /**
- * BCH2 Wallet Card Component
- * Displays wallet balance with BCH2 branding
+ * VOID Wallet Card Component
+ * Displays wallet balance with VOID branding
  */
 
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated, Image } from 'react-native';
-import { BCH2Colors, BCH2Spacing, BCH2Typography, BCH2Shadows, BCH2BorderRadius } from './BCH2Theme';
+import { VoidColors, VOIDSpacing, VOIDTypography, VOIDShadows, VOIDBorderRadius } from './VoidTheme';
 
 // Coin logos
-const BCH2_LOGO = require('../img/bch2-logo-small.png');
-const BC2_LOGO = require('../img/bc2-logo-small.png');
+const VOID_LOGO = require('../img/void-logo-small.png');
+const VOID_LOGO = require('../img/void-logo-small.png');
 
-interface BCH2WalletCardProps {
+interface VoidWalletCardProps {
   balance: number;
   unconfirmedBalance?: number;
   address?: string;
@@ -19,10 +19,10 @@ interface BCH2WalletCardProps {
   onPress?: () => void;
   onReceive?: () => void;
   onSend?: () => void;
-  isBC2?: boolean; // Show as BC2 wallet (orange theme)
+  isVOID?: boolean; // Show as VOID wallet (orange theme)
 }
 
-export const BCH2WalletCard: React.FC<BCH2WalletCardProps> = ({
+export const VoidWalletCard: React.FC<VoidWalletCardProps> = ({
   balance,
   unconfirmedBalance = 0,
   address,
@@ -30,11 +30,11 @@ export const BCH2WalletCard: React.FC<BCH2WalletCardProps> = ({
   onPress,
   onReceive,
   onSend,
-  isBC2 = false,
+  isVOID = false,
 }) => {
-  const primaryColor = isBC2 ? BCH2Colors.bc2Primary : BCH2Colors.primary;
-  const badgeColor = isBC2 ? BCH2Colors.bc2Light : BCH2Colors.primary;
-  const coinSymbol = isBC2 ? 'BC2' : 'BCH2';
+  const primaryColor = isVOID ? VoidColors.voidPrimary : VoidColors.primary;
+  const badgeColor = isVOID ? VoidColors.voidLight : VoidColors.primary;
+  const coinSymbol = isVOID ? 'VOID' : 'VOID';
 
   const formatBalance = (sats: number): string => {
     return (sats / 100000000).toFixed(8);
@@ -55,13 +55,13 @@ export const BCH2WalletCard: React.FC<BCH2WalletCardProps> = ({
       {/* Header */}
       <View style={styles.header}>
         <Image
-          source={isBC2 ? BC2_LOGO : BCH2_LOGO}
+          source={isVOID ? VOID_LOGO : VOID_LOGO}
           style={styles.coinLogo}
           resizeMode="contain"
         />
         <View style={styles.headerText}>
           <Text style={styles.label}>
-            {walletLabel || (isBC2 ? 'BitcoinII' : 'Bitcoin Cash II')}
+            {walletLabel || (isVOID ? 'BitcoinII' : 'VoidCoin')}
           </Text>
           <View style={[styles.coinBadge, { backgroundColor: badgeColor }]}>
             <Text style={styles.coinBadgeText}>{coinSymbol}</Text>
@@ -116,23 +116,23 @@ export const BCH2WalletCard: React.FC<BCH2WalletCardProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: BCH2Colors.backgroundCard,
-    borderRadius: BCH2BorderRadius.lg,
+    backgroundColor: VoidColors.backgroundCard,
+    borderRadius: VOIDBorderRadius.lg,
     borderWidth: 1,
-    padding: BCH2Spacing.lg,
-    marginHorizontal: BCH2Spacing.md,
-    marginVertical: BCH2Spacing.sm,
-    ...BCH2Shadows.md,
+    padding: VOIDSpacing.lg,
+    marginHorizontal: VOIDSpacing.md,
+    marginVertical: VOIDSpacing.sm,
+    ...VOIDShadows.md,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: BCH2Spacing.md,
+    marginBottom: VOIDSpacing.md,
   },
   coinLogo: {
     width: 48,
     height: 48,
-    marginRight: BCH2Spacing.md,
+    marginRight: VOIDSpacing.md,
   },
   headerText: {
     flex: 1,
@@ -141,56 +141,56 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   coinBadge: {
-    paddingHorizontal: BCH2Spacing.sm,
-    paddingVertical: BCH2Spacing.xs,
-    borderRadius: BCH2BorderRadius.sm,
+    paddingHorizontal: VOIDSpacing.sm,
+    paddingVertical: VOIDSpacing.xs,
+    borderRadius: VOIDBorderRadius.sm,
   },
   coinBadgeText: {
-    color: BCH2Colors.textPrimary,
-    fontSize: BCH2Typography.fontSize.sm,
-    fontWeight: BCH2Typography.fontWeight.bold,
+    color: VoidColors.textPrimary,
+    fontSize: VOIDTypography.fontSize.sm,
+    fontWeight: VOIDTypography.fontWeight.bold,
   },
   label: {
-    color: BCH2Colors.textSecondary,
-    fontSize: BCH2Typography.fontSize.base,
-    fontWeight: BCH2Typography.fontWeight.medium,
+    color: VoidColors.textSecondary,
+    fontSize: VOIDTypography.fontSize.base,
+    fontWeight: VOIDTypography.fontWeight.medium,
   },
   balanceContainer: {
     flexDirection: 'row',
     alignItems: 'baseline',
-    marginBottom: BCH2Spacing.xs,
+    marginBottom: VOIDSpacing.xs,
   },
   balance: {
-    fontSize: BCH2Typography.fontSize.xxl,
-    fontWeight: BCH2Typography.fontWeight.bold,
+    fontSize: VOIDTypography.fontSize.xxl,
+    fontWeight: VOIDTypography.fontWeight.bold,
     fontFamily: 'monospace',
   },
   balanceSymbol: {
-    color: BCH2Colors.textSecondary,
-    fontSize: BCH2Typography.fontSize.lg,
-    marginLeft: BCH2Spacing.sm,
+    color: VoidColors.textSecondary,
+    fontSize: VOIDTypography.fontSize.lg,
+    marginLeft: VOIDSpacing.sm,
   },
   unconfirmed: {
-    color: BCH2Colors.warning,
-    fontSize: BCH2Typography.fontSize.sm,
-    marginBottom: BCH2Spacing.sm,
+    color: VoidColors.warning,
+    fontSize: VOIDTypography.fontSize.sm,
+    marginBottom: VOIDSpacing.sm,
   },
   address: {
-    color: BCH2Colors.textMuted,
-    fontSize: BCH2Typography.fontSize.xs,
+    color: VoidColors.textMuted,
+    fontSize: VOIDTypography.fontSize.xs,
     fontFamily: 'monospace',
-    marginBottom: BCH2Spacing.md,
+    marginBottom: VOIDSpacing.md,
   },
   actions: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    gap: BCH2Spacing.md,
+    gap: VOIDSpacing.md,
   },
   actionButton: {
     flex: 1,
-    paddingVertical: BCH2Spacing.sm,
-    paddingHorizontal: BCH2Spacing.md,
-    borderRadius: BCH2BorderRadius.md,
+    paddingVertical: VOIDSpacing.sm,
+    paddingHorizontal: VOIDSpacing.md,
+    borderRadius: VOIDBorderRadius.md,
     borderWidth: 1,
     alignItems: 'center',
   },
@@ -198,12 +198,12 @@ const styles = StyleSheet.create({
     borderWidth: 0,
   },
   actionButtonText: {
-    fontSize: BCH2Typography.fontSize.base,
-    fontWeight: BCH2Typography.fontWeight.semibold,
+    fontSize: VOIDTypography.fontSize.base,
+    fontWeight: VOIDTypography.fontWeight.semibold,
   },
   actionButtonTextFilled: {
-    color: BCH2Colors.textPrimary,
+    color: VoidColors.textPrimary,
   },
 });
 
-export default BCH2WalletCard;
+export default VoidWalletCard;

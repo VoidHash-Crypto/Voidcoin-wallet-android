@@ -178,7 +178,7 @@ export default class CPFP extends Component {
           <TouchableOpacity accessibilityRole="button" style={styles.action} onPress={() => Clipboard.setString(this.state.txhex)}>
             <Text style={styles.actionText}>{loc.send.create_copy}</Text>
           </TouchableOpacity>
-          {/* coinb.in verification removed — BTC-specific, not compatible with BCH2 */}
+          {/* coinb.in verification removed — BTC-specific, not compatible with VOID */}
           <Button disabled={this.context.isElectrumDisabled} onPress={this.broadcast} title={loc.send.confirm_sendNow} />
         </BlueCard>
       </View>

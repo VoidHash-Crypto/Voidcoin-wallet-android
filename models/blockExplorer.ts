@@ -8,7 +8,7 @@ export interface BlockExplorer {
 }
 
 export const BLOCK_EXPLORERS: { [key: string]: BlockExplorer } = {
-  default: { key: 'default', name: 'BCH2 Explorer', url: 'https://explorer.bch2.org' },
+  default: { key: 'default', name: 'VOID Explorer', url: 'https://explorer.void.org' },
   custom: { key: 'custom', name: 'Custom', url: '' }, // Custom URL will be handled separately
 };
 

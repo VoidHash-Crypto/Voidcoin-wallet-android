@@ -1,7 +1,7 @@
 /**
- * Tests for BCH2 Electrum module
+ * Tests for VOID Electrum module
  * Covers: CashAddr-to-scripthash conversion, balance/UTXO API wrappers,
- * connection management, and BC2 explorer API fallback.
+ * connection management, and VOID explorer API fallback.
  *
  * Strategy: The module under test uses module-level state (mainConnected, etc.)
  * that persists across tests. We use jest.isolateModules to get fresh instances
@@ -47,10 +47,10 @@ const mockFetch = jest.fn();
 (global as any).fetch = mockFetch;
 
 // We import these for types/constants only; actual function tests use fresh modules
-import { hardcodedPeers, bc2Peers } from '../../blue_modules/BCH2Electrum';
+import { hardcodedPeers, voidPeers } from '../../blue_modules/VoidElectrum';
 
 // ---------------------------------------------------------------------------
-// CashAddr encoder (same algorithm as bch2-wallet.test.ts) for generating
+// CashAddr encoder (same algorithm as void-wallet.test.ts) for generating
 // valid test addresses
 // ---------------------------------------------------------------------------
 const CHARSET = 'qpzry9x8gf2tvdw0s3jn54khce6mua7l';
@@ -110,14 +110,14 @@ const VALID_P2PKH_BARE = VALID_P2PKH_ADDR.slice('bitcoincashii:'.length);
  * Helper to get a fresh module instance (reset all module-level state).
  */
 function getFreshModule() {
-  let mod: typeof import('../../blue_modules/BCH2Electrum');
+  let mod: typeof import('../../blue_modules/VoidElectrum');
   jest.isolateModules(() => {
-    mod = require('../../blue_modules/BCH2Electrum');
+    mod = require('../../blue_modules/VoidElectrum');
   });
   return mod!;
 }
 
-describe('BCH2Electrum', () => {
+describe('VoidElectrum', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.useFakeTimers();
@@ -247,14 +247,14 @@ describe('BCH2Electrum', () => {
       const mod = getFreshModule();
       const p = mod.getBalanceByAddress('bitcoincash:' + VALID_P2PKH_BARE);
       jest.runAllTimers();
-      await expect(p).rejects.toThrow('Invalid BCH2 address: wrong prefix');
+      await expect(p).rejects.toThrow('Invalid VOID address: wrong prefix');
     });
 
     it('bchtest prefix is rejected', async () => {
       const mod = getFreshModule();
       const p = mod.getBalanceByAddress('bchtest:' + VALID_P2PKH_BARE);
       jest.runAllTimers();
-      await expect(p).rejects.toThrow('Invalid BCH2 address: wrong prefix');
+      await expect(p).rejects.toThrow('Invalid VOID address: wrong prefix');
     });
   });
 
@@ -711,7 +711,7 @@ describe('BCH2Electrum', () => {
 
   // ===== Hardcoded peers =====
   describe('Hardcoded peers', () => {
-    it('BCH2 peers are defined with host and port', () => {
+    it('VOID peers are defined with host and port', () => {
       expect(hardcodedPeers.length).toBeGreaterThanOrEqual(1);
       for (const peer of hardcodedPeers) {
         expect(peer.host).toBeDefined();
@@ -720,9 +720,9 @@ describe('BCH2Electrum', () => {
       }
     });
 
-    it('BC2 peers are defined with host and port', () => {
-      expect(bc2Peers.length).toBeGreaterThanOrEqual(1);
-      for (const peer of bc2Peers) {
+    it('VOID peers are defined with host and port', () => {
+      expect(voidPeers.length).toBeGreaterThanOrEqual(1);
+      for (const peer of voidPeers) {
         expect(peer.host).toBeDefined();
         expect(typeof peer.host).toBe('string');
         expect(peer.ssl || peer.tcp).toBeTruthy();
@@ -730,13 +730,13 @@ describe('BCH2Electrum', () => {
     });
   });
 
-  // ===== BC2 explorer API fallback =====
-  describe('BC2 explorer API fallback', () => {
+  // ===== VOID explorer API fallback =====
+  describe('VOID explorer API fallback', () => {
     beforeEach(() => {
       jest.useRealTimers();
     });
 
-    describe('getBC2Balance', () => {
+    describe('getVoidBalance', () => {
       it('uses explorer API as primary method', async () => {
         mockFetch.mockResolvedValueOnce({
           ok: true,
@@ -748,7 +748,7 @@ describe('BCH2Electrum', () => {
         });
         const mod = getFreshModule();
 
-        const balance = await mod.getBC2Balance('1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa');
+        const balance = await mod.getVoidBalance('1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa');
 
         expect(balance).toEqual({ confirmed: 80000, unconfirmed: 5000 });
         expect(mockFetch).toHaveBeenCalledWith(
@@ -767,7 +767,7 @@ describe('BCH2Electrum', () => {
         });
         const mod = getFreshModule();
 
-        await mod.getBC2Balance('testaddr123');
+        await mod.getVoidBalance('testaddr123');
 
         expect(mockFetch).toHaveBeenCalledWith(
           'https://explorer.bitcoin-ii.org/api/address/testaddr123',
@@ -779,7 +779,7 @@ describe('BCH2Electrum', () => {
         mockBlockchainScripthash_getBalance.mockResolvedValue({ confirmed: 5000, unconfirmed: 100 });
         const mod = getFreshModule();
 
-        const balance = await mod.getBC2Balance('1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa');
+        const balance = await mod.getVoidBalance('1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa');
 
         expect(balance).toEqual({ confirmed: 5000, unconfirmed: 100 });
       });
@@ -789,8 +789,8 @@ describe('BCH2Electrum', () => {
         mockInitElectrum.mockRejectedValue(new Error('Electrum connection refused'));
         const mod = getFreshModule();
 
-        await expect(mod.getBC2Balance('1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa')).rejects.toThrow(
-          'BC2 balance check failed',
+        await expect(mod.getVoidBalance('1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa')).rejects.toThrow(
+          'VOID balance check failed',
         );
       });
 
@@ -801,7 +801,7 @@ describe('BCH2Electrum', () => {
         });
         const mod = getFreshModule();
 
-        const balance = await mod.getBC2Balance('1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa');
+        const balance = await mod.getVoidBalance('1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa');
 
         expect(balance).toEqual({ confirmed: 0, unconfirmed: 0 });
       });
@@ -814,7 +814,7 @@ describe('BCH2Electrum', () => {
         mockInitElectrum.mockRejectedValue(new Error('Electrum down'));
         const mod = getFreshModule();
 
-        await expect(mod.getBC2Balance('1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa')).rejects.toThrow();
+        await expect(mod.getVoidBalance('1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa')).rejects.toThrow();
       });
 
       it('handles non-finite values from Electrum fallback', async () => {
@@ -825,13 +825,13 @@ describe('BCH2Electrum', () => {
         });
         const mod = getFreshModule();
 
-        const balance = await mod.getBC2Balance('1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa');
+        const balance = await mod.getVoidBalance('1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa');
 
         expect(balance).toEqual({ confirmed: 0, unconfirmed: 0 });
       });
     });
 
-    describe('getBC2Utxos', () => {
+    describe('getVOIDUtxos', () => {
       it('returns properly formatted UTXOs from explorer', async () => {
         mockFetch.mockResolvedValueOnce({
           ok: true,
@@ -843,7 +843,7 @@ describe('BCH2Electrum', () => {
         });
         const mod = getFreshModule();
 
-        const utxos = await mod.getBC2Utxos('1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa');
+        const utxos = await mod.getVOIDUtxos('1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa');
 
         expect(utxos).toHaveLength(2);
         expect(utxos[0]).toEqual({
@@ -861,7 +861,7 @@ describe('BCH2Electrum', () => {
         });
         const mod = getFreshModule();
 
-        await mod.getBC2Utxos('testaddr');
+        await mod.getVOIDUtxos('testaddr');
 
         expect(mockFetch).toHaveBeenCalledWith(
           'https://explorer.bitcoin-ii.org/api/address/testaddr/utxo',
@@ -880,7 +880,7 @@ describe('BCH2Electrum', () => {
         });
         const mod = getFreshModule();
 
-        const utxos = await mod.getBC2Utxos('1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa');
+        const utxos = await mod.getVOIDUtxos('1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa');
 
         expect(utxos).toHaveLength(1);
       });
@@ -896,7 +896,7 @@ describe('BCH2Electrum', () => {
         });
         const mod = getFreshModule();
 
-        const utxos = await mod.getBC2Utxos('1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa');
+        const utxos = await mod.getVOIDUtxos('1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa');
 
         expect(utxos).toHaveLength(1);
       });
@@ -906,12 +906,12 @@ describe('BCH2Electrum', () => {
         mockInitElectrum.mockRejectedValue(new Error('Electrum down'));
         const mod = getFreshModule();
 
-        await expect(mod.getBC2Utxos('1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa'))
-          .rejects.toThrow('BC2 UTXO fetch failed');
+        await expect(mod.getVOIDUtxos('1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa'))
+          .rejects.toThrow('VOID UTXO fetch failed');
       });
     });
 
-    describe('getBC2Transactions', () => {
+    describe('getVOIDTransactions', () => {
       it('returns formatted transaction history from explorer', async () => {
         mockFetch.mockResolvedValueOnce({
           ok: true,
@@ -923,7 +923,7 @@ describe('BCH2Electrum', () => {
         });
         const mod = getFreshModule();
 
-        const txs = await mod.getBC2Transactions('1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa');
+        const txs = await mod.getVOIDTransactions('1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa');
 
         expect(txs).toHaveLength(2);
         expect(txs[0]).toEqual({
@@ -937,8 +937,8 @@ describe('BCH2Electrum', () => {
         mockFetch.mockRejectedValueOnce(new Error('Network error'));
         const mod = getFreshModule();
 
-        await expect(mod.getBC2Transactions('1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa'))
-          .rejects.toThrow('BC2 transaction history fetch failed');
+        await expect(mod.getVOIDTransactions('1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa'))
+          .rejects.toThrow('VOID transaction history fetch failed');
       });
 
       it('limits to 500 transactions', async () => {
@@ -952,15 +952,15 @@ describe('BCH2Electrum', () => {
         });
         const mod = getFreshModule();
 
-        const txs = await mod.getBC2Transactions('1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa');
+        const txs = await mod.getVOIDTransactions('1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa');
 
         expect(txs).toHaveLength(500);
       });
     });
 
-    describe('broadcastBC2Transaction', () => {
-      // Valid hex string >= 20 chars for broadcastBC2Transaction input validation
-      const VALID_BC2_TX_HEX = '0200000001abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890';
+    describe('broadcastVOIDTransaction', () => {
+      // Valid hex string >= 20 chars for broadcastVOIDTransaction input validation
+      const VALID_VOID_TX_HEX = '0200000001abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890';
 
       it('broadcasts via explorer API and returns txid', async () => {
         const validTxid = 'a'.repeat(64);
@@ -970,7 +970,7 @@ describe('BCH2Electrum', () => {
         });
         const mod = getFreshModule();
 
-        const result = await mod.broadcastBC2Transaction(VALID_BC2_TX_HEX);
+        const result = await mod.broadcastVOIDTransaction(VALID_VOID_TX_HEX);
 
         expect(result).toBe(validTxid);
         expect(mockFetch).toHaveBeenCalledWith(
@@ -978,7 +978,7 @@ describe('BCH2Electrum', () => {
           expect.objectContaining({
             method: 'POST',
             headers: { 'Content-Type': 'text/plain' },
-            body: VALID_BC2_TX_HEX,
+            body: VALID_VOID_TX_HEX,
           }),
         );
       });
@@ -991,7 +991,7 @@ describe('BCH2Electrum', () => {
         });
         const mod = getFreshModule();
 
-        const result = await mod.broadcastBC2Transaction(VALID_BC2_TX_HEX);
+        const result = await mod.broadcastVOIDTransaction(VALID_VOID_TX_HEX);
 
         expect(result).toBe(validTxid);
       });
@@ -1006,7 +1006,7 @@ describe('BCH2Electrum', () => {
         mockBlockchainTransaction_broadcast.mockResolvedValue(validTxid);
         const mod = getFreshModule();
 
-        const result = await mod.broadcastBC2Transaction(VALID_BC2_TX_HEX);
+        const result = await mod.broadcastVOIDTransaction(VALID_VOID_TX_HEX);
 
         expect(result).toBe(validTxid);
       });
@@ -1020,7 +1020,7 @@ describe('BCH2Electrum', () => {
         mockInitElectrum.mockRejectedValue(new Error('Electrum timeout'));
         const mod = getFreshModule();
 
-        await expect(mod.broadcastBC2Transaction(VALID_BC2_TX_HEX)).rejects.toThrow('BC2 broadcast failed');
+        await expect(mod.broadcastVOIDTransaction(VALID_VOID_TX_HEX)).rejects.toThrow('VOID broadcast failed');
       });
     });
   });
@@ -1065,32 +1065,32 @@ describe('BCH2Electrum', () => {
     });
   });
 
-  // ===== connectBC2 mutex =====
-  describe('connectBC2 mutex', () => {
+  // ===== connectVOID mutex =====
+  describe('connectVOID mutex', () => {
     beforeEach(() => {
       jest.useRealTimers();
     });
 
-    it('connects BC2 and returns balance via Electrum fallback', async () => {
+    it('connects VOID and returns balance via Electrum fallback', async () => {
       mockInitElectrum.mockResolvedValue(undefined);
       mockBlockchainHeaders_subscribe.mockResolvedValue({ height: 100, time: 1234567890 });
       mockBlockchainScripthash_getBalance.mockResolvedValue({ confirmed: 200, unconfirmed: 0 });
-      // Explorer API fails so we fall back to Electrum (which triggers connectBC2)
+      // Explorer API fails so we fall back to Electrum (which triggers connectVOID)
       mockFetch.mockRejectedValueOnce(new Error('Network error'));
 
       const mod = getFreshModule();
 
-      // getBC2Balance should fall back to Electrum and succeed
-      const balance = await mod.getBC2Balance('1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa');
+      // getVoidBalance should fall back to Electrum and succeed
+      const balance = await mod.getVoidBalance('1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa');
 
       expect(balance).toEqual({ confirmed: 200, unconfirmed: 0 });
-      // initElectrum should have been called to establish the BC2 connection
+      // initElectrum should have been called to establish the VOID connection
       expect(mockInitElectrum).toHaveBeenCalled();
     });
   });
 
-  // ===== getBC2Utxos Electrum fallback success =====
-  describe('getBC2Utxos Electrum fallback success', () => {
+  // ===== getVOIDUtxos Electrum fallback success =====
+  describe('getVOIDUtxos Electrum fallback success', () => {
     beforeEach(() => {
       jest.useRealTimers();
     });
@@ -1105,7 +1105,7 @@ describe('BCH2Electrum', () => {
       ]);
       const mod = getFreshModule();
 
-      const utxos = await mod.getBC2Utxos('1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa');
+      const utxos = await mod.getVOIDUtxos('1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa');
 
       expect(utxos).toHaveLength(2);
       expect(utxos[0]).toEqual({
@@ -1123,14 +1123,14 @@ describe('BCH2Electrum', () => {
     });
   });
 
-  // ===== broadcastBC2Transaction Electrum fallback with invalid txid =====
-  describe('broadcastBC2Transaction Electrum fallback with invalid txid', () => {
+  // ===== broadcastVOIDTransaction Electrum fallback with invalid txid =====
+  describe('broadcastVOIDTransaction Electrum fallback with invalid txid', () => {
     beforeEach(() => {
       jest.useRealTimers();
     });
 
     it('throws when Electrum fallback returns non-txid response', async () => {
-      const VALID_BC2_HEX = '0200000001abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890';
+      const VALID_VOID_HEX = '0200000001abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890';
       // Explorer fails
       mockFetch.mockResolvedValueOnce({
         ok: false,
@@ -1141,12 +1141,12 @@ describe('BCH2Electrum', () => {
       mockBlockchainTransaction_broadcast.mockResolvedValue('error: mempool full');
       const mod = getFreshModule();
 
-      await expect(mod.broadcastBC2Transaction(VALID_BC2_HEX)).rejects.toThrow(/Unexpected Electrum response|BC2 broadcast failed/);
+      await expect(mod.broadcastVOIDTransaction(VALID_VOID_HEX)).rejects.toThrow(/Unexpected Electrum response|VOID broadcast failed/);
     });
   });
 
   // ===== addressToScriptHashLegacy CashAddr fallback =====
-  describe('addressToScriptHashLegacy CashAddr fallback (via getBC2Balance)', () => {
+  describe('addressToScriptHashLegacy CashAddr fallback (via getVoidBalance)', () => {
     beforeEach(() => {
       jest.useRealTimers();
     });
@@ -1159,7 +1159,7 @@ describe('BCH2Electrum', () => {
 
       // Pass a CashAddr address (not a legacy address) — bs58check.decode will throw,
       // then the catch block will try decodeCashAddr as fallback
-      const balance = await mod.getBC2Balance(VALID_P2PKH_ADDR);
+      const balance = await mod.getVoidBalance(VALID_P2PKH_ADDR);
 
       expect(balance).toEqual({ confirmed: 1234, unconfirmed: 0 });
       // Verify a scripthash was passed to the Electrum call
@@ -1183,7 +1183,7 @@ describe('BCH2Electrum', () => {
   });
 
   // ===== addressToScriptHashLegacy P2SH version byte 0x05 =====
-  describe('addressToScriptHashLegacy P2SH path (via getBC2Balance)', () => {
+  describe('addressToScriptHashLegacy P2SH path (via getVoidBalance)', () => {
     beforeEach(() => {
       jest.useRealTimers();
     });
@@ -1197,7 +1197,7 @@ describe('BCH2Electrum', () => {
       // Use a P2SH CashAddr address (type 1) - bs58check.decode will fail on CashAddr,
       // falling through to CashAddr decoding where type=1 maps to versionByte=0x05,
       // which triggers the P2SH script path (OP_HASH160 <hash> OP_EQUAL)
-      const balance = await mod.getBC2Balance(VALID_P2SH_ADDR);
+      const balance = await mod.getVoidBalance(VALID_P2SH_ADDR);
 
       expect(balance).toEqual({ confirmed: 5000, unconfirmed: 0 });
       // Verify a valid 64-char hex scripthash was passed to the Electrum call
@@ -1262,7 +1262,7 @@ describe('BCH2Electrum', () => {
         json: () => Promise.resolve({ result: { ismine: true, iswatchonly: false }, error: null }),
       });
 
-      // Second rpcCall: getbalance returns 1.5 BCH2 (in BTC denomination)
+      // Second rpcCall: getbalance returns 1.5 VOID (in BTC denomination)
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: () => Promise.resolve({ result: 1.5, error: null }),
@@ -1285,7 +1285,7 @@ describe('BCH2Electrum', () => {
         json: () => Promise.resolve({ result: { ismine: false, iswatchonly: true }, error: null }),
       });
 
-      // getbalance returns 0.25 BCH2
+      // getbalance returns 0.25 VOID
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: () => Promise.resolve({ result: 0.25, error: null }),
@@ -1347,8 +1347,8 @@ describe('BCH2Electrum', () => {
     });
   });
 
-  // ===== getBC2Utxos non-OK response path =====
-  describe('getBC2Utxos non-OK response (double failure)', () => {
+  // ===== getVOIDUtxos non-OK response path =====
+  describe('getVOIDUtxos non-OK response (double failure)', () => {
     beforeEach(() => {
       jest.useRealTimers();
     });
@@ -1360,23 +1360,23 @@ describe('BCH2Electrum', () => {
         status: 500,
         text: () => Promise.resolve('Server Error'),
       });
-      // Electrum fallback also fails (connectBC2 throws)
+      // Electrum fallback also fails (connectVOID throws)
       mockInitElectrum.mockRejectedValue(new Error('Electrum down'));
       const mod = getFreshModule();
 
-      await expect(mod.getBC2Utxos('1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa'))
-        .rejects.toThrow('BC2 UTXO fetch failed');
+      await expect(mod.getVOIDUtxos('1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa'))
+        .rejects.toThrow('VOID UTXO fetch failed');
     });
   });
 
-  // ===== getBC2BalanceByScripthash non-finite value guard =====
-  describe('getBC2BalanceByScripthash non-finite value guard', () => {
+  // ===== getVoidBalanceByScripthash non-finite value guard =====
+  describe('getVoidBalanceByScripthash non-finite value guard', () => {
     beforeEach(() => {
       jest.useRealTimers();
     });
 
     it('returns { confirmed: 0, unconfirmed: 0 } when Electrum returns NaN/Infinity', async () => {
-      // Make connectBC2 succeed (initElectrum + headers_subscribe)
+      // Make connectVOID succeed (initElectrum + headers_subscribe)
       mockInitElectrum.mockResolvedValue(undefined);
       mockBlockchainHeaders_subscribe.mockResolvedValue({ height: 100, time: 1234567890 });
 
@@ -1387,7 +1387,7 @@ describe('BCH2Electrum', () => {
       });
 
       const mod = getFreshModule();
-      const balance = await mod.getBC2BalanceByScripthash('a'.repeat(64));
+      const balance = await mod.getVoidBalanceByScripthash('a'.repeat(64));
 
       expect(balance).toEqual({ confirmed: 0, unconfirmed: 0 });
     });
@@ -1475,7 +1475,7 @@ describe('BCH2Electrum', () => {
       // Only 5 valid CHARSET characters — decodeCashAddr returns null for < 8 values
       const p = mod.getBalanceByAddress('bitcoincashii:qpzry');
       jest.runAllTimers();
-      await expect(p).rejects.toThrow('Invalid BCH2 address');
+      await expect(p).rejects.toThrow('Invalid VOID address');
     });
   });
 
@@ -1494,7 +1494,7 @@ describe('BCH2Electrum', () => {
 
       const p = mod.getBalanceByAddress(corrupted);
       jest.runAllTimers();
-      await expect(p).rejects.toThrow('Invalid BCH2 address');
+      await expect(p).rejects.toThrow('Invalid VOID address');
     });
   });
 
@@ -1519,12 +1519,12 @@ describe('BCH2Electrum', () => {
       // the function correctly rejects such addresses.
       const p = mod.getBalanceByAddress('bitcoincashii:qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq');
       jest.runAllTimers();
-      await expect(p).rejects.toThrow('Invalid BCH2 address');
+      await expect(p).rejects.toThrow('Invalid VOID address');
     });
   });
 
   // ===== addressToScriptHashLegacy: bs58check.decode exception path =====
-  describe('addressToScriptHashLegacy bs58check exception (via getBC2Balance)', () => {
+  describe('addressToScriptHashLegacy bs58check exception (via getVoidBalance)', () => {
     beforeEach(() => {
       jest.useRealTimers();
     });
@@ -1541,12 +1541,12 @@ describe('BCH2Electrum', () => {
       // '!!!invalid!!!' is neither valid base58 nor valid CashAddr
       // bs58check.decode will throw, then CashAddr decode will return null,
       // then the code throws 'Invalid address format'
-      await expect(mod.getBC2Balance('!!!invalid!!!')).rejects.toThrow();
+      await expect(mod.getVoidBalance('!!!invalid!!!')).rejects.toThrow();
     });
   });
 
   // ===== addressToScriptHashLegacy: CashAddr fallback when legacy decode fails =====
-  describe('addressToScriptHashLegacy CashAddr fallback (via getBC2Balance)', () => {
+  describe('addressToScriptHashLegacy CashAddr fallback (via getVoidBalance)', () => {
     beforeEach(() => {
       jest.useRealTimers();
     });
@@ -1559,7 +1559,7 @@ describe('BCH2Electrum', () => {
 
       // CashAddr address — bs58check.decode fails, falls through to CashAddr decoder
       // type=0 => P2PKH => versionByte=0x00 => P2PKH script path
-      const balance = await mod.getBC2Balance(VALID_P2PKH_ADDR);
+      const balance = await mod.getVoidBalance(VALID_P2PKH_ADDR);
 
       expect(balance).toEqual({ confirmed: 42000, unconfirmed: 0 });
       expect(mockBlockchainScripthash_getBalance).toHaveBeenCalledWith(
@@ -1569,7 +1569,7 @@ describe('BCH2Electrum', () => {
   });
 
   // ===== addressToScriptHashLegacy: version byte 0x05 (P2SH) branching =====
-  describe('addressToScriptHashLegacy P2SH version byte 0x05 (via getBC2Balance)', () => {
+  describe('addressToScriptHashLegacy P2SH version byte 0x05 (via getVoidBalance)', () => {
     beforeEach(() => {
       jest.useRealTimers();
     });
@@ -1581,7 +1581,7 @@ describe('BCH2Electrum', () => {
       const mod = getFreshModule();
 
       // P2SH CashAddr: type=1 => versionByte=0x05 => P2SH script
-      const balance = await mod.getBC2Balance(VALID_P2SH_ADDR);
+      const balance = await mod.getVoidBalance(VALID_P2SH_ADDR);
 
       expect(balance).toEqual({ confirmed: 7777, unconfirmed: 0 });
 
@@ -1682,8 +1682,8 @@ describe('BCH2Electrum', () => {
     });
   });
 
-  // ===== 3. getBC2Utxos() non-array response =====
-  describe('getBC2Utxos() non-array response from explorer', () => {
+  // ===== 3. getVOIDUtxos() non-array response =====
+  describe('getVOIDUtxos() non-array response from explorer', () => {
     beforeEach(() => {
       jest.useRealTimers();
     });
@@ -1701,8 +1701,8 @@ describe('BCH2Electrum', () => {
       // When response.json() returns a non-array, the code throws
       // 'Explorer API returned invalid UTXO data', triggering Electrum fallback
       // which also fails, so the outer catch throws.
-      await expect(mod.getBC2Utxos('testaddr'))
-        .rejects.toThrow('BC2 UTXO fetch failed');
+      await expect(mod.getVOIDUtxos('testaddr'))
+        .rejects.toThrow('VOID UTXO fetch failed');
     });
 
     it('throws when explorer returns object response and Electrum also fails', async () => {
@@ -1715,19 +1715,19 @@ describe('BCH2Electrum', () => {
       mockInitElectrum.mockRejectedValue(new Error('Electrum down'));
       const mod = getFreshModule();
 
-      await expect(mod.getBC2Utxos('testaddr'))
-        .rejects.toThrow('BC2 UTXO fetch failed');
+      await expect(mod.getVOIDUtxos('testaddr'))
+        .rejects.toThrow('VOID UTXO fetch failed');
     });
   });
 
-  // ===== 4. broadcastBC2Transaction() txid not a string (number/object) =====
-  describe('broadcastBC2Transaction() txid not a string', () => {
+  // ===== 4. broadcastVOIDTransaction() txid not a string (number/object) =====
+  describe('broadcastVOIDTransaction() txid not a string', () => {
     beforeEach(() => {
       jest.useRealTimers();
     });
 
     it('rejects when response JSON has txid as a number', async () => {
-      const VALID_BC2_HEX = '0200000001abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890';
+      const VALID_VOID_HEX = '0200000001abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890';
       // Explorer returns JSON with txid as a number
       mockFetch.mockResolvedValueOnce({
         ok: true,
@@ -1741,11 +1741,11 @@ describe('BCH2Electrum', () => {
       // JSON.parse extracts txid=12345, but the regex test /^[a-fA-F0-9]{64}$/
       // checks parsed.txid which is a number - .test(12345) converts to string "12345"
       // which doesn't match the 64-char hex pattern. So validation fails.
-      await expect(mod.broadcastBC2Transaction(VALID_BC2_HEX)).rejects.toThrow(/Broadcast|BC2 broadcast failed/);
+      await expect(mod.broadcastVOIDTransaction(VALID_VOID_HEX)).rejects.toThrow(/Broadcast|VOID broadcast failed/);
     });
 
     it('rejects when response JSON has txid as an object', async () => {
-      const VALID_BC2_HEX = '0200000001abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890';
+      const VALID_VOID_HEX = '0200000001abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890';
       mockFetch.mockResolvedValueOnce({
         ok: true,
         text: () => Promise.resolve(JSON.stringify({ txid: { hash: 'abc' } })),
@@ -1753,7 +1753,7 @@ describe('BCH2Electrum', () => {
       mockInitElectrum.mockRejectedValue(new Error('Electrum down'));
       const mod = getFreshModule();
 
-      await expect(mod.broadcastBC2Transaction(VALID_BC2_HEX)).rejects.toThrow(/Broadcast|BC2 broadcast failed/);
+      await expect(mod.broadcastVOIDTransaction(VALID_VOID_HEX)).rejects.toThrow(/Broadcast|VOID broadcast failed/);
     });
   });
 
@@ -1793,7 +1793,7 @@ describe('BCH2Electrum', () => {
       jest.useRealTimers();
     });
 
-    it('throws when neither bs58check nor CashAddr can decode (error propagates through getBC2Balance)', async () => {
+    it('throws when neither bs58check nor CashAddr can decode (error propagates through getVoidBalance)', async () => {
       // Explorer API fails to force Electrum fallback (which calls addressToScriptHashLegacy)
       mockFetch.mockRejectedValueOnce(new Error('Explorer down'));
       mockInitElectrum.mockResolvedValue(undefined);
@@ -1803,9 +1803,9 @@ describe('BCH2Electrum', () => {
       // '@@@invalidgarbage@@@' is neither valid base58check nor valid CashAddr.
       // bs58check.decode throws, then decodeCashAddr returns null, which causes
       // addressToScriptHashLegacy to throw 'Invalid address format'.
-      // This error is caught by the inner catch (electrumError) in getBC2Balance,
-      // which re-throws as 'BC2 balance check failed: both Explorer API and Electrum unavailable'.
-      await expect(mod.getBC2Balance('@@@invalidgarbage@@@')).rejects.toThrow('BC2 balance check failed');
+      // This error is caught by the inner catch (electrumError) in getVoidBalance,
+      // which re-throws as 'VOID balance check failed: both Explorer API and Electrum unavailable'.
+      await expect(mod.getVoidBalance('@@@invalidgarbage@@@')).rejects.toThrow('VOID balance check failed');
     });
   });
 

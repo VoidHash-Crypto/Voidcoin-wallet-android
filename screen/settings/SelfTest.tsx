@@ -390,7 +390,7 @@ const SelfTestContent: React.FC<{ state: TState; onPressImportDocument: () => vo
           })()
         )}
         <BlueSpacing20 />
-        <SaveFileButton fileName="bch2-selftest.txt" fileContent={'Success on ' + new Date().toUTCString()}>
+        <SaveFileButton fileName="void-selftest.txt" fileContent={'Success on ' + new Date().toUTCString()}>
           <Button title="Test Save to Storage" />
         </SaveFileButton>
         <BlueSpacing20 />

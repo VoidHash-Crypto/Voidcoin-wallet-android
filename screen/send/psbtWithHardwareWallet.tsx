@@ -182,7 +182,7 @@ const PsbtWithHardwareWallet = () => {
   };
 
   const handleOnVerifyPressed = () => {
-    // coinb.in is BTC-specific. BCH2 has no equivalent online tx verification tool yet.
+    // coinb.in is BTC-specific. VOID has no equivalent online tx verification tool yet.
     // Copy hex to clipboard instead so user can verify manually.
     if (txHex) {
       Clipboard.setString(txHex);

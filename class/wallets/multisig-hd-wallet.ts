@@ -443,7 +443,7 @@ export class MultisigHDWallet extends AbstractHDElectrumWallet {
   }
 
   getSecret(coordinationSetup = false) {
-    let ret = '# Bitcoin Cash II Wallet Multisig setup file\n';
+    let ret = '# VoidCoin Wallet Multisig setup file\n';
     if (coordinationSetup) ret += '# this file contains only public keys and is safe to\n# distribute among cosigners\n';
     if (!coordinationSetup) ret += '# this file may contain private information\n';
     ret += '#\n';

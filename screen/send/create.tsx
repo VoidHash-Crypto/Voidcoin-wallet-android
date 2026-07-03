@@ -160,7 +160,7 @@ const SendCreate = () => {
       <TouchableOpacity accessibilityRole="button" style={styles.actionTouch} onPress={() => Clipboard.setString(tx)}>
         <Text style={styles.actionText}>{loc.send.create_copy}</Text>
       </TouchableOpacity>
-      {/* coinb.in verification removed — BTC-specific, not compatible with BCH2 */}
+      {/* coinb.in verification removed — BTC-specific, not compatible with VOID */}
     </View>
   );
 

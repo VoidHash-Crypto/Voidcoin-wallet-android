@@ -506,11 +506,11 @@ const ReceiveDetails = () => {
     if (number > 0) {
       switch (customUnit) {
         case BitcoinUnit.BTC:
-          return customAmount + ' BCH2';
+          return customAmount + ' VOID';
         case BitcoinUnit.SATS:
-          return satoshiToBTC(number) + ' BCH2';
+          return satoshiToBTC(number) + ' VOID';
         case BitcoinUnit.LOCAL_CURRENCY:
-          return fiatToBTC(number) + ' BCH2';
+          return fiatToBTC(number) + ' VOID';
       }
       return customAmount + ' ' + customUnit;
     } else {

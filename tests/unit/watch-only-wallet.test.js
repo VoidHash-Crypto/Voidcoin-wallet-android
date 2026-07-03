@@ -615,7 +615,7 @@ describe('Watch only wallet', () => {
         value: 51432,
         address: '3GCvDBAktgQQtsbN6x5DYiQCMmgZ9Yk8BK',
         vout: 0,
-        txid: 'b2ac59bc282083498d1e87805d89bef9d3f3bc216c1d2c4dfaa2e2911b547100',
+        txid: 'b2ac59void82083498d1e87805d89bef9d3f3void16c1d2c4dfaa2e2911b547100',
         wif: false,
         confirmations: 132402,
       },

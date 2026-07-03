@@ -118,7 +118,7 @@ describe('BlueWallet UI Tests - no wallets', () => {
     await waitForId('ElectrumSettings');
 
     // network -> electrum server
-    // change electrum server to electrum.bch2.org and revert it back
+    // change electrum server to electrum.void.org and revert it back
     // skip this test on iOS. HeaderMenuButton tap triggers a keyboard open for some reason.
     if (device.getPlatform() === 'andoid') {
       await element(by.id('ElectrumSettings')).tap();
@@ -126,7 +126,7 @@ describe('BlueWallet UI Tests - no wallets', () => {
         .toBeVisible()
         .whileElement(by.id('ElectrumSettingsScrollView'))
         .scroll(500, 'down'); // in case emu screen is small and it doesnt fit
-      await element(by.id('HostInput')).replaceText('electrum.bch2.org\n');
+      await element(by.id('HostInput')).replaceText('electrum.void.org\n');
       await element(by.id('HostInput')).tapReturnKey();
       await waitForKeyboardToClose();
       await element(by.id('PortInput')).replaceText('50001\n');

@@ -3,7 +3,7 @@ import DefaultPreference from 'react-native-default-preference';
 import { Transaction, TWallet } from '../class/wallets/types';
 import { useSettings } from '../hooks/context/useSettings';
 import { useStorage } from '../hooks/context/useStorage';
-import { GROUP_IO_BCH2 } from '../blue_modules/currency';
+import { GROUP_IO_VOID } from '../blue_modules/currency';
 import debounce from '../blue_modules/debounce';
 
 enum WidgetCommunicationKeys {
@@ -19,7 +19,7 @@ const WIDGET_CLEARED_VALUE = '0';
 
 const secondsToMilliseconds = (seconds: number): number => seconds * 1000;
 
-DefaultPreference.setName(GROUP_IO_BCH2);
+DefaultPreference.setName(GROUP_IO_VOID);
 
 export const isBalanceDisplayAllowed = async (): Promise<boolean> => {
   try {

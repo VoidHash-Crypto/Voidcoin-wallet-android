@@ -1,18 +1,18 @@
 /**
- * Tests for BCH2 Airdrop claiming module
+ * Tests for VOID Airdrop claiming module
  */
 
-// Mock BCH2Electrum before importing the module under test
+// Mock VoidElectrum before importing the module under test
 const mockGetBalanceByAddress = jest.fn();
 const mockGetBalanceByScripthash = jest.fn();
-const mockGetBC2Balance = jest.fn();
-const mockGetBC2BalanceByScripthash = jest.fn();
+const mockGetVOIDBalance = jest.fn();
+const mockGetVOIDBalanceByScripthash = jest.fn();
 
-jest.mock('../../blue_modules/BCH2Electrum', () => ({
+jest.mock('../../blue_modules/VoidElectrum', () => ({
   getBalanceByAddress: mockGetBalanceByAddress,
   getBalanceByScripthash: mockGetBalanceByScripthash,
-  getBC2Balance: mockGetBC2Balance,
-  getBC2BalanceByScripthash: mockGetBC2BalanceByScripthash,
+  getVoidBalance: mockGetVOIDBalance,
+  getVoidBalanceByScripthash: mockGetVOIDBalanceByScripthash,
   connectMain: jest.fn(),
   disconnectAll: jest.fn(),
 }));
@@ -37,10 +37,10 @@ jest.mock('../../blue_modules/noble_ecc', () => {
   };
 });
 
-// Mock the BCH2Wallet class
-jest.mock('../../class/wallets/bch2-wallet', () => {
+// Mock the VoidWallet class
+jest.mock('../../class/wallets/void-wallet', () => {
   return {
-    BCH2Wallet: jest.fn().mockImplementation(() => ({
+    VoidWallet: jest.fn().mockImplementation(() => ({
       setSecret: jest.fn().mockReturnThis(),
       getAddress: jest.fn().mockReturnValue('bitcoincashii:qmockaddress'),
       fetchBalance: jest.fn().mockResolvedValue(undefined),
@@ -54,7 +54,7 @@ jest.mock('../../class/wallets/bch2-wallet', () => {
 import {
   claimFromWIF,
   claimFromMnemonic,
-  importBC2Wallet,
+  importVOIDWallet,
   getTotalClaimable,
   bc1AddressToScripthash,
   parseDescriptor,
@@ -64,7 +64,7 @@ import {
   buildScanResult,
   AirdropClaimResult,
   AirdropScanResult,
-} from '../../class/bch2-airdrop';
+} from '../../class/void-airdrop';
 
 const TEST_MNEMONIC = 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about';
 
@@ -85,8 +85,8 @@ beforeEach(() => {
   // Default: return zero balance
   mockGetBalanceByAddress.mockResolvedValue({ confirmed: 0, unconfirmed: 0 });
   mockGetBalanceByScripthash.mockResolvedValue({ confirmed: 0, unconfirmed: 0 });
-  mockGetBC2Balance.mockResolvedValue({ confirmed: 0, unconfirmed: 0 });
-  mockGetBC2BalanceByScripthash.mockResolvedValue({ confirmed: 0, unconfirmed: 0 });
+  mockGetVOIDBalance.mockResolvedValue({ confirmed: 0, unconfirmed: 0 });
+  mockGetVOIDBalanceByScripthash.mockResolvedValue({ confirmed: 0, unconfirmed: 0 });
 });
 
 // ============================================================================
@@ -99,9 +99,9 @@ describe('WIF import', () => {
     const result = await claimFromWIF(TEST_WIF_COMPRESSED);
 
     expect(result.success).toBe(true);
-    expect(result.bch2Address).toBeTruthy();
-    expect(result.bch2Address.startsWith('bitcoincashii:')).toBe(true);
-    // BC2 legacy address should start with 1
+    expect(result.voidAddress).toBeTruthy();
+    expect(result.voidAddress.startsWith('bitcoincashii:')).toBe(true);
+    // VOID legacy address should start with 1
     expect(result.address).toMatch(/^[13]/);
     expect(result.balance).toBe(100000);
   });
@@ -112,7 +112,7 @@ describe('WIF import', () => {
     const result = await claimFromWIF(TEST_WIF_UNCOMPRESSED);
 
     expect(result.success).toBe(true);
-    expect(result.bch2Address.startsWith('bitcoincashii:')).toBe(true);
+    expect(result.voidAddress.startsWith('bitcoincashii:')).toBe(true);
     expect(result.balance).toBe(50000);
   });
 
@@ -126,7 +126,7 @@ describe('WIF import', () => {
     expect(r1.success).toBe(true);
     expect(r2.success).toBe(true);
     // Different because compressed vs uncompressed pubkey yields different hash160
-    expect(r1.bch2Address).not.toBe(r2.bch2Address);
+    expect(r1.voidAddress).not.toBe(r2.voidAddress);
   });
 
   it('invalid WIF returns error result', async () => {
@@ -162,14 +162,14 @@ describe('WIF import', () => {
     expect(result.balance).toBe(30000);
   });
 
-  it('WIF claim reports BC2 balance for comparison', async () => {
+  it('WIF claim reports VOID balance for comparison', async () => {
     mockGetBalanceByAddress.mockResolvedValue({ confirmed: 10000, unconfirmed: 0 });
-    mockGetBC2Balance.mockResolvedValue({ confirmed: 50000, unconfirmed: 0 });
+    mockGetVOIDBalance.mockResolvedValue({ confirmed: 50000, unconfirmed: 0 });
 
     const result = await claimFromWIF(TEST_WIF_COMPRESSED);
 
     expect(result.success).toBe(true);
-    expect(result.bc2Balance).toBe(50000);
+    expect(result.voidBalance).toBe(50000);
   });
 });
 
@@ -193,7 +193,7 @@ describe('Mnemonic import', () => {
     expect(results.length).toBeGreaterThanOrEqual(1);
     const firstResult = results[0];
     expect(firstResult.success).toBe(true);
-    expect(firstResult.bch2Address.startsWith('bitcoincashii:')).toBe(true);
+    expect(firstResult.voidAddress.startsWith('bitcoincashii:')).toBe(true);
     expect(firstResult.balance).toBe(100000);
   });
 
@@ -212,7 +212,7 @@ describe('Mnemonic import', () => {
     expect(results).toHaveLength(1);
     expect(results[0].success).toBe(false);
     expect(results[0].balance).toBe(0);
-    expect(results[0].error).toContain('No BCH2 balance found');
+    expect(results[0].error).toContain('No VOID balance found');
   });
 
   it('mnemonic scan finds balances across multiple derivation paths', async () => {
@@ -253,7 +253,7 @@ describe('Mnemonic import', () => {
 // Balance Checking
 // ============================================================================
 describe('Balance checking', () => {
-  it('checks BCH2 balance via Electrum', async () => {
+  it('checks VOID balance via Electrum', async () => {
     mockGetBalanceByAddress.mockResolvedValue({ confirmed: 75000, unconfirmed: 5000 });
 
     const result = await claimFromWIF(TEST_WIF_COMPRESSED);
@@ -264,15 +264,15 @@ describe('Balance checking', () => {
     expect(result.balance).toBeGreaterThanOrEqual(80000);
   });
 
-  it('checks both BCH2 and BC2 balances', async () => {
+  it('checks both VOID and VOID balances', async () => {
     mockGetBalanceByAddress.mockResolvedValue({ confirmed: 10000, unconfirmed: 0 });
-    mockGetBC2Balance.mockResolvedValue({ confirmed: 50000, unconfirmed: 0 });
+    mockGetVOIDBalance.mockResolvedValue({ confirmed: 50000, unconfirmed: 0 });
 
     const result = await claimFromWIF(TEST_WIF_COMPRESSED);
 
     expect(result.success).toBe(true);
-    expect(result.bc2Balance).toBe(50000);
-    expect(mockGetBC2Balance).toHaveBeenCalled();
+    expect(result.voidBalance).toBe(50000);
+    expect(mockGetVOIDBalance).toHaveBeenCalled();
   });
 
   it('no balance found returns zero balance', async () => {
@@ -281,7 +281,7 @@ describe('Balance checking', () => {
 
     expect(result.success).toBe(false);
     expect(result.balance).toBe(0);
-    expect(result.error).toBe('No BCH2 balance found for this key');
+    expect(result.error).toBe('No VOID balance found for this key');
   });
 
   it('getTotalClaimable() sums balances across addresses', async () => {
@@ -353,7 +353,7 @@ describe('SegWit recovery (bc1 addresses)', () => {
     expect(result).toBeNull();
   });
 
-  it('sends SegWit recovery to BCH2 CashAddr destination', async () => {
+  it('sends SegWit recovery to VOID CashAddr destination', async () => {
     // Only bc1 (native segwit) balance, no legacy.
     mockGetBalanceByAddress.mockResolvedValue({ confirmed: 0, unconfirmed: 0 });
     mockGetBalanceByScripthash.mockImplementation(async (sh: string) => {
@@ -365,8 +365,8 @@ describe('SegWit recovery (bc1 addresses)', () => {
 
     expect(result.success).toBe(true);
     expect(result.balance).toBe(100000);
-    // The BCH2 address should always be CashAddr
-    expect(result.bch2Address.startsWith('bitcoincashii:')).toBe(true);
+    // The VOID address should always be CashAddr
+    expect(result.voidAddress.startsWith('bitcoincashii:')).toBe(true);
     // The source address should be bc1 (SegWit)
     expect(result.address.startsWith('bc1')).toBe(true);
   });
@@ -392,14 +392,14 @@ describe('Edge cases', () => {
   it('empty responses from Electrum are handled', async () => {
     mockGetBalanceByAddress.mockResolvedValue({ confirmed: 0, unconfirmed: 0 });
     mockGetBalanceByScripthash.mockResolvedValue({ confirmed: 0, unconfirmed: 0 });
-    mockGetBC2Balance.mockResolvedValue({ confirmed: 0, unconfirmed: 0 });
+    mockGetVOIDBalance.mockResolvedValue({ confirmed: 0, unconfirmed: 0 });
 
     const result = await claimFromWIF(TEST_WIF_COMPRESSED);
 
     // With all-zero balances, claimFromWIF returns success: false
     expect(result.success).toBe(false);
     expect(result.balance).toBe(0);
-    expect(result.error).toBe('No BCH2 balance found for this key');
+    expect(result.error).toBe('No VOID balance found for this key');
   });
 
   it('SegWit balance check failure does not block legacy balance', async () => {
@@ -414,24 +414,24 @@ describe('Edge cases', () => {
     expect(result.address).toMatch(/^[13]/);
   });
 
-  it('BC2 balance check failure does not block airdrop claim', async () => {
+  it('VOID balance check failure does not block airdrop claim', async () => {
     mockGetBalanceByAddress.mockResolvedValue({ confirmed: 50000, unconfirmed: 0 });
-    mockGetBC2Balance.mockRejectedValue(new Error('BC2 server down'));
+    mockGetVOIDBalance.mockRejectedValue(new Error('VOID server down'));
 
     const result = await claimFromWIF(TEST_WIF_COMPRESSED);
 
     expect(result.success).toBe(true);
     expect(result.balance).toBe(50000);
-    expect(result.bc2Balance).toBe(0);
+    expect(result.voidBalance).toBe(0);
   });
 
-  it('importBC2Wallet() creates BCH2 wallet from WIF', async () => {
-    const result = await importBC2Wallet(TEST_WIF_COMPRESSED);
+  it('importVOIDWallet() creates VOID wallet from WIF', async () => {
+    const result = await importVOIDWallet(TEST_WIF_COMPRESSED);
 
     expect(result).toBeDefined();
     expect(result.wallet).toBeDefined();
-    expect(result.bc2Address).toBeTruthy();
-    expect(result.bch2Address).toBeTruthy();
+    expect(result.voidAddress).toBeTruthy();
+    expect(result.voidAddress).toBeTruthy();
     expect(result.balance).toBeDefined();
     expect(result.balance.confirmed).toBeDefined();
     expect(result.balance.unconfirmed).toBeDefined();
@@ -505,7 +505,7 @@ describe('Mnemonic scan BIP49/BIP86 paths', () => {
     const bip49Result = results.find(r => r.address.startsWith('3'));
     expect(bip49Result).toBeDefined();
     expect(bip49Result!.balance).toBe(75000);
-    expect(bip49Result!.bch2Address.startsWith('bitcoincashii:')).toBe(true);
+    expect(bip49Result!.voidAddress.startsWith('bitcoincashii:')).toBe(true);
   });
 
   it('mnemonic scan finds BIP86 Taproot balance via scripthash', async () => {
@@ -521,13 +521,13 @@ describe('Mnemonic scan BIP49/BIP86 paths', () => {
     const taprootResult = results.find(r => r.address.startsWith('bc1p'));
     expect(taprootResult).toBeDefined();
     expect(taprootResult!.balance).toBe(42000);
-    expect(taprootResult!.bch2Address.startsWith('bitcoincashii:')).toBe(true);
+    expect(taprootResult!.voidAddress.startsWith('bitcoincashii:')).toBe(true);
   });
 });
 
 // ============================================================================
 // Internal helper functions tested via re-implementation
-// (These mirror the private helpers in bch2-airdrop.ts)
+// (These mirror the private helpers in void-airdrop.ts)
 // ============================================================================
 const crypto = require('crypto');
 
@@ -827,10 +827,10 @@ describe('Internal helper functions (re-implemented)', () => {
 });
 
 // ============================================================================
-// claimFromWIF BC2 SegWit balance path
+// claimFromWIF VOID SegWit balance path
 // ============================================================================
-describe('claimFromWIF BC2 SegWit balance', () => {
-  it('includes BC2 SegWit balance when segwitBalance > 0', async () => {
+describe('claimFromWIF VOID SegWit balance', () => {
+  it('includes VOID SegWit balance when segwitBalance > 0', async () => {
     // claimFromWIF scans 5 types: legacy, p2pk, bc1, p2sh-segwit, p2tr.
     // Scripthash calls: p2pk(1), bc1(2), p2sh-segwit(3), p2tr(4).
     // Give legacy and bc1 balances, leave others at 0.
@@ -839,41 +839,41 @@ describe('claimFromWIF BC2 SegWit balance', () => {
       if (sh === TEST_WIF_BC1_SCRIPTHASH) return { confirmed: 30000, unconfirmed: 0 };
       return { confirmed: 0, unconfirmed: 0 };
     });
-    // BC2 legacy balance
-    mockGetBC2Balance.mockResolvedValue({ confirmed: 50000, unconfirmed: 0 });
-    // BC2 SegWit balance (called for bc1 type)
-    mockGetBC2BalanceByScripthash.mockResolvedValue({ confirmed: 20000, unconfirmed: 0 });
+    // VOID legacy balance
+    mockGetVOIDBalance.mockResolvedValue({ confirmed: 50000, unconfirmed: 0 });
+    // VOID SegWit balance (called for bc1 type)
+    mockGetVOIDBalanceByScripthash.mockResolvedValue({ confirmed: 20000, unconfirmed: 0 });
 
     const result = await claimFromWIF(TEST_WIF_COMPRESSED);
 
     expect(result.success).toBe(true);
     // Total balance: legacy(10000) + bc1(30000) = 40000
     expect(result.balance).toBe(40000);
-    // BC2 total: legacy(50000) + bc1(20000) = 70000
-    expect(result.bc2Balance).toBe(70000);
-    // BCH2 address is always CashAddr
-    expect(result.bch2Address.startsWith('bitcoincashii:')).toBe(true);
-    // BC2 SegWit balance check should have been called (because bc1 had balance)
-    expect(mockGetBC2BalanceByScripthash).toHaveBeenCalled();
+    // VOID total: legacy(50000) + bc1(20000) = 70000
+    expect(result.voidBalance).toBe(70000);
+    // VOID address is always CashAddr
+    expect(result.voidAddress.startsWith('bitcoincashii:')).toBe(true);
+    // VOID SegWit balance check should have been called (because bc1 had balance)
+    expect(mockGetVOIDBalanceByScripthash).toHaveBeenCalled();
   });
 
-  it('does NOT check BC2 SegWit balance when segwitBalance is 0', async () => {
-    // Legacy BCH2 balance
+  it('does NOT check VOID SegWit balance when segwitBalance is 0', async () => {
+    // Legacy VOID balance
     mockGetBalanceByAddress.mockResolvedValue({ confirmed: 10000, unconfirmed: 0 });
-    // SegWit balance = 0 (does NOT trigger bc2 segwit check)
+    // SegWit balance = 0 (does NOT trigger void segwit check)
     mockGetBalanceByScripthash.mockResolvedValue({ confirmed: 0, unconfirmed: 0 });
-    // BC2 legacy balance
-    mockGetBC2Balance.mockResolvedValue({ confirmed: 50000, unconfirmed: 0 });
+    // VOID legacy balance
+    mockGetVOIDBalance.mockResolvedValue({ confirmed: 50000, unconfirmed: 0 });
 
     const result = await claimFromWIF(TEST_WIF_COMPRESSED);
 
     expect(result.success).toBe(true);
     expect(result.balance).toBe(10000);
-    expect(result.bc2Balance).toBe(50000);
+    expect(result.voidBalance).toBe(50000);
     // Address should be legacy (not bc1) since segwit balance is 0
     expect(result.address).toMatch(/^[13]/);
-    // BC2 SegWit balance check should NOT have been called
-    expect(mockGetBC2BalanceByScripthash).not.toHaveBeenCalled();
+    // VOID SegWit balance check should NOT have been called
+    expect(mockGetVOIDBalanceByScripthash).not.toHaveBeenCalled();
   });
 });
 
@@ -912,18 +912,18 @@ describe('computeTweakedXonly null return during BIP86 scan', () => {
 });
 
 // ============================================================================
-// BIP49/BIP84/BIP86 paths with non-zero BC2 balance
+// BIP49/BIP84/BIP86 paths with non-zero VOID balance
 // ============================================================================
-describe('Mnemonic scan paths with non-zero BC2 balance', () => {
-  it('BIP49 path reports both bch2Balance and bc2Balance > 0', async () => {
-    // Return BCH2 balance for BIP49 m/49'/0'/0'/0/0 P2SH-P2WPKH scripthash
+describe('Mnemonic scan paths with non-zero VOID balance', () => {
+  it('BIP49 path reports both voidBalance and voidBalance > 0', async () => {
+    // Return VOID balance for BIP49 m/49'/0'/0'/0/0 P2SH-P2WPKH scripthash
     mockGetBalanceByScripthash.mockImplementation(async (sh: string) => {
       if (sh === KNOWN_SCRIPTHASHES.BIP49_0_0) return { confirmed: 80000, unconfirmed: 0 };
       return { confirmed: 0, unconfirmed: 0 };
     });
 
-    // Return BC2 balance for the same scripthash
-    mockGetBC2BalanceByScripthash.mockImplementation(async (sh: string) => {
+    // Return VOID balance for the same scripthash
+    mockGetVOIDBalanceByScripthash.mockImplementation(async (sh: string) => {
       if (sh === KNOWN_SCRIPTHASHES.BIP49_0_0) return { confirmed: 25000, unconfirmed: 5000 };
       return { confirmed: 0, unconfirmed: 0 };
     });
@@ -935,20 +935,20 @@ describe('Mnemonic scan paths with non-zero BC2 balance', () => {
     const bip49Result = results.find(r => r.address.startsWith('3'));
     expect(bip49Result).toBeDefined();
     expect(bip49Result!.balance).toBe(80000);
-    expect(bip49Result!.bc2Balance).toBe(30000); // 25000 + 5000
-    expect(bip49Result!.bch2Address.startsWith('bitcoincashii:')).toBe(true);
-    expect(mockGetBC2BalanceByScripthash).toHaveBeenCalled();
+    expect(bip49Result!.voidBalance).toBe(30000); // 25000 + 5000
+    expect(bip49Result!.voidAddress.startsWith('bitcoincashii:')).toBe(true);
+    expect(mockGetVOIDBalanceByScripthash).toHaveBeenCalled();
   });
 
-  it('BIP84 path reports both bch2Balance and bc2Balance > 0', async () => {
-    // Return BCH2 balance for BIP84 m/84'/0'/0'/0/0 bc1 scripthash
+  it('BIP84 path reports both voidBalance and voidBalance > 0', async () => {
+    // Return VOID balance for BIP84 m/84'/0'/0'/0/0 bc1 scripthash
     mockGetBalanceByScripthash.mockImplementation(async (sh: string) => {
       if (sh === KNOWN_SCRIPTHASHES.BIP84_0_0) return { confirmed: 65000, unconfirmed: 0 };
       return { confirmed: 0, unconfirmed: 0 };
     });
 
-    // Return BC2 balance for the same scripthash
-    mockGetBC2BalanceByScripthash.mockImplementation(async (sh: string) => {
+    // Return VOID balance for the same scripthash
+    mockGetVOIDBalanceByScripthash.mockImplementation(async (sh: string) => {
       if (sh === KNOWN_SCRIPTHASHES.BIP84_0_0) return { confirmed: 40000, unconfirmed: 0 };
       return { confirmed: 0, unconfirmed: 0 };
     });
@@ -959,20 +959,20 @@ describe('Mnemonic scan paths with non-zero BC2 balance', () => {
     const bip84Result = results.find(r => r.address.startsWith('bc1q'));
     expect(bip84Result).toBeDefined();
     expect(bip84Result!.balance).toBe(65000);
-    expect(bip84Result!.bc2Balance).toBe(40000);
-    expect(bip84Result!.bch2Address.startsWith('bitcoincashii:')).toBe(true);
-    expect(mockGetBC2BalanceByScripthash).toHaveBeenCalled();
+    expect(bip84Result!.voidBalance).toBe(40000);
+    expect(bip84Result!.voidAddress.startsWith('bitcoincashii:')).toBe(true);
+    expect(mockGetVOIDBalanceByScripthash).toHaveBeenCalled();
   });
 
-  it('BIP86 Taproot path reports both bch2Balance and bc2Balance > 0', async () => {
-    // Return BCH2 balance for BIP86 m/86'/0'/0'/0/0 P2TR scripthash
+  it('BIP86 Taproot path reports both voidBalance and voidBalance > 0', async () => {
+    // Return VOID balance for BIP86 m/86'/0'/0'/0/0 P2TR scripthash
     mockGetBalanceByScripthash.mockImplementation(async (sh: string) => {
       if (sh === KNOWN_SCRIPTHASHES.BIP86_0_0) return { confirmed: 55000, unconfirmed: 0 };
       return { confirmed: 0, unconfirmed: 0 };
     });
 
-    // Return BC2 balance for the same scripthash
-    mockGetBC2BalanceByScripthash.mockImplementation(async (sh: string) => {
+    // Return VOID balance for the same scripthash
+    mockGetVOIDBalanceByScripthash.mockImplementation(async (sh: string) => {
       if (sh === KNOWN_SCRIPTHASHES.BIP86_0_0) return { confirmed: 15000, unconfirmed: 10000 };
       return { confirmed: 0, unconfirmed: 0 };
     });
@@ -983,9 +983,9 @@ describe('Mnemonic scan paths with non-zero BC2 balance', () => {
     const taprootResult = results.find(r => r.address.startsWith('bc1p'));
     expect(taprootResult).toBeDefined();
     expect(taprootResult!.balance).toBe(55000);
-    expect(taprootResult!.bc2Balance).toBe(25000); // 15000 + 10000
-    expect(taprootResult!.bch2Address.startsWith('bitcoincashii:')).toBe(true);
-    expect(mockGetBC2BalanceByScripthash).toHaveBeenCalled();
+    expect(taprootResult!.voidBalance).toBe(25000); // 15000 + 10000
+    expect(taprootResult!.voidAddress.startsWith('bitcoincashii:')).toBe(true);
+    expect(mockGetVOIDBalanceByScripthash).toHaveBeenCalled();
   });
 });
 
@@ -998,8 +998,8 @@ describe('Gap coverage: claimFromWIF SegWit exception returns P2PKH claim', () =
     mockGetBalanceByAddress.mockResolvedValue({ confirmed: 12000, unconfirmed: 3000 });
     // SegWit scripthash throws an exception
     mockGetBalanceByScripthash.mockRejectedValue(new Error('Scripthash lookup failed'));
-    // BC2 balance succeeds
-    mockGetBC2Balance.mockResolvedValue({ confirmed: 5000, unconfirmed: 0 });
+    // VOID balance succeeds
+    mockGetVOIDBalance.mockResolvedValue({ confirmed: 5000, unconfirmed: 0 });
 
     const result = await claimFromWIF(TEST_WIF_COMPRESSED);
 
@@ -1008,10 +1008,10 @@ describe('Gap coverage: claimFromWIF SegWit exception returns P2PKH claim', () =
     expect(result.balance).toBe(15000); // 12000 + 3000
     // Address should be legacy (not bc1) since segwit check threw
     expect(result.address).toMatch(/^[13]/);
-    // BCH2 address should still be valid CashAddr
-    expect(result.bch2Address.startsWith('bitcoincashii:')).toBe(true);
-    // BC2 segwit check should NOT have been called (segwitBalance is 0 due to exception)
-    expect(mockGetBC2BalanceByScripthash).not.toHaveBeenCalled();
+    // VOID address should still be valid CashAddr
+    expect(result.voidAddress.startsWith('bitcoincashii:')).toBe(true);
+    // VOID segwit check should NOT have been called (segwitBalance is 0 due to exception)
+    expect(mockGetVOIDBalanceByScripthash).not.toHaveBeenCalled();
   });
 });
 
@@ -1023,7 +1023,7 @@ describe('Gap coverage: unconfirmed-only balance detection', () => {
 
     expect(result.success).toBe(true);
     expect(result.balance).toBe(77000);
-    expect(result.bch2Address.startsWith('bitcoincashii:')).toBe(true);
+    expect(result.voidAddress.startsWith('bitcoincashii:')).toBe(true);
   });
 
   it('claimFromWIF detects segwit balance when confirmed=0 but unconfirmed>0', async () => {
@@ -1250,7 +1250,7 @@ describe('Gap coverage: BIP84 path iteration count', () => {
     //
     // Strategy: Track all getBalanceByScripthash calls. BIP49 accounts for calls 1-40,
     // BIP84 for calls 41-80, BIP86 for calls 81+.
-    // We return 0 balance for everything so no bc2 balance calls happen.
+    // We return 0 balance for everything so no void balance calls happen.
 
     const results = await claimFromMnemonic(TEST_MNEMONIC);
 
@@ -1265,10 +1265,10 @@ describe('Gap coverage: BIP84 path iteration count', () => {
 
     // Verify the BIP84 paths specifically account for 40 calls (calls 41-80)
     // by checking that call count jumped from 40 to at least 80
-    // Since all return 0, results should show "No BCH2 balance found"
+    // Since all return 0, results should show "No VOID balance found"
     expect(results).toHaveLength(1);
     expect(results[0].balance).toBe(0);
-    expect(results[0].error).toContain('No BCH2 balance found');
+    expect(results[0].error).toContain('No VOID balance found');
   });
 });
 
@@ -1298,7 +1298,7 @@ describe('Gap coverage: BIP86 Taproot continuation after null tweak at index 0 b
     const taprootResult = results.find(r => r.address.startsWith('bc1p'));
     expect(taprootResult).toBeDefined();
     expect(taprootResult!.balance).toBe(19000);
-    expect(taprootResult!.bch2Address.startsWith('bitcoincashii:')).toBe(true);
+    expect(taprootResult!.voidAddress.startsWith('bitcoincashii:')).toBe(true);
 
     // Verify that tweak was called at least twice (first returned null, second succeeded)
     expect(tweakCallCount).toBeGreaterThanOrEqual(2);
@@ -1438,7 +1438,7 @@ describe('Gap coverage: claimFromMnemonic() with 24-word mnemonic', () => {
     expect(results.length).toBeGreaterThanOrEqual(1);
     expect(results[0].success).toBe(true);
     expect(results[0].balance).toBe(200000);
-    expect(results[0].bch2Address.startsWith('bitcoincashii:')).toBe(true);
+    expect(results[0].voidAddress.startsWith('bitcoincashii:')).toBe(true);
   });
 
   it('24-word mnemonic produces different addresses than 12-word mnemonic', async () => {
@@ -1468,10 +1468,10 @@ describe('Gap coverage: claimFromMnemonic() with 24-word mnemonic', () => {
 });
 
 // ============================================================================
-// Gap coverage: claimFromWIF() BC2 SegWit balance check failure in catch block
+// Gap coverage: claimFromWIF() VOID SegWit balance check failure in catch block
 // ============================================================================
-describe('Gap coverage: claimFromWIF() BC2 SegWit balance check failure in catch block', () => {
-  it('when getBC2BalanceByScripthash throws, bc2Balance excludes segwit portion but claim still succeeds', async () => {
+describe('Gap coverage: claimFromWIF() VOID SegWit balance check failure in catch block', () => {
+  it('when getVoidBalanceByScripthash throws, voidBalance excludes segwit portion but claim still succeeds', async () => {
     // claimFromWIF scans 5 types: legacy, p2pk, bc1, p2sh-segwit, p2tr.
     // Scripthash calls: p2pk(1), bc1(2), p2sh-segwit(3), p2tr(4).
     // Give legacy and bc1 balances, leave others at 0.
@@ -1480,23 +1480,23 @@ describe('Gap coverage: claimFromWIF() BC2 SegWit balance check failure in catch
       if (sh === TEST_WIF_BC1_SCRIPTHASH) return { confirmed: 30000, unconfirmed: 0 };
       return { confirmed: 0, unconfirmed: 0 };
     });
-    // BC2 legacy balance succeeds
-    mockGetBC2Balance.mockResolvedValue({ confirmed: 50000, unconfirmed: 0 });
-    // BC2 SegWit balance THROWS (the catch block catches this)
-    mockGetBC2BalanceByScripthash.mockRejectedValue(new Error('BC2 SegWit lookup failed'));
+    // VOID legacy balance succeeds
+    mockGetVOIDBalance.mockResolvedValue({ confirmed: 50000, unconfirmed: 0 });
+    // VOID SegWit balance THROWS (the catch block catches this)
+    mockGetVOIDBalanceByScripthash.mockRejectedValue(new Error('VOID SegWit lookup failed'));
 
     const result = await claimFromWIF(TEST_WIF_COMPRESSED);
 
     // Claim should still succeed
     expect(result.success).toBe(true);
-    // Total BCH2 balance: legacy(10000) + bc1(30000) = 40000
+    // Total VOID balance: legacy(10000) + bc1(30000) = 40000
     expect(result.balance).toBe(40000);
-    // BC2 balance should only include legacy (50000), NOT bc1 segwit (which threw)
-    expect(result.bc2Balance).toBe(50000);
-    // BCH2 address should still be CashAddr
-    expect(result.bch2Address.startsWith('bitcoincashii:')).toBe(true);
-    // Verify the BC2 SegWit balance check was attempted
-    expect(mockGetBC2BalanceByScripthash).toHaveBeenCalled();
+    // VOID balance should only include legacy (50000), NOT bc1 segwit (which threw)
+    expect(result.voidBalance).toBe(50000);
+    // VOID address should still be CashAddr
+    expect(result.voidAddress.startsWith('bitcoincashii:')).toBe(true);
+    // Verify the VOID SegWit balance check was attempted
+    expect(mockGetVOIDBalanceByScripthash).toHaveBeenCalled();
   });
 });
 
@@ -1595,7 +1595,7 @@ describe('getAntiGamingStatus', () => {
       postForkBalance: 50000,
       claims: [],
     });
-    expect(result.warning).toContain('No matching BC2 balance');
+    expect(result.warning).toContain('No matching VOID balance');
     expect(result.blocked).toBe(false);
   });
 
@@ -1606,7 +1606,7 @@ describe('getAntiGamingStatus', () => {
       postForkBalance: 30000,
       claims: [],
     });
-    expect(result.warning).toContain('exceeds the current BC2 balance');
+    expect(result.warning).toContain('exceeds the current VOID balance');
     expect(result.blocked).toBe(false);
   });
 
@@ -1628,9 +1628,9 @@ describe('getAntiGamingStatus', () => {
 describe('buildScanResult', () => {
   it('filters out failed claims and sums balances', () => {
     const claims: AirdropClaimResult[] = [
-      { success: true, address: '1A', addressType: 'legacy', bch2Address: 'bch2:q1', balance: 10000, bc2Balance: 10000 },
-      { success: false, address: '', bch2Address: '', balance: 0, error: 'failed' },
-      { success: true, address: '1B', addressType: 'legacy', bch2Address: 'bch2:q2', balance: 20000, bc2Balance: 15000 },
+      { success: true, address: '1A', addressType: 'legacy', voidAddress: 'void:q1', balance: 10000, voidBalance: 10000 },
+      { success: false, address: '', voidAddress: '', balance: 0, error: 'failed' },
+      { success: true, address: '1B', addressType: 'legacy', voidAddress: 'void:q2', balance: 20000, voidBalance: 15000 },
     ];
     const result = buildScanResult(claims);
     expect(result.totalBalance).toBe(30000);
@@ -1668,7 +1668,7 @@ describe('Gap-limit scanning behavior', () => {
 
     expect(results).toHaveLength(1);
     expect(results[0].success).toBe(false);
-    expect(results[0].error).toContain('No BCH2 balance found');
+    expect(results[0].error).toContain('No VOID balance found');
   });
 
   it('DOES find balance at index 25 when index 5 also has balance (gap reset)', async () => {

@@ -51,7 +51,7 @@ describe('Taproot HD (BIP86)', () => {
 
     let u8a = hd._getPubkeyByAddress(hd._getExternalAddressByIndex(0));
     assert(u8a);
-    assert.strictEqual(uint8ArrayToHex(u8a), 'cc8a4bc64d897bddc5fbc2f670f7a8ba0b386779106cf1223c6fc5d7cd6fc115');
+    assert.strictEqual(uint8ArrayToHex(u8a), 'cc8a4bc64d897bddc5fvoidf670f7a8ba0b386779106cf1223c6fc5d7cd6fc115');
     u8a = hd._getPubkeyByAddress(hd._getInternalAddressByIndex(0));
     assert(u8a);
     assert.strictEqual(uint8ArrayToHex(u8a), '399f1b2f4393f29a18c937859c5dd8a77350103157eb880f02e8c08214277cef');
