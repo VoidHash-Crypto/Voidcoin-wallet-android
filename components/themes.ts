@@ -1,167 +1,114 @@
 import { DarkTheme, DefaultTheme, useTheme as useThemeBase } from '@react-navigation/native';
 import { Appearance } from 'react-native';
 
+// VoidCoin Theme — matches void-coin.net aesthetic
+// Dark background, purple/cyan accents
+
 export const BlueDefaultTheme = {
-  ...DefaultTheme,
-  closeImage: require('../img/close.png'),
-  barStyle: 'dark-content',
-  scanImage: require('../img/scan.png'),
+  ...DarkTheme,
+  closeImage: require('../img/close-white.png'),
+  barStyle: 'light-content',
+  scanImage: require('../img/scan-white.png'),
   colors: {
-    ...DefaultTheme.colors,
+    ...DarkTheme.colors,
     borderWidth: 0.5,
-    brandingColor: '#ffffff',
-    customHeader: '#ffffff',
-    foregroundColor: '#0c2550',
-    borderTopColor: 'rgba(0, 0, 0, 0.1)',
-    buttonBackgroundColor: '#ccddf9',
-    buttonTextColor: '#0c2550',
-    secondButtonTextColor: '#50555C',
-    buttonAlternativeTextColor: '#2f5fb3',
-    buttonDisabledBackgroundColor: '#eef0f4',
-    buttonDisabledTextColor: '#9aa0aa',
-    inputBorderColor: '#d2d2d2',
-    inputBackgroundColor: '#f5f5f5',
-    alternativeTextColor: '#9aa0aa',
-    alternativeTextColor2: '#0f5cc0',
-    buttonBlueBackgroundColor: '#ccddf9',
-    buttonGrayBackgroundColor: '#EEEEEE',
-    incomingBackgroundColor: '#d2f8d6',
-    incomingForegroundColor: '#37c0a1',
-    outgoingBackgroundColor: '#f8d2d2',
-    outgoingForegroundColor: '#d0021b',
-    successColor: '#37c0a1',
-    failedColor: '#ff0000',
-    placeholderTextColor: '#81868e',
+    brandingColor: '#0d0b1a',
+    customHeader: '#0d0b1a',
+    foregroundColor: '#ffffff',
+    borderTopColor: 'rgba(107, 90, 154, 0.3)',
+    buttonBackgroundColor: '#6b5a9a',
+    buttonTextColor: '#ffffff',
+    secondButtonTextColor: '#5ce6e6',
+    buttonAlternativeTextColor: '#5ce6e6',
+    buttonDisabledBackgroundColor: '#2a2440',
+    buttonDisabledTextColor: '#4a4270',
+    inputBorderColor: '#3d3460',
+    inputBackgroundColor: '#1a1630',
+    alternativeTextColor: '#8b80b0',
+    alternativeTextColor2: '#5ce6e6',
+    buttonBlueBackgroundColor: '#6b5a9a',
+    buttonGrayBackgroundColor: '#2a2440',
+    incomingBackgroundColor: '#1a2e2e',
+    incomingForegroundColor: '#5ce6e6',
+    outgoingBackgroundColor: '#2e1a1a',
+    outgoingForegroundColor: '#f07070',
+    successColor: '#5ce6e6',
+    failedColor: '#f07070',
+    placeholderTextColor: '#4a4270',
     shadowColor: '#000000',
-    inverseForegroundColor: '#ffffff',
-    hdborderColor: '#68BBE1',
-    hdbackgroundColor: '#ECF9FF',
-    lnborderColor: '#FFB600',
-    lnbackgroundColor: '#FFFAEF',
-    background: '#FFFFFF',
-    lightButton: '#eef0f4',
-    ballReceive: '#d2f8d6',
-    ballOutgoing: '#f8d2d2',
-    lightBorder: '#ededed',
-    ballOutgoingExpired: '#EEF0F4',
-    modal: '#ffffff',
-    formBorder: '#d2d2d2',
-    modalButton: '#ccddf9',
-    darkGray: '#9AA0AA',
-    scanLabel: '#9AA0AA',
-    feeText: '#81868e',
-    feeLabel: '#d2f8d6',
-    feeValue: '#37c0a1',
-    feeActive: '#d2f8d6',
-    labelText: '#81868e',
-    cta2: '#062453',
-    outputValue: '#13244D',
-    elevated: '#ffffff',
-    mainColor: '#CFDCF6',
-    success: '#ccddf9',
-    successCheck: '#0f5cc0',
-    msSuccessBG: '#37c0a1',
-    msSuccessCheck: '#ffffff',
-    newBlue: '#007AFF',
-    redBG: '#F8D2D2',
-    redText: '#D0021B',
-    changeBackground: '#FDF2DA',
-    changeText: '#F38C47',
-    receiveBackground: '#D1F9D6',
-    receiveText: '#37C0A1',
-    navigationBarColor: '#FFFFFF',
-    androidRippleColor: '#CCCCCC',
+    inverseForegroundColor: '#0d0b1a',
+    hdborderColor: '#6b5a9a',
+    hdbackgroundColor: '#1a1630',
+    lnborderColor: '#5ce6e6',
+    lnbackgroundColor: '#0d1f1f',
+    background: '#0d0b1a',
+    lightButton: '#2a2440',
+    ballReceive: '#1a2e2e',
+    ballOutgoing: '#2e1a1a',
+    lightBorder: '#2a2440',
+    ballOutgoingExpired: '#2a2440',
+    modal: '#1a1630',
+    formBorder: '#3d3460',
+    modalButton: '#6b5a9a',
+    darkGray: '#4a4270',
+    scanLabel: 'rgba(255,255,255,.2)',
+    feeText: '#8b80b0',
+    feeLabel: '#5ce6e6',
+    feeValue: '#0d0b1a',
+    feeActive: 'rgba(92,230,230,.2)',
+    labelText: '#ffffff',
+    cta2: '#5ce6e6',
+    outputValue: '#ffffff',
+    elevated: '#1a1630',
+    mainColor: '#6b5a9a',
+    success: '#1a2e2e',
+    successCheck: '#5ce6e6',
+    msSuccessBG: '#5ce6e6',
+    msSuccessCheck: '#0d0b1a',
+    newBlue: '#5ce6e6',
+    redBG: '#2e1a1a',
+    redText: '#f07070',
+    changeBackground: '#2a2020',
+    changeText: '#f07070',
+    receiveBackground: 'rgba(92,230,230,.15)',
+    receiveText: '#5ce6e6',
+    navigationBarColor: '#0d0b1a',
+    androidRippleColor: '#3d3460',
   },
 };
 
 export type Theme = typeof BlueDefaultTheme;
 
 export const BlueDarkTheme: Theme = {
-  ...DarkTheme,
-  closeImage: require('../img/close-white.png'),
-  scanImage: require('../img/scan-white.png'),
-  barStyle: 'light-content',
-  colors: {
-    ...BlueDefaultTheme.colors,
-    ...DarkTheme.colors,
-    customHeader: '#000000',
-    brandingColor: '#000000',
-    borderTopColor: '#9aa0aa',
-    background: '#000000',
-    foregroundColor: '#ffffff',
-    buttonDisabledBackgroundColor: '#3A3A3C',
-    buttonBackgroundColor: '#3A3A3C',
-    buttonTextColor: '#ffffff',
-    lightButton: 'rgba(255,255,255,.1)',
-    buttonAlternativeTextColor: '#ffffff',
-    alternativeTextColor: '#9aa0aa',
-    alternativeTextColor2: '#0A84FF',
-    ballReceive: '#202020',
-    ballOutgoing: '#202020',
-    lightBorder: '#313030',
-    ballOutgoingExpired: '#202020',
-    modal: '#202020',
-    formBorder: '#202020',
-    inputBackgroundColor: '#262626',
-    modalButton: '#000000',
-    darkGray: '#3A3A3C',
-    feeText: '#81868e',
-    feeLabel: '#8EFFE5',
-    feeValue: '#000000',
-    feeActive: 'rgba(210,248,214,.2)',
-    cta2: '#ffffff',
-    outputValue: '#ffffff',
-    elevated: '#121212',
-    mainColor: '#0A84FF',
-    success: '#202020',
-    successCheck: '#0A84FF',
-    buttonBlueBackgroundColor: '#202020',
-    scanLabel: 'rgba(255,255,255,.2)',
-    labelText: '#ffffff',
-    msSuccessBG: '#8EFFE5',
-    msSuccessCheck: '#000000',
-    newBlue: '#007AFF',
-    redBG: '#5A4E4E',
-    redText: '#FC6D6D',
-    changeBackground: '#5A4E4E',
-    changeText: '#F38C47',
-    receiveBackground: 'rgba(210,248,214,.2)',
-    receiveText: '#37C0A1',
-    navigationBarColor: '#3A3A3C',
-    androidRippleColor: '#444444',
-  },
+  ...BlueDefaultTheme,
 };
 
-// Casting theme value to get autocompletion
 export const useTheme = (): Theme => useThemeBase() as Theme;
 
 export const platformColors = {
   background: BlueDefaultTheme.colors.background,
-  card: BlueDefaultTheme.colors.modal ?? BlueDefaultTheme.colors.elevated ?? BlueDefaultTheme.colors.background,
+  card: BlueDefaultTheme.colors.modal,
   text: BlueDefaultTheme.colors.foregroundColor,
-  secondaryText: BlueDefaultTheme.colors.alternativeTextColor ?? BlueDefaultTheme.colors.darkGray,
-  separator: BlueDefaultTheme.colors.lightBorder ?? BlueDefaultTheme.colors.borderTopColor,
-  chevron: BlueDefaultTheme.colors.alternativeTextColor ?? BlueDefaultTheme.colors.darkGray,
+  secondaryText: BlueDefaultTheme.colors.alternativeTextColor,
+  separator: BlueDefaultTheme.colors.lightBorder,
+  chevron: BlueDefaultTheme.colors.alternativeTextColor,
 };
 
 export class BlueCurrentTheme {
   static colors: Theme['colors'];
   static closeImage: Theme['closeImage'];
   static scanImage: Theme['scanImage'];
-
   static updateColorScheme(): void {
-    const isColorSchemeDark = Appearance.getColorScheme() === 'dark';
-    BlueCurrentTheme.colors = isColorSchemeDark ? BlueDarkTheme.colors : BlueDefaultTheme.colors;
-    BlueCurrentTheme.closeImage = isColorSchemeDark ? BlueDarkTheme.closeImage : BlueDefaultTheme.closeImage;
-    BlueCurrentTheme.scanImage = isColorSchemeDark ? BlueDarkTheme.scanImage : BlueDefaultTheme.scanImage;
+    BlueCurrentTheme.colors = BlueDefaultTheme.colors;
+    BlueCurrentTheme.closeImage = BlueDefaultTheme.closeImage;
+    BlueCurrentTheme.scanImage = BlueDefaultTheme.scanImage;
     const colors = BlueCurrentTheme.colors;
     platformColors.background = colors.background;
-    platformColors.card = colors.modal ?? colors.elevated ?? colors.background;
+    platformColors.card = colors.modal;
     platformColors.text = colors.foregroundColor;
-    platformColors.secondaryText = colors.alternativeTextColor ?? colors.darkGray;
-    platformColors.separator = colors.lightBorder ?? colors.borderTopColor;
-    platformColors.chevron = colors.alternativeTextColor ?? colors.darkGray;
+    platformColors.secondaryText = colors.alternativeTextColor;
+    platformColors.separator = colors.lightBorder;
+    platformColors.chevron = colors.alternativeTextColor;
   }
 }
-
 BlueCurrentTheme.updateColorScheme();
