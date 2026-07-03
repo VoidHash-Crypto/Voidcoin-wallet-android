@@ -95,9 +95,9 @@ android {
         }
     }
 
-    namespace "org.void.wallet"
+    namespace "org.voidcoin.wallet"
     defaultConfig {
-        applicationId "org.void.wallet"
+        applicationId "org.voidcoin.wallet"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 6
