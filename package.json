@@ -173,7 +173,7 @@
     "react-test-renderer": "19.0.0",
     "readable-stream": "3.6.2",
     "realm": "20.1.0",
-    "rn-qr-generator": "2.0.0",
+    "rn-qr-generator": "https://github.com/BlueWallet/rn-qr-generator.git#5870927a70f5bf43dd59b332fd221af971b82bfe",
     "silent-payments": "2.1.0",
     "slip39": "0.1.9",
     "stream-browserify": "3.0.0",
