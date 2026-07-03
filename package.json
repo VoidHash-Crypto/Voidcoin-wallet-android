@@ -143,7 +143,6 @@
     "react-native": "0.78.2",
     "react-native-biometrics": "3.0.1",
     "react-native-camera-kit-no-google": "16.2.0",
-    "react-native-capture-protection": "2.4.1",
     "react-native-default-preference": "1.4.4",
     "react-native-device-info": "14.1.1",
     "react-native-draglist": "3.10.0",
