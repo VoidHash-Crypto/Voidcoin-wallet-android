@@ -29,16 +29,16 @@ export const VOID_ELECTRUM_SSL_PORT = 'void_electrum_ssl_port';
 
 // Default VOID Electrum servers (post-fork chain)
 // SSL preferred for security; TCP available as fallback
-const defaultPeer: Peer = { host: 'electrum.void.org', ssl: 50002, tcp: 50001 };
+const defaultPeer: Peer = { host: '46.7.7.113', ssl: 50002, tcp: 50001 };
 export const hardcodedPeers: Peer[] = [
-  { host: 'electrum.void.org', ssl: 50002, tcp: 50001 },
-  { host: '144.202.73.66', ssl: 50002, tcp: 50001 },  // IP fallback if DNS fails
+  { host: '46.7.7.113', ssl: 50002, tcp: 50001 },
+  { host: '213.181.112.83', ssl: 50002, tcp: 50001 },
 ];
 
 // VOID Electrum servers (for airdrop balance checking) — Dallas server
 export const voidPeers: Peer[] = [
-  { host: 'voidelectrum.void.org', ssl: 50011, tcp: 50010 },
-  { host: '144.202.73.66', ssl: 50011, tcp: 50010 },  // IP fallback if DNS fails
+  { host: '46.7.7.113', ssl: 50002, tcp: 50001 },
+  { host: '213.181.112.83', ssl: 50002, tcp: 50001 },
 ];
 
 let mainClient: typeof ElectrumClient | undefined;
